@@ -231,4 +231,3 @@ class BaseModel {
 		return preg_replace_callback('/([A-Z])/', $func, $str);
 	}
 }
-
