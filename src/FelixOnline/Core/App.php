@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /**
  * App class
  */
@@ -6,6 +7,16 @@ class App
 {
 	protected static $instance = null;
 	protected static $options = array();
+
+	/**
+	 * Required options
+	 */
+	protected $required = array(
+		'db_name',
+		'db_user',
+		'db_pass'
+	);
+
 	public static $db = null;
 	protected static $safesql = null;
 
@@ -16,30 +27,20 @@ class App
 	 */
 	public function __construct($options = array())
 	{
-		global $db;
-		global $safesql;
 		$this->checkOptions($options);
-		$this->options = $options;
+		self::$options = $options;
 
-		// Initialise ezSQL database connection
-		if ($db) {
-			self::$db = $db;
-		} else {
-			self::$db = new ezSQL_mysqli();
-			self::$db->quick_connect(
-				$this->getOption('db_user'),
-				$this->getOption('db_pass'),
-				$this->getOption('db_name'),
-				$this->getOption('db_host', 'localhost'),
-				'utf8'
-			);
-		}
+		self::$db = new \ezSQL_mysqli();
+		self::$db->quick_connect(
+			$this->getOption('db_user'),
+			$this->getOption('db_pass'),
+			$this->getOption('db_name'),
+			$this->getOption('db_host', 'localhost'),
+			$this->getOption('db_port', 3306),
+			'utf8'
+		);
 
-		if ($safesql) {
-			self::$safesql = $safesql;
-		} else {
-			self::$safesql = new SafeSQL_MySQLi(self::$db->dbh);
-		}
+		self::$safesql = new \SafeSQL_MySQLi(self::$db->dbh);
 
 		self::$instance = $this;
 	}
@@ -51,15 +52,9 @@ class App
 	 */
 	private function checkOptions($options)
 	{
-		$required = array(
-			'db_name',
-			'db_user',
-			'db_pass'
-		);
-
-		foreach($required as $req) {
+		foreach($this->required as $req) {
 			if (!array_key_exists($req, $options)) {
-				throw new InternalException('"' . $req . '" option is not defined');
+				throw new \FelixOnline\Exceptions\InteralException('"' . $req . '" option is not defined');
 			}
 		}
 	}
@@ -99,15 +94,15 @@ class App
 	 */
 	public function getOption($key)
 	{
-		if (!array_key_exists($key, $this->options)) {
+		if (!array_key_exists($key, self::$options)) {
 			// if a default has been defined 
 			if (func_get_arg(1)) {
 				return func_get_arg(1);
 			} else {
-				throw new InternalException('Key "'.$key.'" has not been set');
+				throw new \FelixOnline\Exceptions\InteralException('Key "'.$key.'" has not been set');
 			}
 		}
-		return $this->options[$key];
+		return self::$options[$key];
 	}
 
 	/**

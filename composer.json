@@ -14,6 +14,13 @@
     ],
     "require": {
 		"robmorgan/phinx": "0.2.*",
-		"rzeka/akismet-api": "dev-master"
-    }
+		"rzeka/akismet-api": "dev-master",
+		"jv2222/ezsql": "dev-master",
+		"d11wtq/boris": "1.0.*"
+    },
+	"autoload": {
+		"psr-0": {
+			"FelixOnline\\Core": "src/"
+		}
+	}
 }
