@@ -1,0 +1,19 @@
+{
+    "name": "felixonline/core",
+    "description": "Felix Online Core",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jonathan Kim",
+            "email": "jkimbo@gmail.com"
+        },
+		{
+			"name": "Philip Kent",
+			"email": "kentphilip@gmail.com"
+		}
+    ],
+    "require": {
+		"robmorgan/phinx": "0.2.*",
+		"rzeka/akismet-api": "dev-master"
+    }
+}
