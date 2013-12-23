@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /*
  * Article class
  * Deals with both article retrieval and article submission
@@ -54,34 +55,31 @@ class Article extends BaseModel {
 	 * Returns article object
 	 */
 	function __construct($id = NULL) {
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-
 		//$this->db->cache_queries = true;
 		if($id !== NULL) { // if creating an already existing article object
-			$sql = $this->safesql->query("SELECT
-										`id`,
-										`title`,
-										`short_title`,
-										`teaser`,
-										`author`,
-										`approvedby`,
-										`category`,
-										UNIX_TIMESTAMP(`date`) as date,
-										UNIX_TIMESTAMP(`published`) as published,`hidden`,
-										`searchable`,
-										`text1`,
-										`text2`,
-										`img1`,
-										`img2`,
-										`img2lr`,
-										`hits`
-									FROM `article`
-									WHERE id=%i", array($id));
-			parent::__construct($this->db->get_row($sql), 'Article', $id);
-			//$this->db->cache_queries = false;
+			$sql = App::query(
+				"SELECT
+					`id`,
+					`title`,
+					`short_title`,
+					`teaser`,
+					`author`,
+					`approvedby`,
+					`category`,
+					UNIX_TIMESTAMP(`date`) as date,
+					UNIX_TIMESTAMP(`published`) as published,`hidden`,
+					`searchable`,
+					`text1`,
+					`text2`,
+					`img1`,
+					`img2`,
+					`img2lr`,
+					`hits`
+				FROM `article`
+				WHERE id=%i",
+				array($id)
+			);
+			parent::__construct(App::$db->get_row($sql), 'Article', $id);
 			return $this;
 		} else {
 			// initialise new article
@@ -95,13 +93,18 @@ class Article extends BaseModel {
 	 */
 	public function getAuthors() {
 		if(!$this->authors) {
-			$sql = $this->safesql->query("SELECT
-											article_author.author as author
-											FROM `article_author`
-											INNER JOIN `article`
-											ON (article_author.article=article.id)
-											WHERE article.id=%i", array($this->getId()));
-			$authors = $this->db->get_results($sql);
+			$sql = App::query(
+				"SELECT
+					article_author.author as author
+				FROM `article_author`
+				INNER JOIN `article`
+				ON (article_author.article=article.id)
+				WHERE article.id=%i",
+				array(
+					$this->getId()
+				)
+			);
+			$authors = App::$db->get_results($sql);
 			foreach($authors as $author) {
 				$this->authors[] = new User($author->author);
 			}
@@ -195,8 +198,16 @@ class Article extends BaseModel {
 	 */
 	public function getContent() {
 		if(!$this->content) {
-			$sql = $this->safesql->query("SELECT `content` FROM `text_story` WHERE id = %i", array($this->getText1()));
-			$this->content = $this->db->get_var($sql);
+			$sql = App::query(
+				"SELECT
+					`content`
+				FROM `text_story`
+				WHERE id = %i",
+				array(
+					$this->getText1()
+				)
+			);
+			$this->content = App::$db->get_var($sql);
 		}
 		return $this->cleanText($this->content);
 	}
@@ -494,6 +505,4 @@ class Article extends BaseModel {
 									ORDER BY count DESC, article DESC LIMIT %i", array($threshold, $threshold, $number_to_get)); // go for most recent comments instead
 		return $db->get_results($sql);
 	}
-	
 }
-

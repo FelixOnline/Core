@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /*
  * Base model class
  *
@@ -19,13 +20,7 @@ class BaseModel {
 	const TRANSFORMER_NONE = 1;
 	const TRANSFORMER_NO_HTML = 2;
 
-	function __construct($dbObject, $class, $item=null) {
-		/* initialise db connection and store it in object */
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-
+	function __construct($fields, $class, $item=null) {
 		$this->class = $class;
 		$this->item = $item;
 
@@ -33,8 +28,8 @@ class BaseModel {
 			$this->import(get_class($this).'Helper');
 		}
 
-		if($dbObject) {
-			foreach($dbObject as $key => $value) {
+		if($fields) {
+			foreach($fields as $key => $value) {
 				if(!empty($this->filters) && array_key_exists($key, $this->filters)) {
 					$key = $this->filters[$key];
 				}
