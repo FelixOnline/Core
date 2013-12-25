@@ -190,7 +190,8 @@ class Article extends BaseModel {
 	 * Public: Get category url
 	 */
 	public function getCategoryURL() {
-		return STANDARD_URL.$this->getCategoryCat().'/';
+		$app = App::getInstance();
+		return $app->getOption('base_url').$this->getCategoryCat().'/';
 	}
 
 	/*
@@ -364,7 +365,8 @@ class Article extends BaseModel {
 	 * Returns string
 	 */
 	public function getURL() {
-		return STANDARD_URL.$this->constructURL();
+		$app = App::getInstance();
+		return $app->getOption('base_url').$this->constructURL();
 	}
 
 	/*
