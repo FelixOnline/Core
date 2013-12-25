@@ -31,7 +31,7 @@ class Category extends BaseModel
 	private $stories; // array of top story objects
 
 	function __construct($id = NULL) {
-		if($id !== NULL) {
+		if ($id !== NULL) {
 			$sql = App::query(
 				"SELECT
 					id,

@@ -19,7 +19,7 @@ class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
 			$create = "CREATE TABLE IF NOT EXISTS `$table` ";
 			$cols = array();
 			foreach ($meta->getColumns() as $col) {
-				$cols[] = "`$col` VARCHAR(200)";
+				$cols[] = "`$col` VARCHAR(400)";
 			}
 			$create .= '('.implode(',', $cols).');';
 			$pdo->exec($create);

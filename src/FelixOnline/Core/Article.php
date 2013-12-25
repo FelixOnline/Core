@@ -25,6 +25,8 @@ namespace FelixOnline\Core;
  *	  short_desc	  - short description of article for boxes on front page [optional]
  */
 class Article extends BaseModel {
+	const TEASER_LENGTH = 200;
+
 	private $authors; // array of authors of article
 	private $approvedby; // user object of user who approved article
 	private $category_cat; // category cat (short version)
@@ -55,7 +57,7 @@ class Article extends BaseModel {
 	 * Returns article object
 	 */
 	function __construct($id = NULL) {
-		if($id !== NULL) { // if creating an already existing article object
+		if ($id !== NULL) { // if creating an already existing article object
 			$sql = App::query(
 				"SELECT
 					`id`,
@@ -123,7 +125,7 @@ class Article extends BaseModel {
 		return $this->approvedby;
 	}
 
-	/*
+	/**
 	 * Public: Get list of authors in english
 	 *
 	 * Returns html string of article authors
@@ -145,7 +147,7 @@ class Article extends BaseModel {
 		return implode (', ', $full_array).' and '.$last;
 	}
 
-	/*
+	/**
 	 * Public: Get category class
 	 */
 	public function getCategory() {
@@ -155,28 +157,7 @@ class Article extends BaseModel {
 		return $this->category;
 	}
 
-	/*
-	 * Public: Get label of article category
-	 */
-	public function getCategoryLabel() {
-		if(!$this->category_label || !$this->category_cat) {
-			$sql = $this->safesql->query("SELECT cat,`label` FROM `category` WHERE id = %i", array($this->getCategory()));
-			$cat = $this->db->get_row($sql);
-			$this->category_label = $cat->label;
-			$this->category_cat = $cat->cat;
-		}
-		return $this->category_label;
-	}
-
-	/*
-	 * Public: Get category url
-	 */
-	public function getCategoryURL() {
-		$app = App::getInstance();
-		return $app->getOption('base_url').$this->getCategory()->getCat().'/';
-	}
-
-	/*
+	/**
 	 * Public: Get article content
 	 */
 	public function getContent() {
@@ -195,7 +176,7 @@ class Article extends BaseModel {
 		return $this->cleanText($this->content);
 	}
 
-	/*
+	/**
 	 * Private: Clean text
 	 */
 	private function cleanText($text) {
@@ -203,11 +184,11 @@ class Article extends BaseModel {
 		$result = preg_replace('#<div[^>]*(?:/>|>(?:\s|&nbsp;)*</div>)#im', '', $result); // Removes empty html div tags
 		$result = preg_replace('#<span*(?:/>|>(?:\s|&nbsp;)[^>]*</span>)#im', '', $result); // Removes empty html div tags
 		$result = preg_replace('#<p[^>]*(?:/>|>(?:\s|&nbsp;)*</p>)#im', '', $result); // Removes empty html p tags
-		//$result = preg_replace("/<(\/)*div[^>]*>/", "<\\1p>", $result); // Changes div tags into <p> tags
+		$result = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $result); // Remove style attributes
 		return $result;
 	}
 
-	/*
+	/**
 	 * Public: Get article teaser
 	 * TODO
 	 *
@@ -215,11 +196,23 @@ class Article extends BaseModel {
 	 */
 	public function getTeaserFull() {
 		if ($this->getTeaser()) {
-			return str_replace('<br/>','',strip_tags($this->getTeaser()));
-			//return str_replace('<br/>','',preg_replace($this->search,'',$this->teaser));
+			return str_replace('<br/>', '', strip_tags($this->getTeaser()));
 		} else {
-			$text = $this->getText(1);
-			return trim(substr(strip_tags($text),0,strrpos(substr(strip_tags($text),0,TEASER_LENGTH),' '))).'...';
+			$text = strip_tags($this->getContent());
+			return trim(
+				substr(
+					$text,
+					0,
+					strrpos(
+						substr(
+							$text,
+							0,
+							self::TEASER_LENGTH
+						),
+						' '
+					)
+				)
+			).'...';
 		}
 	}
 

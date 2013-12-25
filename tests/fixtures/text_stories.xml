@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+	<table_data name="text_story">
+	<row>
+		<field name="id">27</field>
+		<field name="user">felix</field>
+		<field name="content">&lt;p&gt;As Imperial alumnus Simon Singh prepares to return to College to give a guest lecture on the libel laws in science of which he has fallen foul of, the Government have announced the commencement of a working group on libel reform.&lt;/p&gt;</field>
+		<field name="timestamp">2011-04-18 08:52:32</field>
+	</row>
+	<row>
+		<field name="id">28</field>
+		<field name="user">felix</field>
+		<field name="content">&lt;p&gt;
+	All I bloody hear is the clock ticking. We all know what that sounds like, and we all know what the stabbing sounds of each second, &amp;lsquo;tick&amp;rsquo; or &amp;lsquo;tock&amp;rsquo;, means. Time is slipping away, and there&amp;rsquo;s just about nothing we can do to stop it (short from building a DeLorean and taking a joyride with Marty McFly).&amp;nbsp;&lt;/p&gt;
+</field>
+		<field name="timestamp">2011-04-18 08:53:59</field>
+	</row>
+	<row>
+		<field name="id">31</field>
+		<field name="user">rsp07</field>
+		<field name="content">&lt;div&gt;
+	Well done terrorism &amp;ndash; you&amp;rsquo;ve won again. A single guy is discovered with (potentially) explosive underpants and now millions of pounds of taxpayers&amp;rsquo; money is being spent on full body scanners in airports. Initially, there was a fuss over liquids, which are still banned until 2011.&lt;/div&gt;
+</field>
+		<field name="timestamp">2010-01-14 15:43:38</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>
