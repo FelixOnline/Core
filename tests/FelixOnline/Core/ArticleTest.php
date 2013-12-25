@@ -58,4 +58,31 @@ class ArticleTest extends DatabaseTestCase
 			"All I bloody hear is the clock ticking. We all know what that sounds like, and we all know what the stabbing sounds of each second, &lsquo;tick&rsquo; or &lsquo;tock&rsquo;, means. Time is slipping..."
 		);
 	}
+
+	public function testGetPreview()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$this->assertEquals(
+			$article->getPreview(),
+			"As Imperial alumnus Simon Singh prepares to return to College to give a guest lecture on the libel laws in science of which he has fallen foul of, the Government have announced the commencement of a working group on libel reform. ... <br/><a href=\"http://localhost/news/1/fighting-for-libel-reform/\" title=\"Read more\" id=\"readmorelink\">Read more</a>"
+		);
+	}
+
+	public function testGetShortDesc()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$this->assertEquals(
+			$article->getShortDesc(),
+			"In light of Simon Singh returning to Imperial to give a lecture on libel laws th"
+		);
+	}
+
+	public function testGetShortDescFromContent()
+	{
+		$article = new \FelixOnline\Core\Article(2);
+		$this->assertEquals(
+			$article->getShortDesc(),
+			"All I bloody hear is the clock ticking. We all know what that sounds like, and w"
+		);
+	}
 }

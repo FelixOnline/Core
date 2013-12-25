@@ -75,7 +75,8 @@ class Article extends BaseModel {
 					`img1`,
 					`img2`,
 					`img2lr`,
-					`hits`
+					`hits`,
+					`short_desc`
 				FROM `article`
 				WHERE id=%i",
 				array($id)
@@ -224,11 +225,9 @@ class Article extends BaseModel {
 	 */
 	public function getPreview($limit = 50) {
 		$string = strip_tags($this->getContent());
-		$words = explode(" ",$string);
-		if(count($words) > $limit) {
-		  $append = ' ... <br/><a href="'.$this->getURL().'" title="Read more" id="readmorelink">Read more</a>';
-		}
-		return implode(" ",array_splice($words,0,$limit)) . $append;
+		$words = explode(" ", $string);
+		$append = ' ... <br/><a href="'.$this->getURL().'" title="Read more" id="readmorelink">Read more</a>'; // TODO move into template
+		return implode(" ", array_splice($words, 0, $limit)) . $append;
 	}
 
 	/*
@@ -239,10 +238,10 @@ class Article extends BaseModel {
 	 * $limit - character limit for description [defaults to 80]
 	 */
 	public function getShortDesc($limit = 80) {
-		if($this->fields['short_desc']) {
+		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']) {
 			return substr($this->fields['short_desc'], 0, $limit);
 		} else {
-			return substr(strip_tags($this->getContent()), 0, $limit);
+			return substr(trim(strip_tags($this->getContent())), 0, $limit);
 		}
 	}
 
