@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+    <table_data name="category">
+    <row>
+        <field name="id">1</field>
+        <field name="label">News</field>
+        <field name="cat">news</field>
+        <field name="uri">?cat=news</field>
+        <field name="colourclass">burgundy</field>
+        <field name="active">1</field>
+        <field name="top_slider_1">1</field>
+        <field name="top_slider_2">2</field>
+        <field name="top_slider_3">3</field>
+        <field name="top_slider_4">0</field>
+        <field name="top_sidebar_1">1</field>
+        <field name="top_sidebar_2">2</field>
+        <field name="top_sidebar_3">3</field>
+        <field name="top_sidebar_4">0</field>
+        <field name="top_sidebar_5">0</field>
+        <field name="email">news.felix@imperial.ac.uk</field>
+        <field name="twitter" xsi:nil="true" />
+        <field name="description" xsi:nil="true" />
+        <field name="hidden">0</field>
+        <field name="order">1</field>
+    </row>
+</table_data>
+</database>
+</mysqldump>

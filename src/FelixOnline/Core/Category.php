@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /*
  * Category class
  *
@@ -29,13 +30,9 @@ class Category extends BaseModel
 	private $count; // number of articles in catgeory
 	private $stories; // array of top story objects
 
-	function __construct($cat=NULL) {
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-		if($cat !== NULL) {
-			$sql = $this->safesql->query(
+	function __construct($id = NULL) {
+		if($id !== NULL) {
+			$sql = App::query(
 				"SELECT
 					id,
 					label,
@@ -56,8 +53,10 @@ class Category extends BaseModel
 					description,
 					hidden
 				FROM category
-				WHERE cat='%s'", array($cat));
-			parent::__construct($this->db->get_row($sql), 'Category', $cat);
+				WHERE id=%i",
+				array($id)
+			);
+			parent::__construct(App::$db->get_row($sql), 'Category', $id);
 			return $this;
 		} else {
 		}

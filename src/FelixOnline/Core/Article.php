@@ -55,7 +55,6 @@ class Article extends BaseModel {
 	 * Returns article object
 	 */
 	function __construct($id = NULL) {
-		//$this->db->cache_queries = true;
 		if($id !== NULL) { // if creating an already existing article object
 			$sql = App::query(
 				"SELECT
@@ -151,26 +150,9 @@ class Article extends BaseModel {
 	 */
 	public function getCategory() {
 		if(!$this->category) {
-			$this->category = new Category($this->getCategoryCat());
+			$this->category = new Category($this->fields['category']);
 		}
 		return $this->category;
-	}
-
-	/*
-	 * Public: Get cat of article category
-	 */
-	public function getCategoryCat() {
-		if(!$this->category_cat || !$this->category_label) {
-			$sql = $this->safesql->query("SELECT
-											`cat`,
-											label
-										FROM `category`
-										WHERE id = %i", array($this->fields['category']));
-			$cat = $this->db->get_row($sql);
-			$this->category_cat = $cat->cat;
-			$this->category_label = $cat->label;
-		}
-		return $this->category_cat;
 	}
 
 	/*
@@ -191,7 +173,7 @@ class Article extends BaseModel {
 	 */
 	public function getCategoryURL() {
 		$app = App::getInstance();
-		return $app->getOption('base_url').$this->getCategoryCat().'/';
+		return $app->getOption('base_url').$this->getCategory()->getCat().'/';
 	}
 
 	/*
@@ -375,7 +357,7 @@ class Article extends BaseModel {
 	 * Returns string
 	 */
 	private function constructURL() {
-		$cat = $this->getCategoryCat();
+		$cat = $this->getCategory()->getCat();
 		$dashed = Utility::urliseText($this->getTitle());
 		$output = $cat.'/'.$this->getId().'/'.$dashed.'/'; // output: CAT/ID/TITLE/
 		return $output;

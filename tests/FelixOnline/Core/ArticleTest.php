@@ -7,7 +7,8 @@ require_once __DIR__ . '/../../utilities.php';
 class ArticleTest extends DatabaseTestCase
 {
 	public $fixtures = array(
-		'articles'
+		'articles',
+		'categories',
 	);
 
 	public function setUp()
@@ -22,5 +23,11 @@ class ArticleTest extends DatabaseTestCase
 	{
 		$article = new \FelixOnline\Core\Article(1);
 		$this->assertEquals($article->getTitle(), 'Fighting for Libel Reform');
+	}
+
+	public function testGetURL()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$this->assertEquals($article->getURL(), 'http://localhost/news/1/fighting-for-libel-reform/');
 	}
 }
