@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /*
  * User class
  *
@@ -18,7 +19,6 @@
  *	  img		 -
  */
 class User extends BaseModel {
-	protected $db;
 	private $articles;
 	private $count;
 	private $popArticles = array();
@@ -30,17 +30,12 @@ class User extends BaseModel {
 		'facebook' =>parent::TRANSFORMER_NO_HTML,
 		'twitter' => parent::TRANSFORMER_NO_HTML,
 		'websitename' => parent::TRANSFORMER_NO_HTML,
-		'websiteurl' => parent::TRANSFORMER_NO_HTML);
+		'websiteurl' => parent::TRANSFORMER_NO_HTML
+	);
 
 	function __construct($uname = NULL) {
-		/* initialise db connection and store it in object */
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-
-		if($uname !== NULL) {
-			$sql = $this->safesql->query(
+		if ($uname !== NULL) {
+			$sql = App::query(
 				"SELECT 
 					`user`,
 					`name`,
@@ -60,10 +55,10 @@ class User extends BaseModel {
 				WHERE user='%s'",
 				array(
 					$uname
-				));
+				)
+			);
 
-			parent::__construct($this->db->get_row($sql), 'User', $uname);
-			return $this;
+			parent::__construct(App::$db->get_row($sql), 'User', $uname);
 		} else {
 		}
 	}
@@ -74,7 +69,8 @@ class User extends BaseModel {
 	 * $page - page to link to
 	 */
 	public function getURL($pagenum = NULL) {
-		$output = STANDARD_URL.'user/'.$this->getUser().'/'; 
+		$app = App::getInstance();
+		$output = $app->getOption('base_url') . 'user/'.$this->getUser().'/'; 
 		if($pagenum != NULL) {
 			$output .= $pagenum.'/';
 		}

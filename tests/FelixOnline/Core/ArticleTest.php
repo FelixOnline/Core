@@ -10,6 +10,8 @@ class ArticleTest extends DatabaseTestCase
 		'articles',
 		'categories',
 		'text_stories',
+		'users',
+		'article_authors',
 	);
 
 	public function setUp()
@@ -84,5 +86,40 @@ class ArticleTest extends DatabaseTestCase
 			$article->getShortDesc(),
 			"All I bloody hear is the clock ticking. We all know what that sounds like, and w"
 		);
+	}
+
+	public function testGetAuthors()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$authors = $article->getAuthors();
+
+		$this->assertCount(1, $authors);
+		$this->assertInstanceOf('FelixOnline\Core\User', $authors[0]);
+		$this->assertEquals($authors[0]->getUser(), 'felix');
+	}
+
+	public function testGetAuthorsEnglish()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$authors = $article->getAuthorsEnglish();
+
+		$this->assertEquals($authors, '<a href="http://localhost/user/felix/">Joseph Letts - Felix Editor</a>');
+	}
+
+	public function testGetAuthorsEnglishMultiple()
+	{
+		$article = new \FelixOnline\Core\Article(2);
+		$authors = $article->getAuthorsEnglish();
+
+		$this->assertEquals($authors, '<a href="http://localhost/user/felix/">Joseph Letts - Felix Editor</a>, <a href="http://localhost/user/jk708/">Jonathan Kim</a> and <a href="http://localhost/user/pk1811/">Philip Kent</a>');
+	}
+
+	public function testGetApprovedBy()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$user = $article->getApprovedBy();
+
+		$this->assertInstanceOf('FelixOnline\Core\User', $user);
+		$this->assertEquals($user->getUser(), 'felix');
 	}
 }

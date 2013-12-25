@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+	<table_data name="article_author">
+	<row>
+		<field name="article">1</field>
+		<field name="author">felix</field>
+	</row>
+	<row>
+		<field name="article">2</field>
+		<field name="author">felix</field>
+	</row>
+	<row>
+		<field name="article">2</field>
+		<field name="author">jk708</field>
+	</row>
+	<row>
+		<field name="article">2</field>
+		<field name="author">pk1811</field>
+	</row>
+	<row>
+		<field name="article">3</field>
+		<field name="author">felix</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>

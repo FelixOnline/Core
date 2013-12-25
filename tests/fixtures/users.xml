@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+	<table_data name="user">
+	<row>
+		<field name="user">felix</field>
+		<field name="name">Joseph Letts - Felix Editor</field>
+		<field name="visits">999</field>
+		<field name="ip">0.0.0.0</field>
+		<field name="timestamp">2013-12-06 16:55:35</field>
+		<field name="role">100</field>
+		<field name="info"></field>
+		<field name="description">No-one goes harder than Joseph Letts</field>
+		<field name="email">felix@imperial.ac.uk</field>
+		<field name="facebook">http://www.facebook.com/FelixImperial</field>
+		<field name="twitter">feliximperial</field>
+		<field name="websitename">My website</field>
+		<field name="websiteurl">http://felixonline.co.uk</field>
+		<field name="img">183</field>
+	</row>
+	<row>
+		<field name="user">jk708</field>
+		<field name="name">Jonathan Kim</field>
+		<field name="visits">999</field>
+		<field name="ip">0.0.0.0</field>
+		<field name="timestamp">2013-12-06 16:55:35</field>
+		<field name="role">10</field>
+		<field name="info"></field>
+		<field name="description">Hello world!</field>
+		<field name="email">jkimbo@gmail.com</field>
+        <field name="facebook">https://www.facebook.com/Jonny.Kim</field>
+		<field name="twitter">jonnykim</field>
+		<field name="websitename">jkimbo.co.uk</field>
+        <field name="websiteurl">http://jkimbo.co.uk</field>
+		<field name="img">3612</field>
+	</row>
+	<row>
+		<field name="user">pk1811</field>
+		<field name="name">Philip Kent</field>
+		<field name="visits">999</field>
+		<field name="ip">0.0.0.0</field>
+		<field name="timestamp">2013-12-06 16:55:35</field>
+		<field name="role">100</field>
+		<field name="info"></field>
+		<field name="description">Hi! I'm a second year chemist who edits the
+            Science section, amongst writing articles for News and Science.
+        
+        I'm also in charge of the Felix network and computers, so do get in
+        touch if thee's an issue with them.</field>
+		<field name="email">philip.kent11@imperial.ac.uk</field>
+        <field name="facebook">https://www.facebook.com/lsproc</field>
+		<field name="twitter">lsproc</field>
+		<field name="websitename"></field>
+        <field name="websiteurl"></field>
+		<field name="img">676</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>
