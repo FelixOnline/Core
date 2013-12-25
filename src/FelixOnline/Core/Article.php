@@ -252,21 +252,28 @@ class Article extends BaseModel {
 	 */
 	public function getNumComments() {
 		if(!$this->num_comments && $this->num_comments !== 0) {
-			$sql = $this->safesql->query("SELECT SUM(count) AS count
-										FROM (
-											SELECT article,COUNT(*) AS count
-											FROM `comment`
-											WHERE article=%i
-											AND `active`=1
-											GROUP BY article
-											UNION ALL
-											SELECT article,COUNT(*) AS count
-											FROM `comment_ext`
-											WHERE article=%i
-											AND `active`=1
-											AND `pending`=0
-											GROUP BY article
-										) AS t GROUP BY article", array($this->getId(), $this->getId()));
+			$sql = $this->safesql->query(
+				"SELECT
+					SUM(count) AS count
+				FROM (
+					SELECT article,COUNT(*) AS count
+					FROM `comment`
+					WHERE article=%i
+					AND `active`=1
+					GROUP BY article
+					UNION ALL
+					SELECT article,COUNT(*) AS count
+					FROM `comment_ext`
+					WHERE article=%i
+					AND `active`=1
+					AND `pending`=0
+					GROUP BY article
+				) AS t GROUP BY article",
+				array(
+					$this->getId(),
+					$this->getId()
+				)
+			);
 			$this->num_comments = $this->db->get_var($sql);
 			if(!$this->num_comments) $this->num_comments = 0;
 		}
@@ -279,32 +286,42 @@ class Article extends BaseModel {
 	 * Returns db object
 	 */
 	public function getComments() {
-		$sql = $this->safesql->query("SELECT id,timestamp
-									FROM (
-										SELECT
-											comment.id,
-											UNIX_TIMESTAMP(comment.timestamp) AS timestamp
-										FROM `comment`
-										WHERE article=%i
-										AND active=1". // select all internal comments
-									" UNION SELECT
-											comment_ext.id,
-											UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
-										FROM `comment_ext`
-										WHERE article=%i
-										AND pending=0 AND spam=0". // select external comments that are not spam
-									" UNION SELECT
-											comment_ext.id,
-											UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
-											FROM `comment_ext`
-										WHERE article=%i
-										AND IP = '%s'
-										AND active=1
-										AND pending=1
-										AND spam=0". // select external comments that are pending and are from current ip
-									") AS t
-									ORDER BY timestamp ASC
-									LIMIT 500", array($this->getId(), $this->getId(), $this->getId(), $_SERVER['REMOTE_ADDR']));
+		$sql = $this->safesql->query(
+			"SELECT
+				id,
+				timestamp
+			FROM (
+				SELECT
+					comment.id,
+					UNIX_TIMESTAMP(comment.timestamp) AS timestamp
+				FROM `comment`
+				WHERE article=%i
+				AND active=1 # select all internal comments
+				UNION SELECT
+					comment_ext.id,
+					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
+				FROM `comment_ext`
+				WHERE article=%i
+				AND pending=0 AND spam=0 # select external comments that are not spam
+				UNION SELECT
+					comment_ext.id,
+					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
+					FROM `comment_ext`
+				WHERE article=%i
+				AND IP = '%s'
+				AND active=1
+				AND pending=1
+				AND spam=0 # select external comments that are pending and are from current ip
+			) AS t
+			ORDER BY timestamp ASC
+			LIMIT 500",
+			array(
+				$this->getId(),
+				$this->getId(),
+				$this->getId(),
+				$_SERVER['REMOTE_ADDR']
+			)
+		);
 		$comments = array();
 		$rsc = $this->db->get_results($sql);
 		if($rsc) {
@@ -319,7 +336,7 @@ class Article extends BaseModel {
 	 * Public: Get image class
 	 */
 	public function getImage() {
-		if($this->getImg1()) {
+		if ($this->getImg1()) {
 			if($this->getImg1() == 183 || $this->getImg1() == 742) {
 				return false;
 			} else {
@@ -383,16 +400,28 @@ class Article extends BaseModel {
 		global $currentuser;
 		$user = NULL;
 		if($currentuser->isLoggedIn()) $user = $currentuser->getUser();
-		$sql = $this->safesql->query("INSERT INTO
-										article_visit
-									(
-										article,
-										user,
-										IP,
-										browser,
-										referrer,
-										repeat_visit
-									) VALUES (%q)", array(array($this->getId(), $user, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'], $_SERVER['HTTP_REFERER'], $repeat)));
+		$sql = $this->safesql->query(
+			"INSERT INTO
+				article_visit
+			(
+				article,
+				user,
+				IP,
+				browser,
+				referrer,
+				repeat_visit
+			) VALUES (%q)",
+				array(
+					array(
+						$this->getId(),
+						$user,
+						$_SERVER['REMOTE_ADDR'],
+						$_SERVER['HTTP_USER_AGENT'],
+						$_SERVER['HTTP_REFERER'],
+						$repeat
+					)
+				)
+			);
 		return $this->db->query($sql);
 	}
 
@@ -404,37 +433,46 @@ class Article extends BaseModel {
 	private function recentlyVisited() {
 		global $currentuser;
 		if($currentuser->isLoggedIn()) {
-			$sql = $this->safesql->query("SELECT
-											COUNT(id)
-										FROM
-											`article_visit`
-										WHERE user = '%s'
-										AND article = '%s'
-										AND UNIX_TIMESTAMP(timestamp) < now() - interval 4 week", array($currentuser->getUser(), $this->getId()));
+			$sql = $this->safesql->query(
+				"SELECT
+					COUNT(id)
+				FROM
+					`article_visit`
+				WHERE user = '%s'
+				AND article = '%s'
+				AND UNIX_TIMESTAMP(timestamp) < now() - interval 4 week",
+				array(
+					$currentuser->getUser(),
+					$this->getId()
+				)
+			);
 			return $this->db->get_var($sql);
 		} else {
-			$sql = $this->safesql->query("SELECT
-											COUNT(id)
-										FROM
-											`article_visit`
-										WHERE IP = '%s'
-										AND browser = '%s'
-										AND article = %i
-										AND UNIX_TIMESTAMP(timestamp) < now() - interval 4 week", array($_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'], $this->getId()));
+			$sql = $this->safesql->query(
+				"SELECT
+					COUNT(id)
+				FROM
+					`article_visit`
+				WHERE IP = '%s'
+				AND browser = '%s'
+				AND article = %i
+				AND UNIX_TIMESTAMP(timestamp) < now() - interval 4 week",
+				array(
+					$_SERVER['REMOTE_ADDR'],
+					$_SERVER['HTTP_USER_AGENT'],
+					$this->getId()
+				)
+			);
 			return $this->db->get_var($sql);
 		}
-	}
-
-	public function print_this() {
-		print_r($this);
 	}
 
 	public static function getMostPopular($number_to_get) {
 		global $db;
 		global $safesql;
 
-		$sql = $safesql->query("
-			SELECT
+		$sql = $safesql->query(
+			"SELECT
 				DISTINCT article AS id,
 				COUNT(article) AS c
 			FROM (
@@ -455,30 +493,39 @@ class Article extends BaseModel {
 		global $db;
 		global $safesql;
 
-		$sql = $safesql->query("SELECT article AS id,SUM(count) AS count
-									FROM (
-											(SELECT c.article,COUNT(*) AS count
-											FROM `comment` AS c
-											INNER JOIN `article` AS a ON (c.article=a.id)
-											WHERE c.`active`=1
-											AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
-											AND a.published<NOW()
-											GROUP BY article
-											ORDER BY timestamp DESC
-											LIMIT 20)
-										UNION ALL
-											(SELECT ce.article,COUNT(*) AS count
-											FROM `comment_ext` AS ce
-											INNER JOIN `article` AS a ON (ce.article=a.id)
-											WHERE ce.`active`=1
-											AND pending=0
-											AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
-											AND a.published<NOW()
-											GROUP BY article
-											ORDER BY timestamp DESC)
-									) AS t
-									GROUP BY article
-									ORDER BY count DESC, article DESC LIMIT %i", array($threshold, $threshold, $number_to_get)); // go for most recent comments instead
+		$sql = $safesql->query(
+			"SELECT
+				article AS id,
+				SUM(count) AS count
+			FROM (
+					(SELECT c.article,COUNT(*) AS count
+					FROM `comment` AS c
+					INNER JOIN `article` AS a ON (c.article=a.id)
+					WHERE c.`active`=1
+					AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
+					AND a.published<NOW()
+					GROUP BY article
+					ORDER BY timestamp DESC
+					LIMIT 20)
+				UNION ALL
+					(SELECT ce.article,COUNT(*) AS count
+					FROM `comment_ext` AS ce
+					INNER JOIN `article` AS a ON (ce.article=a.id)
+					WHERE ce.`active`=1
+					AND pending=0
+					AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
+					AND a.published<NOW()
+					GROUP BY article
+					ORDER BY timestamp DESC)
+			) AS t
+			GROUP BY article
+			ORDER BY count DESC, article DESC LIMIT %i",
+			array(
+				$threshold,
+				$threshold,
+				$number_to_get
+			)
+		); // go for most recent comments instead
 		return $db->get_results($sql);
 	}
 }
