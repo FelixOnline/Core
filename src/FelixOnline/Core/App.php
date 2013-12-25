@@ -54,7 +54,7 @@ class App
 	{
 		foreach($this->required as $req) {
 			if (!array_key_exists($req, $options)) {
-				throw new \FelixOnline\Exceptions\InteralException('"' . $req . '" option is not defined');
+				throw new \FelixOnline\Exceptions\InternalException('"' . $req . '" option is not defined');
 			}
 		}
 	}
@@ -99,7 +99,7 @@ class App
 			if (func_get_arg(1)) {
 				return func_get_arg(1);
 			} else {
-				throw new \FelixOnline\Exceptions\InteralException('Key "'.$key.'" has not been set');
+				throw new \FelixOnline\Exceptions\InternalException('Key "'.$key.'" has not been set');
 			}
 		}
 		return self::$options[$key];

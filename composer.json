@@ -20,7 +20,7 @@
     },
 	"autoload": {
 		"psr-0": {
-			"FelixOnline\\Core": "src/"
+			"FelixOnline": "src/"
 		}
 	}
 }
