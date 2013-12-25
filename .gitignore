@@ -3,3 +3,5 @@ composer.lock
 composer.phar
 config.php
 phinx.yml
+
+tests_coverage/

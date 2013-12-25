@@ -30,7 +30,7 @@ class UniversalException extends \Exception {
 	
 	public function __construct(
 		$message,
-		$code = parent::EXCEPTION_UNIVERSAL,
+		$code = self::EXCEPTION_UNIVERSAL,
 		\Exception $previous = null
 	) {
 		global $currentuser;
