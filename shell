@@ -5,7 +5,19 @@ require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/lib/SafeSQL.php';
 $config = require __DIR__ . '/config.php';
 
-$app = new \FelixOnline\Core\App($config);
+$db = new \ezSQL_mysqli();
+$db->quick_connect(
+	$config['db_user'],
+	$config['db_pass'],
+	$config['db_name'],
+	array_key_exists('db_host', $config) ? $config['db_host'] : 'localhost',
+	array_key_exists('db_port', $config) ? $config['db_port'] : 3306,
+	'utf8'
+);
+
+$safesql = new \SafeSQL_MySQLi($db->dbh);
+
+$app = new \FelixOnline\Core\App($config, $db, $safesql);
 
 $boris = new \Boris\Boris('felix> ');
 $boris->setLocal(array('app' => $app));

@@ -12,9 +12,7 @@ class App
 	 * Required options
 	 */
 	protected $required = array(
-		'db_name',
-		'db_user',
-		'db_pass'
+		'base_url'
 	);
 
 	public static $db = null;
@@ -25,22 +23,13 @@ class App
 	 *
 	 * @param array $options - options array
 	 */
-	public function __construct($options = array())
+	public function __construct($options = array(), \ezSQL_mysqli $db, \SafeSQL_MySQLi $safesql)
 	{
 		$this->checkOptions($options);
 		self::$options = $options;
 
-		self::$db = new \ezSQL_mysqli();
-		self::$db->quick_connect(
-			$this->getOption('db_user'),
-			$this->getOption('db_pass'),
-			$this->getOption('db_name'),
-			$this->getOption('db_host', 'localhost'),
-			$this->getOption('db_port', 3306),
-			'utf8'
-		);
-
-		self::$safesql = new \SafeSQL_MySQLi(self::$db->dbh);
+		self::$db = $db;
+		self::$safesql = $safesql;
 
 		self::$instance = $this;
 	}
@@ -54,7 +43,7 @@ class App
 	{
 		foreach($this->required as $req) {
 			if (!array_key_exists($req, $options)) {
-				throw new \FelixOnline\Exceptions\InternalException('"' . $req . '" option is not defined');
+				throw new \FelixOnline\Exceptions\InternalException('"' . $req . '" option has not been defined');
 			}
 		}
 	}
@@ -67,7 +56,7 @@ class App
 	public static function getInstance()
 	{
 		if (is_null(self::$instance)) {
-			self::$instance = new App();
+			throw new \FelixOnline\Exceptions\InternalException('App has not been initialised yet');
 		}
 		return self::$instance;
 	}
@@ -96,10 +85,10 @@ class App
 	{
 		if (!array_key_exists($key, self::$options)) {
 			// if a default has been defined 
-			if (func_get_arg(1)) {
+			if (func_num_args() > 1) {
 				return func_get_arg(1);
 			} else {
-				throw new \FelixOnline\Exceptions\InternalException('Key "'.$key.'" has not been set');
+				throw new \FelixOnline\Exceptions\InternalException('Option "'.$key.'" has not been set');
 			}
 		}
 		return self::$options[$key];
