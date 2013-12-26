@@ -24,6 +24,28 @@
         <field name="hidden">0</field>
         <field name="order">1</field>
     </row>
+    <row>
+        <field name="id">2</field>
+        <field name="label">Comment</field>
+        <field name="cat">comment</field>
+        <field name="uri">?cat=comment</field>
+        <field name="colourclass">burgundy</field>
+        <field name="active">1</field>
+        <field name="top_slider_1">1</field>
+        <field name="top_slider_2">2</field>
+        <field name="top_slider_3">3</field>
+        <field name="top_slider_4">0</field>
+        <field name="top_sidebar_1">1</field>
+        <field name="top_sidebar_2">2</field>
+        <field name="top_sidebar_3">3</field>
+        <field name="top_sidebar_4">0</field>
+        <field name="top_sidebar_5">0</field>
+        <field name="email">comment.felix@imperial.ac.uk</field>
+        <field name="twitter" xsi:nil="true" />
+        <field name="description" xsi:nil="true" />
+        <field name="hidden">0</field>
+        <field name="order">1</field>
+    </row>
 </table_data>
 </database>
 </mysqldump>

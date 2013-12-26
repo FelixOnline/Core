@@ -1,6 +1,6 @@
 <?php
 namespace FelixOnline\Core;
-/*
+/**
  * Category class
  *
  * Fields:
@@ -62,31 +62,35 @@ class Category extends BaseModel
 		}
 	}
 
-	/*
+	/**
 	 * Public: Get category url
 	 */
 	public function getURL($pagenum = NULL) {
-		$output = STANDARD_URL.$this->getCat().'/';
-		if($pagenum != NULL) {
+		$app = App::getInstance();
+		$output = $app->getOption('base_url').$this->getCat().'/';
+		if ($pagenum != NULL) {
 			$output .= $pagenum.'/';
 		}
 		return $output;
 	}
 
-	/*
+	/**
 	 * Public: Get category editors
 	 *
 	 * Returns array of user objects
 	 */
 	public function getEditors() {
-		if(!$this->editors) {
-			$sql = $this->safesql->query(
+		if (!$this->editors) {
+			$sql = App::query(
 				"SELECT 
 					user 
 				FROM `category_author` 
 				WHERE category=%i 
-				AND admin=1", array($this->getId()));
-			$editors = $this->db->get_results($sql);
+				AND admin=1",
+				array(
+					$this->getId()
+				));
+			$editors = App::$db->get_results($sql);
 			if (is_null($editors)) {
 				$this->editors = null;
 			} else {
@@ -98,7 +102,7 @@ class Category extends BaseModel
 		return $this->editors;
 	}
 
-	/*
+	/**
 	 * Public: Get category articles
 	 *
 	 * $page - page number to limit article list
@@ -106,7 +110,7 @@ class Category extends BaseModel
 	 * Returns dbobject
 	 */
 	public function getArticles($page) {
-		$sql = $this->safesql->query(
+		$sql = App::query(
 			"SELECT 
 				id 
 			FROM `article` 
@@ -119,17 +123,17 @@ class Category extends BaseModel
 				($page-1) * ARTICLES_PER_CAT_PAGE,
 				ARTICLES_PER_CAT_PAGE
 			));
-		return $this->db->get_results($sql);
+		return App::$db->get_results($sql);
 	}
 
-	/*
+	/**
 	 * Public: Get number of pages in a category
 	 *
 	 * Returns int 
 	 */
 	public function getNumPages() {
-		if(!$this->count) {
-			$sql = $this->safesql->query(
+		if (!$this->count) {
+			$sql = App::query(
 				"SELECT 
 					COUNT(id) as count 
 				FROM `article` 
@@ -138,14 +142,20 @@ class Category extends BaseModel
 				array(
 					$this->getId()
 				));
-			$this->count = $this->db->get_var($sql);
+			$this->count = App::$db->get_var($sql);
 		}
 		$pages = ceil(($this->count - ARTICLES_PER_CAT_PAGE) / (ARTICLES_PER_SECOND_CAT_PAGE)) + 1;
 		return $pages;
 	}
 
+	/**
+	 * Get category top stories
+	 *
+	 * Returns array of articles
+	 */
 	public function getTopStories() {
 		if(!$this->stories) {
+			$this->stories = array();
 			$this->stories['top_story_1'] = new Article($this->fields['top_slider_1']);
 			$this->stories['top_story_2'] = new Article($this->fields['top_slider_2']);
 			$this->stories['top_story_3'] = new Article($this->fields['top_slider_3']);
@@ -159,9 +169,7 @@ class Category extends BaseModel
 	 */
 	public static function getCategories()
 	{
-		global $db;
-		global $safesql;
-		$sql = $safesql->query(
+		$sql = App::query(
 			"SELECT
 				label,
 				cat
@@ -170,7 +178,7 @@ class Category extends BaseModel
 			AND id > 0
 			ORDER BY `order` ASC",
 			array());
-		$cats = $db->get_results($sql);
+		$cats = App::$db->get_results($sql);
 		return $cats;
 	}
 }

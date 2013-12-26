@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+	<table_data name="category_author">
+	<row>
+		<field name="category">1</field>
+		<field name="user">felix</field>
+		<field name="admin">1</field>
+	</row>
+	<row>
+		<field name="category">1</field>
+		<field name="user">jk708</field>
+		<field name="admin">1</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>
