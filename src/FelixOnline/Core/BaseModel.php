@@ -20,8 +20,8 @@ class BaseModel {
 	const TRANSFORMER_NONE = 1;
 	const TRANSFORMER_NO_HTML = 2;
 
-	function __construct($fields, $class, $item=null) {
-		$this->class = $class;
+	function __construct($fields, $item = NULL) {
+		$this->class = get_class($this);
 		$this->item = $item;
 
 		if(class_exists(get_class($this).'Helper')) {
@@ -130,12 +130,12 @@ class BaseModel {
 	public function save() {
 		$arrayLength = count($this->fields);
 		if(!$arrayLength) {
-			throw new InternalException('No fields in object', $this->class);
+			throw new InternalException('No fields in object');
 		}
 		$sql = "INSERT INTO `";
 
 		if(!$this->dbtable) {
-			throw new InternalException('No table specified', $this->class);
+			throw new InternalException('No table specified');
 		}
 		$sql .= $this->dbtable;
 

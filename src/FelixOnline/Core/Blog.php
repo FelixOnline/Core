@@ -29,7 +29,7 @@ class Blog extends BaseModel {
 											`sticky`
 										FROM `blogs`
 										WHERE slug='%s'", array($slug));
-			parent::__construct($this->db->get_row($sql), 'Blog', $slug);
+			parent::__construct($this->db->get_row($sql), $slug);
 			return $this;
 		} else {
 			// initialise new blog

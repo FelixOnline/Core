@@ -56,7 +56,7 @@ class Category extends BaseModel
 				WHERE id=%i",
 				array($id)
 			);
-			parent::__construct(App::$db->get_row($sql), 'Category', $id);
+			parent::__construct(App::$db->get_row($sql), $id);
 			return $this;
 		} else {
 		}

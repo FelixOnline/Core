@@ -35,7 +35,7 @@ class BlogPost extends BaseModel {
 													`visible`
 												FROM `blog_post`
 												WHERE id=%i", array($this->getId()));
-			parent::__construct($this->db->get_row($sql), 'BlogPost', $slug);
+			parent::__construct($this->db->get_row($sql), $slug);
 			return $this;
 		} else {
 			// initialise new blog post

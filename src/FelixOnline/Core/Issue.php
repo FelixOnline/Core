@@ -31,7 +31,7 @@ class Issue extends BaseModel {
 				'IssueNo' => 'issue_no',
 				'PubNo' => 'pub_no'
 			);
-			parent::__construct($this->dba->get_row($sql), 'Issue', $id);
+			parent::__construct($this->dba->get_row($sql), $id);
 			return $this;
 		} else {
 			// initialise new issue

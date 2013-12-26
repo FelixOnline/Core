@@ -52,7 +52,7 @@ class Image extends BaseModel {
 				array(
 					$id,
 				));
-			parent::__construct($this->db->get_row($sql), 'Image', $id);
+			parent::__construct($this->db->get_row($sql), $id);
 			return $this;
 		} else {
 			// initialise new image

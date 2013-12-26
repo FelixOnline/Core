@@ -58,7 +58,7 @@ class User extends BaseModel {
 				)
 			);
 
-			parent::__construct(App::$db->get_row($sql), 'User', $uname);
+			parent::__construct(App::$db->get_row($sql), $uname);
 		} else {
 		}
 	}

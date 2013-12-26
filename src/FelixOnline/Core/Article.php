@@ -81,7 +81,7 @@ class Article extends BaseModel {
 				WHERE id=%i",
 				array($id)
 			);
-			parent::__construct(App::$db->get_row($sql), 'Article', $id);
+			parent::__construct(App::$db->get_row($sql), $id);
 			return $this;
 		} else {
 			// initialise new article

@@ -1,4 +1,6 @@
 <?php
+
+require_once __DIR__ . '/../lib/SafeSQL.php';
 /**
  * Test utilities
  */

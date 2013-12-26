@@ -28,7 +28,7 @@ class Page extends BaseModel {
 				array(
 					$slug,	
 				));
-			parent::__construct($this->db->get_row($sql), 'Page', $slug);
+			parent::__construct($this->db->get_row($sql), $slug);
 			return $this;
 		} else {
 			// initialise new page

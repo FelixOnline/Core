@@ -91,7 +91,7 @@ class Comment extends BaseModel {
 						$id
 					));
 
-				parent::__construct($this->db->get_row($sql), 'Comment (Internal)', $id);
+				parent::__construct($this->db->get_row($sql), $id);
 
 				return $this;
 			} else {
@@ -118,7 +118,7 @@ class Comment extends BaseModel {
 
 				$this->transfomers['name'] = parent::TRANSFORMER_NO_HTML;
 
-				parent::__construct($this->db->get_row($sql), 'Comment (External)', $id);
+				parent::__construct($this->db->get_row($sql), $id);
 				return $this;
 			}
 		} else {

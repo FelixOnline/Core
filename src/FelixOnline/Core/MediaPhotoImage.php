@@ -45,7 +45,7 @@ class MediaPhotoImage extends BaseModel {
 				array(
 					$id,
 				));
-			parent::__construct($this->db->get_row($sql), get_class($this), $id);
+			parent::__construct($this->db->get_row($sql), $id);
 			return $this;
 		} else {
 			return $this;
