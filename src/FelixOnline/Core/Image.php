@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /*
  * Image class
  *
@@ -18,7 +19,7 @@
  *	  height
  */
 class Image extends BaseModel {
-	/*
+	/**
 	 * Constructor for Image class
 	 * If initialised with id then store relevant data in object
 	 *
@@ -27,12 +28,8 @@ class Image extends BaseModel {
 	 * Returns image object
 	 */
 	function __construct($id=NULL) {
-		/* initialise db connection and store it in object */
-		global $db, $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-		if($id !== NULL) { // if creating an already existing article object
-			$sql = $this->safesql->query(
+		if ($id !== NULL) { // if creating an already existing article object
+			$sql = App::query(
 				"SELECT
 					`id`,
 					`title`,
@@ -52,14 +49,13 @@ class Image extends BaseModel {
 				array(
 					$id,
 				));
-			parent::__construct($this->db->get_row($sql), $id);
-			return $this;
+			parent::__construct(App::$db->get_row($sql), $id);
 		} else {
 			// initialise new image
 		}
 	}
 
-	/*
+	/**
 	 * Public: Get image source url
 	 */
 	public function getURL($width = '', $height = '') {
@@ -77,28 +73,17 @@ class Image extends BaseModel {
 		}
 	}
 
-	/*
+	/**
 	 * Public: Check if image is tall or not
-	 *
-	 * $width - width of place image needs to fit to
-	 * $limit - pixel limit to check image against
 	 */
-	public function isTall($width = 460, $limit = 400) {
-		$scale = $this->getWidth()/$width;
-		
-		if($scale == 0) {
-			return false;
-		}
-		
-		$check = $this->getHeight()/$scale;
-		if ($check > $limit) {
+	public function isTall() {
+		if ($this->getWidth() < $this->getHeight()) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
-	/*
+	/**
 	 * Public: Get image name
 	 * Get image filename
 	 */

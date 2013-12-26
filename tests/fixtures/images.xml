@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+	<table_data name="image">
+	<row>
+		<field name="id">22</field>
+		<field name="title">Simon Singh</field>
+		<field name="uri">img/upload/201001081608-felix-SimonSin.jpg</field>
+		<field name="user">felix</field>
+		<field name="description">Simon Singh sitting on a park bench</field>
+		<field name="timestamp">2010-01-08 16:08:03</field>
+		<field name="v_offset">0</field>
+		<field name="h_offset">0</field>
+		<field name="caption">Simon Singh sitting on a park bench</field>
+		<field name="attribution">John Doe</field>
+		<field name="attr_link">http://example.com</field>
+		<field name="width">1000</field>
+		<field name="height">1500</field>
+	</row>
+	<row>
+		<field name="id">23</field>
+		<field name="title">Puppies</field>
+		<field name="uri">img/upload/201001081608-felix-puppies.jpg</field>
+		<field name="user">felix</field>
+		<field name="description">OMFG puppies</field>
+		<field name="timestamp">2010-01-08 16:08:03</field>
+		<field name="v_offset">0</field>
+		<field name="h_offset">0</field>
+		<field name="caption">OMFG puppies</field>
+		<field name="attribution">John Doe</field>
+		<field name="attr_link">http://example.com</field>
+		<field name="width">1500</field>
+		<field name="height">1000</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>
