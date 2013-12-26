@@ -11,7 +11,6 @@
 	if(!defined('COOKIE_LENGTH'))					define('COOKIE_LENGTH', 2592000); // cookie length (30 days) (60*60*24*30)
 	if(!defined('AUTHENTICATION_SERVER'))			define('AUTHENTICATION_SERVER','dougal.union.ic.ac.uk'); // authentication server
 	if(!defined('AUTHENTICATION_PATH'))				define('AUTHENTICATION_PATH','https://dougal.union.ic.ac.uk/media/felix/'); // authentication path
-	if(!defined('DEFAULT_IMG_URI'))					define('DEFAULT_IMG_URI','defaultimage.jpg'); // default image
 	if(!defined('MOST_POPULAR_INTERVAL'))			define('MOST_POPULAR_INTERVAL',7); // commented - look at comments over previous ... days
 	if(!defined('POPULAR_ARTICLES'))				define('POPULAR_ARTICLES',5); // used for commented and viewed
 	if(!defined('RECENT_COMMENTS'))					define('RECENT_COMMENTS',5); // number of recent comments to display
