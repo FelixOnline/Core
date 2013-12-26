@@ -59,17 +59,13 @@ class Image extends BaseModel {
 	 * Public: Get image source url
 	 */
 	public function getURL($width = '', $height = '') {
-		if($this->getUri()) {
-			$uri = $this->getName();
-			if($height) {
-				return IMAGE_URL.$width.'/'.$height.'/'.$uri;
-			} else if($width) {
-				return IMAGE_URL.$width.'/'.$uri;
-			} else {
-				return IMAGE_URL.'upload/'.$uri;
-			}
-		} else {
-			return IMAGE_URL.DEFAULT_IMG_URI;
+		$uri = $this->getName();
+		if ($height && $width) {
+			return IMAGE_URL.$width.'/'.$height.'/'.$uri;
+		} else if ($width) {
+			return IMAGE_URL.$width.'/'.$uri;
+		} else { // original image
+			return IMAGE_URL.'upload/'.$uri;
 		}
 	}
 

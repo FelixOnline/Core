@@ -47,6 +47,8 @@
  *	  if($id = $comment->save()) echo 'Success!';
  */
 class Comment extends BaseModel {
+	const EXTERNAL_COMMENT_ID = 80000000; // external comment id start
+
 	private $article; // article class comment is on
 	private $user; // user class
 	private $reply; // comment class of reply
@@ -54,7 +56,8 @@ class Comment extends BaseModel {
 	private $commentsToApprove;
 	protected $db;
 	protected $transformers = array(
-		'content' => parent::TRANSFORMER_NO_HTML);
+		'content' => parent::TRANSFORMER_NO_HTML
+	);
 	
 	/*
 	 * Constructor for Comment class
@@ -72,7 +75,7 @@ class Comment extends BaseModel {
 		$this->safesql = $safesql;
 
 		if($id != NULL) {
-			if($id < EXTERNAL_COMMENT_ID) { // if comment is internal
+			if($id < self::EXTERNAL_COMMENT_ID) { // if comment is internal
 				$this->external = false; // comment is internal
 				$sql = $this->safesql->query(
 					"SELECT 
