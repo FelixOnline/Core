@@ -53,6 +53,17 @@ class CategoryTest extends DatabaseTestCase
 		$this->assertNull($editors);
 	}
 
+	public function testGetTopStories()
+	{
+		$category = new \FelixOnline\Core\Category(1);
+
+		$topStories = $category->getTopStories();
+		$this->assertCount(4, $topStories);
+		$this->assertInstanceOf('FelixOnline\Core\Article', $topStories[0]);
+		$this->assertEquals($topStories[0]->getTitle(), 'Fighting for Libel Reform');
+		$this->assertNull($topStories[3]);
+	}
+
 	public function testGetCategories()
 	{
 		$categories = \FelixOnline\Core\Category::getCategories();

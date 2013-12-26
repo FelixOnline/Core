@@ -12,7 +12,7 @@
         <field name="top_slider_1">1</field>
         <field name="top_slider_2">2</field>
         <field name="top_slider_3">3</field>
-        <field name="top_slider_4">0</field>
+        <field name="top_slider_4" xsi:nil="true" />
         <field name="top_sidebar_1">1</field>
         <field name="top_sidebar_2">2</field>
         <field name="top_sidebar_3">3</field>

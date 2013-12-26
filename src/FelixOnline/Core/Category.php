@@ -156,10 +156,21 @@ class Category extends BaseModel
 	public function getTopStories() {
 		if(!$this->stories) {
 			$this->stories = array();
-			$this->stories['top_story_1'] = new Article($this->fields['top_slider_1']);
-			$this->stories['top_story_2'] = new Article($this->fields['top_slider_2']);
-			$this->stories['top_story_3'] = new Article($this->fields['top_slider_3']);
-			$this->stories['top_story_4'] = new Article($this->fields['top_slider_4']);
+
+			$sliders = array(
+				'top_slider_1',
+				'top_slider_2',
+				'top_slider_3',
+				'top_slider_4',
+			);
+
+			foreach($sliders as $slider) {
+				if (!is_null($this->fields[$slider])) {
+					$this->stories[] = new Article($this->fields[$slider]);
+				} else {
+					$this->stories[] = null;
+				}
+			}
 		}
 		return $this->stories;
 	}
