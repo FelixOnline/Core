@@ -52,4 +52,13 @@ class CategoryTest extends DatabaseTestCase
 		$editors = $category->getEditors();
 		$this->assertNull($editors);
 	}
+
+	public function testGetCategories()
+	{
+		$categories = \FelixOnline\Core\Category::getCategories();
+
+		$this->assertCount(2, $categories);
+		$this->assertInstanceOf('FelixOnline\Core\Category', $categories[0]);
+		$this->assertEquals($categories[0]->getLabel(), 'News');
+	}
 }

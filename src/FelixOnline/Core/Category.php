@@ -171,14 +171,20 @@ class Category extends BaseModel
 	{
 		$sql = App::query(
 			"SELECT
-				label,
-				cat
+				`id`
 			FROM `category`
 			WHERE hidden = 0
 			AND id > 0
 			ORDER BY `order` ASC",
 			array());
-		$cats = App::$db->get_results($sql);
+		$results = App::$db->get_results($sql);
+		$cats = array();
+
+		if (!is_null($results)) {
+			foreach($results as $cat) {
+				$cats[] = new Category($cat->id);
+			}
+		}
 		return $cats;
 	}
 }
