@@ -24,11 +24,7 @@ class BaseModel {
 		$this->class = get_class($this);
 		$this->item = $item;
 
-		if(class_exists(get_class($this).'Helper')) {
-			$this->import(get_class($this).'Helper');
-		}
-
-		if($fields) {
+		if (!is_null($fields)) {
 			foreach($fields as $key => $value) {
 				if(!empty($this->filters) && array_key_exists($key, $this->filters)) {
 					$key = $this->filters[$key];
@@ -36,7 +32,7 @@ class BaseModel {
 				$this->fields[$key] = $value;
 			}
 		} else {
-			throw new ModelNotFoundException('No model in database', $class, $item);
+			throw new \FelixOnline\Exceptions\ModelNotFoundException('No model in database', $this->class, $item);
 		}
 		return $this->fields;
 	}
@@ -45,67 +41,53 @@ class BaseModel {
 	 * Create dynamic functions
 	 */
 	function __call($method,$arguments) {
-		// check if there is an imported function that matches request
-		if(array_key_exists($method, $this->importedFunctions)) {
-			// invoke the function
-			return call_user_func_array(array($this->importedFunctions[$method], $method), $arguments);
-		} else {
-			$meth = $this->from_camel_case(substr($method,3,strlen($method)-3));
-			$verb = substr($method, 0, 3);
-			switch($verb) {
-				case 'get':
-					if(array_key_exists($meth, $this->fields)) {
-						return $this->fields[$meth];
-					}
-					throw new ModelConfigurationException('The requested field "'.$meth.'" does not exist', $verb, $meth, $class, $item);
-					break;
-				case 'set':
-					if(array_key_exists($meth, $this->transformers)) {
-						switch($this->transformers[$meth]) {
-							case self::TRANSFORMER_NO_HTML:
-								$this->fields[$meth] = strip_tags($arguments[0]);
-								break;
-							case self::TRANSFORMER_NONE:
-							default:
-								$this->fields[$meth] = $arguments[0];
-								break;
-						}
-					} else {
-						$this->fields[$meth] = $arguments[0];
-					}
-
+		$meth = $this->from_camel_case(substr($method,3,strlen($method)-3));
+		$verb = substr($method, 0, 3);
+		switch($verb) {
+			case 'get':
+				if(array_key_exists($meth, $this->fields)) {
 					return $this->fields[$meth];
-					break;
-				case 'has':
-					if (array_key_exists($meth, $this->fields)) {
-						return true;
+				}
+				throw new \FelixOnline\Exceptions\ModelConfigurationException(
+					'The requested field "'.$meth.'" does not exist',
+					$verb,
+					$meth,
+					$this->class,
+					$this->item
+				);
+				break;
+			case 'set':
+				if(array_key_exists($meth, $this->transformers)) {
+					switch($this->transformers[$meth]) {
+						case self::TRANSFORMER_NO_HTML:
+							$this->fields[$meth] = strip_tags($arguments[0]);
+							break;
+						case self::TRANSFORMER_NONE:
+						default:
+							$this->fields[$meth] = $arguments[0];
+							break;
 					}
-					return false;
-					break;
-				default:
-					throw new ModelConfigurationException('The requested verb is not valid', $verb, $meth, $class, $item);
-					break;
-			}
-		}
-	}
+				} else {
+					$this->fields[$meth] = $arguments[0];
+				}
 
-	/*
-	 * Import an object and allow its functions to be used in this class
-	 */
-	public function import($object) {
-		// the new object to import
-		$newImport = new $object($this);
-		// the name of the new object (class name)
-		$importName = get_class($newImport);
-		// the new functions to import
-		$importFunctions = get_class_methods($newImport);
-
-		// add the object to the registry
-		array_push($this->imported, array($import_name, $newImport));
-
-		// add the methods to the registry
-		foreach($importFunctions as $key => $functionName) {
-			$this->importedFunctions[$functionName] = &$newImport;
+				return $this->fields[$meth];
+				break;
+			case 'has':
+				if (array_key_exists($meth, $this->fields)) {
+					return true;
+				}
+				return false;
+				break;
+			default:
+				throw new \FelixOnline\Exceptions\ModelConfigurationException(
+					'The requested verb is not valid',
+					$verb,
+					$meth,
+					$this->class,
+					$this->item
+				);
+				break;
 		}
 	}
 
