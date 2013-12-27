@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+	<table_data name="comment">
+	<row>
+		<field name="id">1</field>
+		<field name="article">1</field>
+		<field name="user">felix</field>
+		<field name="comment">Test comment number one</field>
+		<field name="timestamp">2009-12-27 02:46:51</field>
+		<field name="active">1</field>
+		<field name="reply" xsi:nil="true" />
+		<field name="likes">0</field>
+		<field name="dislikes">0</field>
+	</row>
+	<row>
+		<field name="id">2</field>
+		<field name="article">1</field>
+		<field name="user">jk708</field>
+		<field name="comment">Test comment number two</field>
+		<field name="timestamp">2009-12-27 02:47:51</field>
+		<field name="active">1</field>
+		<field name="reply" xsi:nil="true" />
+		<field name="likes">1</field>
+		<field name="dislikes">0</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>

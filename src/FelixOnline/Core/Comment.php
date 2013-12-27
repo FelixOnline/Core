@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /*
  * Comment class
  * Deals with both comment retrieval and comment submission
@@ -59,7 +60,7 @@ class Comment extends BaseModel {
 		'content' => parent::TRANSFORMER_NO_HTML
 	);
 	
-	/*
+	/**
 	 * Constructor for Comment class
 	 * If initialised with an id then store relevant data
 	 * Do nothing if not
@@ -69,15 +70,10 @@ class Comment extends BaseModel {
 	 * Returns comment object.
 	 */
 	public function __construct($id=NULL) {
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-
-		if($id != NULL) {
+		if ($id != NULL) {
 			if($id < self::EXTERNAL_COMMENT_ID) { // if comment is internal
 				$this->external = false; // comment is internal
-				$sql = $this->safesql->query(
+				$sql = App::query(
 					"SELECT 
 						id, 
 						`article`,
@@ -94,12 +90,10 @@ class Comment extends BaseModel {
 						$id
 					));
 
-				parent::__construct($this->db->get_row($sql), $id);
-
-				return $this;
+				parent::__construct(App::$db->get_row($sql), $id);
 			} else {
 				$this->external = true; // comment is external
-				$sql = $this->safesql->query(
+				$sql = App::query(
 					"SELECT 
 						id, 
 						`article`,
@@ -121,8 +115,7 @@ class Comment extends BaseModel {
 
 				$this->transfomers['name'] = parent::TRANSFORMER_NO_HTML;
 
-				parent::__construct($this->db->get_row($sql), $id);
-				return $this;
+				parent::__construct(App::$db->get_row($sql), $id);
 			}
 		} else {
 			$this->setFieldFilters(array(
@@ -132,21 +125,21 @@ class Comment extends BaseModel {
 		}
 	}
 
-	/*
+	/**
 	 * Public: Get article class that comment is on
 	 */
 	public function getArticle() { 
-		if(!$this->article) {
+		if (!$this->article) {
 			$this->article = new Article($this->fields['article']);
 		}
 		return $this->article;
 	}
 
-	/*
+	/**
 	 * Public: Get user class
 	 */
 	public function getUser() {
-		if(!$this->user) {
+		if (!$this->user) {
 			$this->user = new User($this->fields['user']);
 		}
 		return $this->user;
@@ -158,7 +151,7 @@ class Comment extends BaseModel {
 	 * Returns comment object of reply. Returns false if no reply
 	 */
 	public function getReply() {
-		if($this->fields['reply']) {
+		if ($this->fields['reply']) {
 			if(!$this->reply) {
 				try {
 					$this->reply = new Comment($this->fields['reply']); // initialise new comment as reply
@@ -172,7 +165,7 @@ class Comment extends BaseModel {
 		}
 	}
 
-	/*
+	/**
 	 * Public: Get comment content with reply link
 	 */
 	public function getContent() { 
@@ -186,7 +179,7 @@ class Comment extends BaseModel {
 		return $output;
 	}
 
-	/*
+	/**
 	 * Public: Get commenter's name
 	 */
 	public function getName() {
@@ -201,14 +194,14 @@ class Comment extends BaseModel {
 		}
 	}
 
-	/*
+	/**
 	 * Public: Get url
 	 */
 	public function getURL() {
 		return $this->getArticle()->getURL().'#comment'.$this->getId();
 	}
 
-	/*
+	/**
 	 * Public: Check if comment is from author of article
 	 *
 	 * Returns true if is author. False if not.
