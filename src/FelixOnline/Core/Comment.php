@@ -204,7 +204,7 @@ class Comment extends BaseModel {
 		if($this->isExternal()) {
 			return false;
 		} else {
-			if(in_array($this->getUser()->getUser(), $this->getArticle()->getAuthors())) {
+			if(in_array($this->getUser(), $this->getArticle()->getAuthors())) {
 				return true;
 			} else {
 				return false;
@@ -560,41 +560,20 @@ class Comment extends BaseModel {
 		}
 	}
 
-	/*
-	 * Utility functions
+	/**
+	 * Get a number of comments to approve
 	 */
-
-	public function printThis() {
-		print_r($this);
-	}
-
-	private function log($name, $content) {
-		$file = 'emails/'.date('Y-m-d H:i:s').' '.$name.'.txt';
-		$fh = fopen($file, 'a');
-		if(is_string($content)) {
-			$body = $content."\r\n";
-		} else {
-			ob_start();
-			print_r($content);
-			$content = ob_get_contents();
-			ob_end_clean();
-			$body = $content."\r\n";
-		}
-		fwrite($fh, $body);
-		fclose($fh);
-	}
-
-	private function getCommentsToApprove() {
-		if(!$this->commentsToApprove) {
+	private function getNumCommentsToApprove() {
+		if(!$this->numCommentsToApprove) {
 			$sql = $this->safesql->query(
 				"SELECT 
 					COUNT(id) 
 				FROM comment_ext 
 				WHERE ACTIVE=1 
 				AND pending=1", array());
-			$this->commentsToApprove = $this->db->get_var($sql);
+			$this->numCommentsToApprove = $this->db->get_var($sql);
 		}
-		return $this->commentsToApprove;
+		return $this->numCommentsToApprove;
 	}
 	
 	/*

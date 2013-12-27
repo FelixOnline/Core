@@ -107,4 +107,28 @@ class CommentTest extends DatabaseTestCase
 		$comment = new \FelixOnline\Core\Comment(1);
 		$this->assertEquals($comment->getURL(), 'http://localhost/news/1/fighting-for-libel-reform/#comment1');
 	}
+
+	public function testByAuthor()
+	{
+		$comment = new \FelixOnline\Core\Comment(1);
+		$this->assertTrue($comment->byAuthor());
+
+		$comment = new \FelixOnline\Core\Comment(2);
+		$this->assertFalse($comment->byAuthor());
+
+		$comment = new \FelixOnline\Core\Comment(80000001);
+		$this->assertFalse($comment->byAuthor());
+	}
+
+	public function testIsRejected()
+	{
+		$internal = new \FelixOnline\Core\Comment(1);
+		$this->assertFalse($internal->isRejected());
+
+		$external = new \FelixOnline\Core\Comment(80000001);
+		$this->assertFalse($external->isRejected());
+
+		$external = new \FelixOnline\Core\Comment(80000003);
+		$this->assertTrue($external->isRejected());
+	}
 }
