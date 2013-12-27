@@ -140,7 +140,11 @@ class Comment extends BaseModel {
 	 */
 	public function getUser() {
 		if (!$this->user) {
-			$this->user = new User($this->fields['user']);
+			if ($this->hasUser()) {
+				$this->user = new User($this->fields['user']);
+			} else {
+				throw new \FelixOnline\Exceptions\InternalException('External comment does not have a user');
+			}
 		}
 		return $this->user;
 	}
@@ -153,11 +157,7 @@ class Comment extends BaseModel {
 	public function getReply() {
 		if ($this->fields['reply']) {
 			if(!$this->reply) {
-				try {
-					$this->reply = new Comment($this->fields['reply']); // initialise new comment as reply
-				} catch (Exception $e) {
-					return false;
-				}
+				$this->reply = new Comment($this->fields['reply']); // initialise new comment as reply
 			}
 			return $this->reply;
 		} else {
@@ -166,16 +166,10 @@ class Comment extends BaseModel {
 	}
 
 	/**
-	 * Public: Get comment content with reply link
+	 * Public: Get comment content
 	 */
 	public function getContent() { 
-		$output = '';
-		// Add link to reply comment
-		if($this->getReply()) { 
-			$output .= '<a href="'.Utility::currentPageURL().'#comment'.$this->getReply()->getId().'" id="replyLink">';
-			$output .= '@'.$this->getReply()->getName().':</a> '; 
-		} 
-		$output .= nl2br(trim($this->fields['content'])); 
+		$output = nl2br(trim($this->fields['content'])); 
 		return $output;
 	}
 

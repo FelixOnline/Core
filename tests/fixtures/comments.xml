@@ -20,7 +20,7 @@
 		<field name="comment">Test comment number two</field>
 		<field name="timestamp">2009-12-27 02:47:51</field>
 		<field name="active">1</field>
-		<field name="reply" xsi:nil="true" />
+        <field name="reply">1</field>
 		<field name="likes">1</field>
 		<field name="dislikes">0</field>
 	</row>
