@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /**
  * Article manager
  */

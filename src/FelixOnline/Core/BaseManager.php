@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /**
  * Base manager
  */
@@ -6,13 +7,6 @@ class BaseManager
 {
 	protected $table; // database table
 	protected $class; // object class name
-
-	function __construct() {
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-	}
 
 	/**
 	 * Get object based on id
@@ -74,9 +68,9 @@ class BaseManager
 			$params[] = $limit;
 		}
 
-		$sql = $this->safesql->query($sql, $params);
+		$sql = App::query($sql, $params);
 
-		$results = $this->db->get_results($sql);
+		$results = App::$db->get_results($sql);
 		$objects = [];
 
 		foreach($results as $result) {
