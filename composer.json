@@ -25,6 +25,9 @@
 	"autoload": {
 		"psr-0": {
 			"FelixOnline": "src/"
-		}
+		},
+        "classmap": [
+            "lib/SafeSQL.php"
+		]
 	}
 }
