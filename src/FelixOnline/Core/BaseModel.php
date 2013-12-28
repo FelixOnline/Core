@@ -111,14 +111,28 @@ class BaseModel {
 	 */
 	public function save() {
 		$arrayLength = count($this->fields);
-		if(!$arrayLength) {
-			throw new InternalException('No fields in object');
+		if (!$arrayLength) {
+			throw new \FelixOnline\Exceptions\InternalException('No fields in object');
 		}
+
+		if (!$this->dbtable) {
+			throw new \FelixOnline\Exceptions\InternalException('No table specified');
+		}
+
+		$sql = $this->constructSQL();
+
+		return App::$db->query($sql);
+	}
+
+	/**
+	 * Private: Construct SQL
+	 */
+	public function constructSQL() {
+		$arrayLength = count($this->fields);
+		$values = array();
+
 		$sql = "INSERT INTO `";
 
-		if(!$this->dbtable) {
-			throw new InternalException('No table specified');
-		}
 		$sql .= $this->dbtable;
 
 		$sql .= "` (";
@@ -127,44 +141,65 @@ class BaseModel {
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];
 			}
-			if($i == $arrayLength) {
-				$sql .= $key;
-			} else {
-				$sql .= $key.', ';
+
+			$sql .= '`';
+			$sql .= $key;
+			$sql .= '`';
+
+			if($i !== $arrayLength) {
+				$sql .= ', ';
 			}
 			$i++;
 		}
+
 		$sql .= ") VALUES (";
+
 		$i = 1;
 		foreach($this->fields as $key => $value) {
-			if(isset($value)) {
-				if(is_numeric($value)) {
-					$sql .= $value;
-				} else {
-					$sql .= "'".$this->db->escape($value)."'";
-				}
-			} else {
-				$sql .= "''";
-			}
+			$sql .= $this->getFieldValue($value, $values);
+
 			if($i != $arrayLength) {
 				$sql .= ", ";
 			}
 			$i++;
 		}
+
 		$sql .= ") ";
 		$sql .= "ON DUPLICATE KEY UPDATE ";
 		$i = 1;
+
 		foreach($this->fields as $key => $value) {
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];
 			}
-			$sql .= $key."='".$this->db->escape($value)."'";
+			$sql .= '`'.$key.'`'."=";
+
+			$sql .= $this->getFieldValue($value, $values);
+
 			if($i != $arrayLength) {
 				$sql .= ", ";
 			}
 			$i++;
 		}
-		return $this->db->query($sql);
+
+		return App::query($sql, $values);
+	}
+
+	/**
+	 * Private: Get field value
+	 */
+	private function getFieldValue($value, &$values) {
+		if (is_null($value)) {
+			return 'NULL';
+		}
+
+		$values[] = $value;
+
+		if (is_numeric($value)) {
+			return "%i";
+		}
+
+		return "'%s'";
 	}
 
 	/*
