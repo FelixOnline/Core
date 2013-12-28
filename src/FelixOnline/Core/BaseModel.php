@@ -233,6 +233,14 @@ class BaseModel {
 		return $this->fields;
 	}
 
+	/**
+	 * Public: Set fields
+	 */
+	public function setFields($fields) {
+		$this->fields = $fields;
+		return $this->fields;
+	}
+
 	/*
 	 * Convert camel case to underscore
 	 * http://www.paulferrett.com/2009/php-camel-case-functions/
