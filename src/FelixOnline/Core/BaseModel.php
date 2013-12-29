@@ -132,11 +132,14 @@ class BaseModel {
 					$changed[$field] = $this->fields[$field];
 				}
 			}
-			$sql = $this->constructUpdateSQL($changed);
 
-			App::$db->query($sql);
-			if (App::$db->last_error) {
-				throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+			if (!empty($changed)) {
+				$sql = $this->constructUpdateSQL($changed);
+
+				App::$db->query($sql);
+				if (App::$db->last_error) {
+					throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+				}
 			}
 		} else { // insert model
 			$sql = $this->constructInsertSQL($this->fields);

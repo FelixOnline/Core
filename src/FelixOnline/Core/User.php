@@ -24,6 +24,7 @@ class User extends BaseModel {
 	private $popArticles = array();
 	private $comments = array();
 	protected $dbtable = 'user';
+	protected $primaryKey = 'user';
 	protected $transformers = array(
 		'description' => parent::TRANSFORMER_NO_HTML,
 		'email' => parent::TRANSFORMER_NO_HTML,
