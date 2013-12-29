@@ -121,7 +121,14 @@ class BaseModel {
 
 		$sql = $this->constructSQL();
 
-		return App::$db->query($sql);
+		App::$db->query($sql);
+		if (App::$db->last_error) {
+			throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+		}
+
+		$this->setId(App::$db->insert_id);
+
+		return $this->getId(); // return new id
 	}
 
 	/**

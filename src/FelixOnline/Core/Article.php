@@ -15,7 +15,7 @@ namespace FelixOnline\Core;
  *	  approvedby	  - user who approved the article to be published
  *	  published	   - timestamp when article was published
  *	  hidden		  - if article is hidden from engine
- *        searchable       - can article be seen by search engines?
+ *	  searchable       - can article be seen by search engines?
  *	  text1		   - id of main article text
  *	  img1			- id of main article image
  *	  text2		   - id of second article text [depreciated]
@@ -45,8 +45,8 @@ class Article extends BaseModel {
 		'@<![\s\S]*?--[ \t\n\r]*>@',		// multi-line comments including CDATA
 		'@</?[^>]*>*@' 		  // html tags
 	);
-	protected $db;
-	protected $safesql;
+
+	protected $dbtable = 'article';
 
 	/*
 	 * Constructor for Article class
