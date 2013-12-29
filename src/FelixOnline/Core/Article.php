@@ -467,6 +467,24 @@ class Article extends BaseModel {
 		}
 	}
 
+	/**
+	 * Public: Set content to article
+	 */
+	public function setContent($content) {
+		$sql = App::query(
+			"INSERT INTO text_story (`content`) VALUES ('%s')",
+			array($content)
+		);
+
+		App::$db->query($sql);
+
+		$id = App::$db->insert_id;
+
+		$this->setText1($id);
+
+		return $id;
+	}
+
 	public static function getMostPopular($number_to_get) {
 		global $db;
 		global $safesql;

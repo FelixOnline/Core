@@ -121,4 +121,14 @@ class ArticleTest extends DatabaseTestCase
 		$this->assertInstanceOf('FelixOnline\Core\User', $user);
 		$this->assertEquals($user->getUser(), 'felix');
 	}
+
+	public function testSetContent()
+	{
+		$this->assertEquals(3, $this->getConnection()->getRowCount('text_story'));
+		$article = new \FelixOnline\Core\Article(1);
+
+		$id = $article->setContent('Foo bar');
+		$this->assertEquals(4, $this->getConnection()->getRowCount('text_story'));
+		$this->assertEquals($id, $article->getText1());
+	}
 }
