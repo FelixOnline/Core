@@ -68,7 +68,8 @@ class Article extends BaseModel {
 					`approvedby`,
 					`category`,
 					UNIX_TIMESTAMP(`date`) as date,
-					UNIX_TIMESTAMP(`published`) as published,`hidden`,
+					UNIX_TIMESTAMP(`published`) as published,
+					`hidden`,
 					`searchable`,
 					`text1`,
 					`text2`,
@@ -251,8 +252,8 @@ class Article extends BaseModel {
 	 * Returns int
 	 */
 	public function getNumComments() {
-		if(!$this->num_comments && $this->num_comments !== 0) {
-			$sql = $this->safesql->query(
+		if(!isset($this->num_comments)) {
+			$sql = App::query(
 				"SELECT
 					SUM(count) AS count
 				FROM (
@@ -274,8 +275,8 @@ class Article extends BaseModel {
 					$this->getId()
 				)
 			);
-			$this->num_comments = $this->db->get_var($sql);
-			if(!$this->num_comments) $this->num_comments = 0;
+			$this->num_comments = App::$db->get_var($sql);
+			if(!isset($this->num_comments)) $this->num_comments = 0;
 		}
 		return $this->num_comments;
 	}
@@ -283,13 +284,14 @@ class Article extends BaseModel {
 	/*
 	 * Public: Get comments
 	 *
+	 * $ip - server ip
+	 *
 	 * Returns db object
 	 */
-	public function getComments() {
-		$sql = $this->safesql->query(
+	public function getComments($ip) {
+		$sql = App::query(
 			"SELECT
-				id,
-				timestamp
+				id
 			FROM (
 				SELECT
 					comment.id,
@@ -302,16 +304,18 @@ class Article extends BaseModel {
 					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
 				FROM `comment_ext`
 				WHERE article=%i
-				AND pending=0 AND spam=0 # select external comments that are not spam
+				AND active = 1
+				AND pending  =0
+				AND spam = 0 # select external comments that are not spam
 				UNION SELECT
 					comment_ext.id,
 					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
 					FROM `comment_ext`
 				WHERE article=%i
 				AND IP = '%s'
-				AND active=1
-				AND pending=1
-				AND spam=0 # select external comments that are pending and are from current ip
+				AND active = 1
+				AND pending = 1
+				AND spam = 0 # select external comments that are pending and are from current ip
 			) AS t
 			ORDER BY timestamp ASC
 			LIMIT 500",
@@ -319,12 +323,12 @@ class Article extends BaseModel {
 				$this->getId(),
 				$this->getId(),
 				$this->getId(),
-				$_SERVER['REMOTE_ADDR']
+				$ip,
 			)
 		);
 		$comments = array();
-		$rsc = $this->db->get_results($sql);
-		if($rsc) {
+		$rsc = App::$db->get_results($sql);
+		if ($rsc) {
 			foreach($rsc as $key => $obj) {
 				$comments[] = new Comment($obj->id);
 			}
@@ -486,9 +490,9 @@ class Article extends BaseModel {
 	}
 
 	/**
-	 * Public: Set authors to article
+	 * Public: Add authors to article
 	 */
-	public function setAuthors($authors) {
+	public function addAuthors($authors) {
 		foreach ($authors as $author) {
 			$sql = App::query(
 				"INSERT INTO article_author (`article`, `author`) VALUES (%i, '%s')",
@@ -497,67 +501,5 @@ class Article extends BaseModel {
 			App::$db->query($sql);
 		}
 		return $authors;
-	}
-
-	public static function getMostPopular($number_to_get) {
-		global $db;
-		global $safesql;
-
-		$sql = $safesql->query(
-			"SELECT
-				DISTINCT article AS id,
-				COUNT(article) AS c
-			FROM (
-				SELECT article FROM article_visit AS av
-				INNER JOIN article AS a
-				ON (av.article=a.id)
-				WHERE a.published IS NOT NULL
-				AND a.published > FROM_UNIXTIME(UNIX_TIMESTAMP() - 1814400)
-				ORDER BY timestamp DESC LIMIT 500
-			) AS t GROUP BY article ORDER BY c DESC LIMIT %i",
-			array($number_to_get)
-		);
-
-		return $db->get_results($sql);
-	}
-
-	public static function getMostCommented($threshold, $number_to_get) {
-		global $db;
-		global $safesql;
-
-		$sql = $safesql->query(
-			"SELECT
-				article AS id,
-				SUM(count) AS count
-			FROM (
-					(SELECT c.article,COUNT(*) AS count
-					FROM `comment` AS c
-					INNER JOIN `article` AS a ON (c.article=a.id)
-					WHERE c.`active`=1
-					AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
-					AND a.published<NOW()
-					GROUP BY article
-					ORDER BY timestamp DESC
-					LIMIT 20)
-				UNION ALL
-					(SELECT ce.article,COUNT(*) AS count
-					FROM `comment_ext` AS ce
-					INNER JOIN `article` AS a ON (ce.article=a.id)
-					WHERE ce.`active`=1
-					AND pending=0
-					AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
-					AND a.published<NOW()
-					GROUP BY article
-					ORDER BY timestamp DESC)
-			) AS t
-			GROUP BY article
-			ORDER BY count DESC, article DESC LIMIT %i",
-			array(
-				$threshold,
-				$threshold,
-				$number_to_get
-			)
-		); // go for most recent comments instead
-		return $db->get_results($sql);
 	}
 }

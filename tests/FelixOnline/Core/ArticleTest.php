@@ -11,6 +11,8 @@ class ArticleTest extends DatabaseTestCase
 		'text_stories',
 		'users',
 		'article_authors',
+		'comments',
+		'comments_ext',
 	);
 
 	public function setUp()
@@ -132,7 +134,7 @@ class ArticleTest extends DatabaseTestCase
 		$this->assertEquals($id, $article->getText1());
 	}
 
-	public function testSetAuthors()
+	public function testAddAuthors()
 	{
 		$this->assertEquals(5, $this->getConnection()->getRowCount('article_author'));
 
@@ -141,9 +143,26 @@ class ArticleTest extends DatabaseTestCase
 			new \FelixOnline\Core\User('jk708'),
 			new \FelixOnline\Core\User('pk1811'),
 		);
-		$article->setAuthors($users);
+		$article->addAuthors($users);
 
 		$this->assertEquals(7, $this->getConnection()->getRowCount('article_author'));
 		$this->assertCount(3, $article->getAuthors());
+	}
+
+	public function testGetNumComments()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+
+		$this->assertEquals(4, $article->getNumComments());
+	}
+
+	public function testGetComments()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+
+		$comments = $article->getComments('0.0.0.0');
+
+		$this->assertCount(5, $comments);
+		$this->assertInstanceOf('FelixOnline\Core\Comment', $comments[0]);
 	}
 }

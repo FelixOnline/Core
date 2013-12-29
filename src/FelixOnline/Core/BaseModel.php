@@ -241,6 +241,14 @@ class BaseModel {
 	}
 
 	/**
+	 * Public: Set field
+	 */
+	public function setField($field, $value) {
+		$this->fields[$field] = $value;
+		return $this->fields[$field];
+	}
+
+	/**
 	 * Public: Set fields
 	 */
 	public function setFields($fields) {
