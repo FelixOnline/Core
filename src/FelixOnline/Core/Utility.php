@@ -131,7 +131,8 @@ class Utility {
 		$title = strtolower($string); // Make title lowercase
 		$title= preg_replace('/[^\w\d_ -]/si', '', $title); // Remove special characters
 		$dashed = str_replace( " ", "-", $title); // Replace spaces with hypens
-		return $dashed;
+		$utf8 = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $dashed); // Remove non printable characters
+		return $utf8;
 	}
 
 	/*
