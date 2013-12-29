@@ -16,6 +16,8 @@ class BaseModel {
 	private $importedFunctions = array();
 	protected $filters = array();
 	protected $transformers = array();
+	protected $initialFields; // Initial fields, used to determine whether the model has been modified
+	protected $primaryKey = 'id';
 
 	const TRANSFORMER_NONE = 1;
 	const TRANSFORMER_NO_HTML = 2;
@@ -34,6 +36,8 @@ class BaseModel {
 		} else {
 			throw new \FelixOnline\Exceptions\ModelNotFoundException('No model in database', $this->class, $item);
 		}
+
+		$this->initialFields = $this->fields;
 		return $this->fields;
 	}
 
@@ -119,23 +123,40 @@ class BaseModel {
 			throw new \FelixOnline\Exceptions\InternalException('No table specified');
 		}
 
-		$sql = $this->constructSQL();
+		// update model
+		if (array_key_exists($this->primaryKey, $this->fields) && $this->fields[$this->primaryKey]) {
+			// Determine what has been modified
+			$changed = array();
+			foreach ($this->initialFields as $field => $value) {
+				if ($this->fields[$field] !== $value) {
+					$changed[$field] = $this->fields[$field];
+				}
+			}
+			$sql = $this->constructUpdateSQL($changed);
 
-		App::$db->query($sql);
-		if (App::$db->last_error) {
-			throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+			App::$db->query($sql);
+			if (App::$db->last_error) {
+				throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+			}
+		} else { // insert model
+			$sql = $this->constructInsertSQL($this->fields);
+
+			App::$db->query($sql);
+			if (App::$db->last_error) {
+				throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+			}
+
+			$this->fields[$this->primaryKey] = App::$db->insert_id;
 		}
 
-		$this->setId(App::$db->insert_id);
-
-		return $this->getId(); // return new id
+		return $this->fields[$this->primaryKey]; // return new id
 	}
 
 	/**
 	 * Private: Construct SQL
 	 */
-	public function constructSQL() {
-		$arrayLength = count($this->fields);
+	public function constructInsertSQL($fields) {
+		$arrayLength = count($fields);
 		$values = array();
 
 		$sql = "INSERT INTO `";
@@ -144,7 +165,7 @@ class BaseModel {
 
 		$sql .= "` (";
 		$i = 1; // counter
-		foreach($this->fields as $key => $value) {
+		foreach($fields as $key => $value) {
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];
 			}
@@ -162,7 +183,7 @@ class BaseModel {
 		$sql .= ") VALUES (";
 
 		$i = 1;
-		foreach($this->fields as $key => $value) {
+		foreach($fields as $key => $value) {
 			$sql .= $this->getFieldValue($value, $values);
 
 			if($i != $arrayLength) {
@@ -171,11 +192,26 @@ class BaseModel {
 			$i++;
 		}
 
-		$sql .= ") ";
-		$sql .= "ON DUPLICATE KEY UPDATE ";
-		$i = 1;
+		$sql .= ")";
 
-		foreach($this->fields as $key => $value) {
+		return App::query($sql, $values);
+	}
+
+	/**
+	 * Public: Construct update SQL
+	 */
+	public function constructUpdateSQL($fields) {
+		$arrayLength = count($fields);
+		$values = array();
+
+		$sql = "UPDATE `";
+
+		$sql .= $this->dbtable;
+
+		$sql .= "` SET ";
+
+		$i = 1;
+		foreach($fields as $key => $value) {
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];
 			}
@@ -188,6 +224,15 @@ class BaseModel {
 			}
 			$i++;
 		}
+
+		$sql .= " WHERE `" . $this->primaryKey . "`=";
+		$primaryKey = $this->fields[$this->primaryKey];
+		if (is_numeric($primaryKey)) {
+			$sql .= "%i";
+		} else {
+			$sql .= "'%s'";
+		}
+		$values[] = $this->fields[$this->primaryKey];
 
 		return App::query($sql, $values);
 	}
@@ -254,6 +299,14 @@ class BaseModel {
 	public function setFields($fields) {
 		$this->fields = $fields;
 		return $this->fields;
+	}
+
+	/**
+	 * Public: Set primary key
+	 */
+	public function setPrimaryKey($key) {
+		$this->primaryKey = $key;
+		return $this->primaryKey;
 	}
 
 	/*

@@ -85,7 +85,7 @@ class BaseModelTest extends DatabaseTestCase
 		$this->assertEquals($fields, $model->getFields());
 	}
 
-	public function testConstructSQL()
+	public function testConstructInsertSQL()
 	{
 		$model = new \FelixOnline\Core\BaseModel(array(
 			'foo' => 'bar', // string
@@ -96,8 +96,27 @@ class BaseModelTest extends DatabaseTestCase
 		$model->setDbtable('test');
 
 		$this->assertEquals(
-			$model->constructSQL(),
-			"INSERT INTO `test` (`foo`, `fizz`, `buzz`, `empty`) VALUES ('bar', 1, NULL, '') ON DUPLICATE KEY UPDATE `foo`='bar', `fizz`=1, `buzz`=NULL, `empty`=''"
+			$model->constructInsertSQL($model->getFields()),
+			"INSERT INTO `test` (`foo`, `fizz`, `buzz`, `empty`) VALUES ('bar', 1, NULL, '')"
+		);
+	}
+
+	public function testConstructUpdateSQL()
+	{
+		$model = new \FelixOnline\Core\BaseModel(array(
+			'id' => 1,
+			'foo' => 'bar', // string
+			'fizz' => 1, // number
+			'buzz' => NULL, // null
+			'empty' => '', // empty
+		));
+		$model->setDbtable('test');
+
+		$this->assertEquals(
+			$model->constructUpdateSQL(array(
+				'foo' => 'bars',
+			)),
+			"UPDATE `test` SET `foo`='bars' WHERE `id`=1"
 		);
 	}
 
@@ -116,6 +135,26 @@ class BaseModelTest extends DatabaseTestCase
 		$user->save();
 
 		$this->assertEquals(4, $this->getConnection()->getRowCount('user'));
+	}
+
+	public function testSaveUpdate()
+	{
+		$this->assertEquals(3, $this->getConnection()->getRowCount('user'));
+
+		$user = new \FelixOnline\Core\BaseModel(array(
+			'user' => 'felix',
+			'name' => 'Joseph Letts - Felix Editor',
+			'role' => 100,
+			'info' => '',
+		));
+
+		$user->setPrimaryKey('user');
+		$user->setDbtable('user');
+
+		$user->setInfo('Foo bar');
+		$user->save();
+
+		$this->assertEquals(3, $this->getConnection()->getRowCount('user'));
 	}
 
 	public function testSaveNoFieldsException()
@@ -141,18 +180,29 @@ class BaseModelTest extends DatabaseTestCase
 	public function testFieldFilters()
 	{
 		$model = new \FelixOnline\Core\BaseModel(array(
-			'foo' => 'bar'
+			'id' => 1,
+			'foo' => 'bar',
+			'xxx' => 'bbb',
 		));
 
 		$model->setFieldFilters(array(
-			'foo' => 'fizz'
+			'foo' => 'fizz',
+			'xxx' => 'yyy',
 		));
 
 		$model->setDbtable('test');
 
 		$this->assertEquals(
-			$model->constructSQL(),
-			"INSERT INTO `test` (`fizz`) VALUES ('bar') ON DUPLICATE KEY UPDATE `fizz`='bar'"
+			$model->constructInsertSQL($model->getFields()),
+			"INSERT INTO `test` (`id`, `fizz`, `yyy`) VALUES (1, 'bar', 'bbb')"
+		);
+
+		$this->assertEquals(
+			$model->constructUpdateSQL(array(
+				'foo' => 'bars',
+				'xxx' => 'aaa'
+			)),
+			"UPDATE `test` SET `fizz`='bars', `yyy`='aaa' WHERE `id`=1"
 		);
 	}
 }
