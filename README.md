@@ -2,7 +2,10 @@
 
 Core functionality for the Felix Online site.
 
+## Progress
+So far Article has almost complete coverage with Category, Image and Comment mostly covered. Still a lot of work to do!
+
 ## Tests
 
 * Run `composer install` to install all dependencies
-* Run `./vendor/bin/phpunit` in the root folder to run the tests
+* Run `./vendor/bin/phpunit tests` in the root folder to run the tests
