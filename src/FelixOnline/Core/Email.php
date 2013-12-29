@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /*
  * Email class
  *
@@ -185,10 +186,4 @@ class Email {
 		fwrite($fh, $body);
 		fclose($fh);
 	}
-
-	public function printThis() {
-		print_r($this);
-	}
 }
-
-?>
