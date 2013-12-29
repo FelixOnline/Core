@@ -485,6 +485,20 @@ class Article extends BaseModel {
 		return $id;
 	}
 
+	/**
+	 * Public: Set authors to article
+	 */
+	public function setAuthors($authors) {
+		foreach ($authors as $author) {
+			$sql = App::query(
+				"INSERT INTO article_author (`article`, `author`) VALUES (%i, '%s')",
+				array($this->getId(), $author->getUser())
+			);
+			App::$db->query($sql);
+		}
+		return $authors;
+	}
+
 	public static function getMostPopular($number_to_get) {
 		global $db;
 		global $safesql;

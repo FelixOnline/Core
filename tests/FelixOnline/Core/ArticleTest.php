@@ -131,4 +131,19 @@ class ArticleTest extends DatabaseTestCase
 		$this->assertEquals(4, $this->getConnection()->getRowCount('text_story'));
 		$this->assertEquals($id, $article->getText1());
 	}
+
+	public function testSetAuthors()
+	{
+		$this->assertEquals(5, $this->getConnection()->getRowCount('article_author'));
+
+		$article = new \FelixOnline\Core\Article(1);
+		$users = array(
+			new \FelixOnline\Core\User('jk708'),
+			new \FelixOnline\Core\User('pk1811'),
+		);
+		$article->setAuthors($users);
+
+		$this->assertEquals(7, $this->getConnection()->getRowCount('article_author'));
+		$this->assertCount(3, $article->getAuthors());
+	}
 }
