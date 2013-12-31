@@ -91,17 +91,26 @@ class User extends BaseModel {
 			WHERE article_author.author='%s'
 			AND published < NOW()
 			ORDER BY article.date DESC";
-		if($page) {
+		$values = array(
+			$this->getUser()
+		);
+
+		if ($page) {
 			$sql .= " LIMIT %i, %i";
+			$values[] = ($page-1) * ARTICLES_PER_USER_PAGE;
+			$values[] = ARTICLES_PER_USER_PAGE;
 		}
 
-		$sql = $this->safesql->query($sql, array(
-			$this->getUser(),
-			($page-1) * ARTICLES_PER_USER_PAGE,
-			ARTICLES_PER_USER_PAGE,
-		));
-		$this->articles = $this->db->get_results($sql);	
-		return $this->articles;
+		$sql = App::query($sql, $values);
+
+		$results = App::$db->get_results($sql);	
+		$articles = array();
+		
+		foreach ($results as $article) {
+			$articles[] = new Article($article->id);
+		}
+
+		return $articles;
 	}
 
 	/*
@@ -110,7 +119,7 @@ class User extends BaseModel {
 	 */
 	public function getPopularArticles() {
 		if(!$this->popArticles) {
-			$sql = $this->safesql->query(
+			$sql = App::query(
 				"SELECT 
 					id 
 				FROM `article` 
@@ -123,7 +132,7 @@ class User extends BaseModel {
 					$this->getUser(),
 					NUMBER_OF_POPULAR_ARTICLES_USER,
 				));
-			$articles = $this->db->get_results($sql);
+			$articles = App::$db->get_results($sql);
 			foreach($articles as $key => $obj) {
 				$this->popArticles[] = new Article($obj->id);
 			}
@@ -137,7 +146,7 @@ class User extends BaseModel {
 	 */
 	public function getComments() {
 		if(!$this->comments) {
-			$sql = $this->safesql->query(
+			$sql = App::query(
 				"SELECT 
 					id
 				FROM `comment` 
@@ -148,7 +157,7 @@ class User extends BaseModel {
 					$this->getUser(),
 					NUMBER_OF_POPULAR_COMMENTS_USER,
 				));
-			$comments = $this->db->get_results($sql);	
+			$comments = App::$db->get_results($sql);	
 			if($comments) {
 				foreach($comments as $key => $obj) {
 					$this->comments[] = new Comment($obj->id);
@@ -180,7 +189,7 @@ class User extends BaseModel {
 	 */
 	public function getLikes() {
 		if(!$this->likes) {
-			$sql = $this->safesql->query(
+			$sql = App::query(
 				"SELECT 
 					SUM(likes) 
 				FROM `comment` 
@@ -189,7 +198,7 @@ class User extends BaseModel {
 				array(
 					$this->getUser(),
 				));
-			$this->likes = $this->db->get_var($sql);
+			$this->likes = App::$db->get_var($sql);
 		}
 		return $this->likes;
 	}
@@ -200,7 +209,7 @@ class User extends BaseModel {
 	 */
 	public function getDislikes() {
 		if(!$this->dislikes) {
-			$sql = $this->safesql->query(
+			$sql = App::query(
 				"SELECT 
 					SUM(dislikes) 
 				FROM `comment` 
@@ -209,7 +218,7 @@ class User extends BaseModel {
 				array(
 					$this->getUser(),
 				));
-			$this->dislikes = $this->db->get_var($sql);
+			$this->dislikes = App::$db->get_var($sql);
 		}
 		return $this->dislikes;
 	}
@@ -221,7 +230,7 @@ class User extends BaseModel {
 	 */
 	public function getNumPages() {
 		if(!$this->count) {
-			$sql = $this->safesql->query(
+			$sql = App::query(
 				"SELECT 
 					COUNT(id) as count 
 				FROM `article` 
@@ -233,7 +242,7 @@ class User extends BaseModel {
 				array(
 					$this->getUser()
 				));
-			$this->count = $this->db->get_var($sql);
+			$this->count = App::$db->get_var($sql);
 		}
 
 		$pages = ceil(($this->count - ARTICLES_PER_USER_PAGE) / (ARTICLES_PER_USER_PAGE)) + 1;
@@ -288,7 +297,7 @@ class User extends BaseModel {
 	}
 
 	public function getFirstLogin() {
-		$sql = $this->safesql->query(
+		$sql = App::query(
 			"SELECT 
 				UNIX_TIMESTAMP(timestamp) as timestamp 
 			FROM `login` 
