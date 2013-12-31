@@ -1,0 +1,22 @@
+language: php
+
+php:
+  - 5.5
+  - 5.4
+
+install:
+  - composer install
+
+services:
+  - mysql
+
+env: DB_USER=travis
+
+before_script:
+  - echo 'date.timezone = "Europe/London"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - mysql -e 'CREATE DATABASE `test_media_felix`;'
+
+script: vendor/bin/phpunit tests
+
+notifications:
+  irc: "chat.freenode.net#felixonline"
