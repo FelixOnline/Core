@@ -5,18 +5,14 @@ namespace FelixOnline\Core;
  */
 class CurrentUser extends User {
 	protected $session; // current session id
-	protected $ip; // user ip address
-	
+
 	/*
 	 * Create current user object
-	 * Store session id and ip address into object
+	 * Store session into object
 	 */
-	function __construct($ip, $browser, Session $session) {
+	function __construct(Session $session) {
 		$this->session = $session;
 		$this->session->start();
-
-		$this->ip = $ip;
-		$this->browser = $browser;
 
 		if ($user = $this->isLoggedIn()) {
 			$this->setUser($user);
@@ -83,6 +79,8 @@ class CurrentUser extends User {
 			return false;
 		}
 
+		$env = Environment::getInstance();
+
 		$cookiehash = $_COOKIE['felixonline'];
 
 		$sql = App::query(
@@ -125,8 +123,8 @@ class CurrentUser extends User {
 			)",
 			array(
 				$this->session->getId(),
-				$this->ip,
-				$this->browser,
+				$env['REMOTE_ADDR'],
+				$env['HTTP_USER_AGENT'],
 				$username,
 			));
 		App::$db->query($sql);
@@ -149,6 +147,8 @@ class CurrentUser extends User {
 			return false; // If we have no session, this method is meaningless.
 		}
 
+		$env = Environment::getInstance();
+
 		$sql = App::query(
 			"SELECT
 				TIMESTAMPDIFF(SECOND,timestamp,NOW()) AS timediff,
@@ -170,8 +170,8 @@ class CurrentUser extends User {
 
 		if (
 			$user->timediff <= SESSION_LENGTH 
-			&& $user->ip == $this->ip
-			&& $user->browser == $this->browser
+			&& $user->ip == $env['REMOTE_ADDR']
+			&& $user->browser == $env['HTTP_USER_AGENT']
 		) {
 			return true;
 		} else {
@@ -189,6 +189,8 @@ class CurrentUser extends User {
 	public function setUser($username) {
 		$username = strtolower($username);
 		
+		$env = Environment::getInstance();
+
 		try {
 			parent::__construct($username);
 		} catch (\FelixOnline\Exceptions\ModelNotFoundException $e) {
@@ -207,8 +209,8 @@ class CurrentUser extends User {
 			AND TIMESTAMPDIFF(SECOND,timestamp,NOW()) <= %i",
 			array(
 				$this->session->getId(),
-				$this->ip,
-				$this->browser,
+				$env['REMOTE_ADDR'],
+				$env['HTTP_USER_AGENT'],
 				SESSION_LENGTH,
 			));
 		App::$db->query($sql); // if this fails, it doesn't matter, we will

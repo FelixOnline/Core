@@ -17,19 +17,32 @@ class App
 
 	public static $db = null;
 	protected static $safesql = null;
+	protected static $env = null;
 
 	/**
 	 * Constructor
 	 *
 	 * @param array $options - options array
+	 * @param \ezSQL_mysqli $db - database object
+	 * @param \SafeSQL_MySQLi $db - safesql object
 	 */
-	public function __construct($options = array(), \ezSQL_mysqli $db, \SafeSQL_MySQLi $safesql)
-	{
+	public function __construct(
+		$options = array(),
+		\ezSQL_mysqli $db,
+		\SafeSQL_MySQLi $safesql,
+		Environment $env = null
+	) {
 		$this->checkOptions($options);
 		self::$options = $options;
 
 		self::$db = $db;
 		self::$safesql = $safesql;
+
+		if (is_null($env)) {
+			self::$env = Environment::getInstance();
+		} else {
+			self::$env = $env;
+		}
 
 		self::$instance = $this;
 	}
@@ -103,5 +116,13 @@ class App
 	public static function query($sql, $values)
 	{
 		return self::$safesql->query($sql, $values);
+	}
+
+	/**
+	 * Get environment
+	 */
+	public static function getEnv()
+	{
+		return self::$env;
 	}
 }

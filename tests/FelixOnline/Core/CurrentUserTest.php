@@ -31,8 +31,6 @@ class CurrentUserTest extends DatabaseTestCase
 	public function testNotLoggedIn()
 	{
 		$currentUser = new \FelixOnline\Core\CurrentUser(
-			'0.0.0.0',
-			'browser',
 			$this->session
 		);
 	}

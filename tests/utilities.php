@@ -17,5 +17,8 @@ function create_app($config = array('base_url' => 'foo')) {
 	);
 
 	$safesql = new \SafeSQL_MySQLi($db->dbh);
-	return new \FelixOnline\Core\App($config, $db, $safesql);
+
+	$env = \FelixOnline\Core\Environment::mock();
+
+	return new \FelixOnline\Core\App($config, $db, $safesql, $env);
 }
