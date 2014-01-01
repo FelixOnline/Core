@@ -32,6 +32,21 @@
 		<field name="width">1500</field>
 		<field name="height">1000</field>
 	</row>
+	<row>
+		<field name="id">24</field>
+		<field name="title">Jonathan Kim</field>
+		<field name="uri">img/upload/201001081608-jk708-jonathan.jpg</field>
+		<field name="user">jk708</field>
+		<field name="description">Jonathan Kim</field>
+		<field name="timestamp">2010-01-08 16:08:03</field>
+		<field name="v_offset">0</field>
+		<field name="h_offset">0</field>
+		<field name="caption">Jonathan Kim</field>
+		<field name="attribution"></field>
+		<field name="attr_link"></field>
+		<field name="width">1500</field>
+		<field name="height">1000</field>
+	</row>
 	</table_data>
 </database>
 </mysqldump>

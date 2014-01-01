@@ -11,6 +11,7 @@ class UserTest extends DatabaseTestCase
 		'articles',
 		'article_authors',
 		'comments',
+		'images',
 	);
 
 	public function setUp()
@@ -134,5 +135,13 @@ class UserTest extends DatabaseTestCase
 
 		$user = new \FelixOnline\Core\User('jk708');
 		$this->assertFalse($user->hasArticlesHiddenFromRobots());
+	}
+
+	public function testGetImage()
+	{
+		$user = new \FelixOnline\Core\User('jk708');
+		$image = $user->getImage();
+
+		$this->assertInstanceOf('FelixOnline\Core\Image', $image);
 	}
 }

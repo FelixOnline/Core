@@ -25,6 +25,7 @@ class User extends BaseModel {
 	private $comments = array();
 	private $likes;
 	private $dislikes;
+	private $image;
 	protected $dbtable = 'user';
 	protected $primaryKey = 'user';
 	protected $transformers = array(
