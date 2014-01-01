@@ -23,6 +23,8 @@ class User extends BaseModel {
 	private $count;
 	private $popArticles = array();
 	private $comments = array();
+	private $likes;
+	private $dislikes;
 	protected $dbtable = 'user';
 	protected $primaryKey = 'user';
 	protected $transformers = array(
@@ -179,7 +181,7 @@ class User extends BaseModel {
 							/ ($this->getLikes() + $this->getDislikes()));
 			return round($popularity);
 		} else {
-			return false;
+			return 0;
 		}
 	}
 
