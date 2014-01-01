@@ -13,7 +13,7 @@
 		<field name="approvedby">felix</field>
 		<field name="published">2010-01-08 16:11:02</field>
 		<field name="hidden">0</field>
-		<field name="searchable">0</field>
+		<field name="searchable">1</field>
 		<field name="text1">27</field>
 		<field name="img1">22</field>
 		<field name="text2" xsi:nil="true" />
@@ -33,7 +33,7 @@
 		<field name="approvedby">felix</field>
 		<field name="published">2010-01-09 01:05:12</field>
 		<field name="hidden">0</field>
-		<field name="searchable">0</field>
+		<field name="searchable">1</field>
 		<field name="text1">28</field>
 		<field name="img1" xsi:nil="true" />
 		<field name="text2" xsi:nil="true" />

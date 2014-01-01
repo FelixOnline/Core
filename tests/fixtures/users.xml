@@ -25,7 +25,7 @@
 		<field name="ip">0.0.0.0</field>
 		<field name="timestamp">2013-12-06 16:55:35</field>
 		<field name="role">10</field>
-		<field name="info"></field>
+		<field name="info">["Alumni"]</field>
 		<field name="description">Hello world!</field>
 		<field name="email">jkimbo@gmail.com</field>
         <field name="facebook">https://www.facebook.com/Jonny.Kim</field>

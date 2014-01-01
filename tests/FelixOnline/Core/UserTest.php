@@ -115,4 +115,24 @@ class UserTest extends DatabaseTestCase
 
 		$this->assertEquals('Letts', $user->getLastName());
 	}
+
+	public function testGetInfo()
+	{
+		$user = new \FelixOnline\Core\User('felix');
+
+		$this->assertFalse($user->getInfo());
+
+		$user = new \FelixOnline\Core\User('jk708');
+
+		$this->assertEquals(['Alumni'], $user->getInfo());
+	}
+
+	public function testHasArticlesHiddenFromRobots()
+	{
+		$user = new \FelixOnline\Core\User('felix');
+		$this->assertTrue($user->hasArticlesHiddenFromRobots());
+
+		$user = new \FelixOnline\Core\User('jk708');
+		$this->assertFalse($user->hasArticlesHiddenFromRobots());
+	}
 }

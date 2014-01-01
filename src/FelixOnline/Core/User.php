@@ -272,30 +272,13 @@ class User extends BaseModel {
 	}
 
 	/*
-	 * Public: Get email
-	 * If user has defined an email the use that. Else use ldap email
-	 * $force - [boolean] if true then always return an email address (if not defined in database then from ldap)
-	 *
-	 * Returns string
-	 */
-	public function getEmail($force = false) {
-		if($force == true) { // if forcing email
-			if(!$this->fields['email']) {
-				return ldap_get_mail($this->getUser());
-			}
-			return $this->fields['email'];
-		}
-		return $this->fields['email'];
-	}
-
-	/*
 	 * Public: Get user info
 	 * Decode json array of info
 	 *
 	 * Returns array
 	 */
 	public function getInfo() {
-		return json_decode($this->fields['info']);
+		return Utility::jsonDecode($this->fields['info']);
 	}
 
 	public function getFirstLogin() {
@@ -309,7 +292,7 @@ class User extends BaseModel {
 			array(
 				$this->getUser()
 			));
-		$login = $this->db->get_var($sql);
+		$login = App::$db->get_var($sql);
 		if($login) {
 			return $login;
 		} else {
@@ -318,7 +301,7 @@ class User extends BaseModel {
 	}
 
 	public function getLastLogin() {
-		$sql = $this->safesql->query(
+		$sql = App::query(
 			"SELECT 
 				UNIX_TIMESTAMP(timestamp) as timestamp 
 			FROM `login` 
@@ -328,7 +311,7 @@ class User extends BaseModel {
 			array(
 				$this->getUser()
 			));
-	$login = $this->db->get_var($sql);
+		$login = App::$db->get_var($sql);
 		if($login) {
 			return $login;
 		} else {
@@ -368,13 +351,18 @@ class User extends BaseModel {
 	 * Public: has Articles Hidden from Robots
 	 */
 	public function hasArticlesHiddenFromRobots() {
-		$sql=$this->safesql->query(
-			"SELECT COUNT(*) 
-			FROM `article_author` INNER JOIN `article` 
-			ON article_author.article=article.id 
-			WHERE article_author.`author`='%s' and searchable=0",
-			array( $this->getUser()) );
-		$result=$this->db->get_var($sql);
-		return ($result>0 ? true: false);
+		$sql = App::query(
+			"SELECT
+				COUNT(id)
+			FROM `article_author`
+			INNER JOIN `article` 
+			ON article_author.article = article.id 
+			WHERE article_author.`author` = '%s'
+			AND searchable = 0",
+			array(
+				$this->getUser())
+			);
+		$result = App::$db->get_var($sql);
+		return ($result > 0 ? true: false);
 	}
 }

@@ -1,5 +1,7 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Exceptions\InternalException;
 /*
  * Utility Class
  *
@@ -207,14 +209,18 @@ class Utility {
 	 */
 	public static function jsonDecode($string)
 	{
-		$json = json_decode($string, true);
+		if ($string) {
+			$json = json_decode($string, true);
 
-		// if json_decode failed
-		if ($json === null) {
-			self::jsonLastError();
+			// if json_decode failed
+			if ($json === null) {
+				self::jsonLastError();
+			}
+
+			return $json;
+		} else {
+			return false;
 		}
-
-		return $json;
 	}
 
 	/**
