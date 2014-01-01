@@ -142,11 +142,7 @@ class CurrentUser extends User {
 	 * on every visit, if this is greater than two hours then we need to log in
 	 * again, unless the cookie is valid
 	 */
-	public function isSessionRecent() {
-		if (!$this->session['loggedin']) {
-			return false; // If we have no session, this method is meaningless.
-		}
-
+	protected function isSessionRecent() {
 		$env = Environment::getInstance();
 
 		$sql = App::query(
@@ -155,10 +151,10 @@ class CurrentUser extends User {
 				ip,
 				browser
 			FROM `login`
-			WHERE session_id='%s'
-			AND logged_in=1
-			AND valid=1
-			AND user='%s'
+			WHERE session_id = '%s'
+			AND logged_in = 1
+			AND valid = 1
+			AND user = '%s'
 			ORDER BY timediff ASC
 			LIMIT 1",
 			array(
@@ -169,7 +165,8 @@ class CurrentUser extends User {
 		$user = App::$db->get_row($sql);
 
 		if (
-			$user->timediff <= SESSION_LENGTH 
+			$user
+			&& $user->timediff <= SESSION_LENGTH 
 			&& $user->ip == $env['REMOTE_ADDR']
 			&& $user->browser == $env['HTTP_USER_AGENT']
 		) {
