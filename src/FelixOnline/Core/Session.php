@@ -3,7 +3,7 @@ namespace FelixOnline\Core;
 /**
  * Session class
  */
-class Session implements \arrayaccess
+class Session implements \ArrayAccess
 {
 	protected $session = array();
 	private $name;
@@ -25,7 +25,7 @@ class Session implements \arrayaccess
 		session_name($this->name); // set session name
 		session_start(); // start session
 
-		$this->session = $_SESSION[$this->name];
+		$this->session = &$_SESSION[$this->name];
 
 		$this->id = session_id();
 		return $this->id;
