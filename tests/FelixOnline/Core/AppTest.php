@@ -17,7 +17,9 @@ class AppTest extends DatabaseTestCase
 		);
 
 		$safesql = new \SafeSQL_MySQLi($db->dbh);
-		return new \FelixOnline\Core\App($config, $db, $safesql);
+		$env = \FelixOnline\Core\Environment::mock();
+
+		return new \FelixOnline\Core\App($config, $db, $safesql, $env);
 	}
 
 	public function testApp()
