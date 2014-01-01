@@ -5,14 +5,25 @@ namespace FelixOnline\Core;
  */
 class CurrentUser extends User {
 	protected $session; // current session id
+	protected $cookies; // cookie class
 
 	/*
 	 * Create current user object
 	 * Store session into object
 	 */
-	function __construct(Session $session) {
-		$this->session = $session;
+	function __construct(Session $session = null, Cookies $cookies = null) {
+		if (is_null($session)) {
+			$this->session = new Session('felix');
+		} else {
+			$this->session = $session;
+		}
 		$this->session->start();
+
+		if (is_null($cookies)) {
+			$this->cookies = new Cookies();
+		} else {
+			$this->cookies = $cookies;
+		}
 
 		if ($user = $this->isLoggedIn()) {
 			$this->setUser($user);
@@ -26,20 +37,67 @@ class CurrentUser extends User {
 		$this->session->reset();
 	}
 
-	/*
+	/**
+	 * Public: Check if user is currently logged in
+	 *
+	 * Returns boolean
+	 */
+	public function isLoggedIn() {
+		if($this->session['loggedin'] && $this->isSessionRecent()){
+			return true;
+		} else {
+			// n.b. the session is cleared by isSessionRecent if invalid
+			
+			return $this->loginFromCookie();
+		}
+	}
+
+	/**
+	 * Public: Set user
+	 */
+	public function setUser($username) {
+		$env = Environment::getInstance();
+
+		try {
+			parent::__construct($username);
+		} catch (\FelixOnline\Exceptions\ModelNotFoundException $e) {
+			// User does not yet exist in our database...
+			// It'll be created later so carry on
+		}
+
+		// TODO Remove?
+		$sql = App::query(
+			"UPDATE login
+				SET timestamp = NOW()
+			WHERE session_id='%s'
+			AND logged_in=1
+			AND ip='%s'
+			AND browser='%s'
+			AND valid=1
+			AND TIMESTAMPDIFF(SECOND,timestamp,NOW()) <= %i",
+			array(
+				$this->session->getId(),
+				$env['REMOTE_ADDR'],
+				$env['HTTP_USER_AGENT'],
+				SESSION_LENGTH,
+			));
+		App::$db->query($sql); // if this fails, it doesn't matter, we will
+								// just be auto logged out after a while
+	}
+
+
+	/**
 	 * Public: Removes the permanent cookie, and removes associated database entries
 	 */
-	public function removeCookie() {
-		if (array_key_exists('felixonline', $_COOKIE)) {
-			$sql = App::query(
-				"DELETE FROM cookies
-				WHERE hash = '%s'",
-				array(
-					$_COOKIE['felixonline']
-				));
+	protected function removeCookie() {
+		$sql = App::query(
+			"DELETE FROM cookies
+			WHERE hash = '%s'",
+			array(
+				$this->cookies['felixonline']
+			));
 
-			App::$db->query($sql);
-		}
+		App::$db->query($sql);
 
 		// also remove any expired cookies for anyone
 		// TODO move to cron
@@ -49,39 +107,20 @@ class CurrentUser extends User {
 
 		App::$db->query($sql);
 
-		setcookie('felixonline', '', time() - 42000, '/');
+		$this->cookies->delete('felixonline');
 	}
 
 	/**
-	 * Public: Check if user is currently logged in
-	 *
-	 * Returns boolean
-	 */
-	public function isLoggedIn() {
-		if($this->session['loggedin'] && $this->isSessionRecent()){
-			return $this->session['uname'];
-		} else {
-			// n.b. the session is cleared by isSessionRecent if invalid
-			
-			return $this->loginFromCookie();
-		}
-	}
-
-	/*
-	 * Public: Check if there is a valid permanent cookie, if so log in with it
+	 * Protected: Check if there is a valid permanent cookie, if so log in with it
 	 *
 	 * Returns false if failed, username otherwise
 	 * TODO make sure there isn't redundant code
 	 */
-	public function loginFromCookie() {
+	protected function loginFromCookie() {
 		// is there a cookie?
-		if (!array_key_exists('felixonline', $_COOKIE)) {
+		if (!isset($this->cookies['felixonline'])) {
 			return false;
 		}
-
-		$env = Environment::getInstance();
-
-		$cookiehash = $_COOKIE['felixonline'];
 
 		$sql = App::query(
 			"SELECT user
@@ -91,7 +130,7 @@ class CurrentUser extends User {
 			ORDER BY expires ASC
 			LIMIT 1",
 			array(
-				$cookiehash
+				$this->cookies['felixonline']
 			));
 
 		$cookie = App::$db->get_row($sql);
@@ -105,7 +144,22 @@ class CurrentUser extends User {
 		// Reset session ID
 		$this->resetToGuest();
 
+		// Populate user class
+		parent::__construct($username);
+
 		// Create session
+		$this->createSession();
+
+		return true;
+	}
+
+	/**
+	 * Create session for user
+	 */
+	protected function createSession()
+	{
+		$env = Environment::getInstance();
+
 		$sql = App::query(
 			"INSERT INTO `login` 
 			(
@@ -125,20 +179,16 @@ class CurrentUser extends User {
 				$this->session->getId(),
 				$env['REMOTE_ADDR'],
 				$env['HTTP_USER_AGENT'],
-				$username,
+				$this->getUser(),
 			));
 		App::$db->query($sql);
 
-		parent::__construct($username);
-
 		$this->session['uname'] = $this->getUser();
 		$this->session['loggedin'] = true;
-
-		return $this->getUser();
 	}
 
 	/*
-	 * Public: Check if the session is recent (the last visited time is updated
+	 * Protected: Check if the session is recent (the last visited time is updated
 	 * on every visit, if this is greater than two hours then we need to log in
 	 * again, unless the cookie is valid
 	 */
@@ -180,51 +230,8 @@ class CurrentUser extends User {
 		}
 	}
 
-	/**
-	 * Public: Set user
-	 */
-	public function setUser($username) {
-		$username = strtolower($username);
-		
-		$env = Environment::getInstance();
-
-		try {
-			parent::__construct($username);
-		} catch (\FelixOnline\Exceptions\ModelNotFoundException $e) {
-			// User does not yet exist in our database...
-			// It'll be created later so carry on
-		}
-
-		$sql = App::query(
-			"UPDATE login
-				SET timestamp = NOW()
-			WHERE session_id='%s'
-			AND logged_in=1
-			AND ip='%s'
-			AND browser='%s'
-			AND valid=1
-			AND TIMESTAMPDIFF(SECOND,timestamp,NOW()) <= %i",
-			array(
-				$this->session->getId(),
-				$env['REMOTE_ADDR'],
-				$env['HTTP_USER_AGENT'],
-				SESSION_LENGTH,
-			));
-		App::$db->query($sql); // if this fails, it doesn't matter, we will
-								// just be auto logged out after a while
-		
-	}
-
 	public function getSession() {
 		return $this->session;
-	}
-
-	public function getUser() {
-		if($this->fields['user']) {
-			return $this->fields['user'];
-		} else {
-			return false;
-		}
 	}
 
 	/*
