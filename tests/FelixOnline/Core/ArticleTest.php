@@ -13,6 +13,7 @@ class ArticleTest extends DatabaseTestCase
 		'article_authors',
 		'comments',
 		'comments_ext',
+		'images',
 	);
 
 	public function setUp()
@@ -164,5 +165,19 @@ class ArticleTest extends DatabaseTestCase
 
 		$this->assertCount(5, $comments);
 		$this->assertInstanceOf('FelixOnline\Core\Comment', $comments[0]);
+	}
+
+	public function testGetImage()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+
+		$image = $article->getImage();
+		$this->assertInstanceOf('FelixOnline\Core\Image', $image);
+
+		// No image
+		$article = new \FelixOnline\Core\Article(2);
+
+		$image = $article->getImage();
+		$this->assertNull($image);
 	}
 }
