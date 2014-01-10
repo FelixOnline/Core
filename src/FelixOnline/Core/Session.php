@@ -19,6 +19,7 @@ class Session implements \ArrayAccess
 
 	/**
 	 * Start session
+     * @codeCoverageIgnore
 	 */
 	public function start()
 	{
@@ -33,6 +34,7 @@ class Session implements \ArrayAccess
 
 	/**
 	 * Reset session
+     * @codeCoverageIgnore
 	 */
 	public function reset()
 	{
@@ -47,6 +49,7 @@ class Session implements \ArrayAccess
 
 	/**
 	 * Destroy session
+     * @codeCoverageIgnore
 	 */
 	public function destroy()
 	{

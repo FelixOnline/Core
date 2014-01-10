@@ -7,6 +7,9 @@ class Cookies implements \ArrayAccess
 {
 	protected $cookies = array();
 
+	/**
+     * @codeCoverageIgnore
+     */
 	public function __construct()
 	{
 		$this->cookies = &$_COOKIE;
@@ -14,6 +17,7 @@ class Cookies implements \ArrayAccess
 
 	/**
 	 * Set cookie
+     * @codeCoverageIgnore
 	 */
 	public function set($name, $value, $expire, $path = "/")
 	{
@@ -22,6 +26,7 @@ class Cookies implements \ArrayAccess
 
 	/**
 	 * Delete cookie
+     * @codeCoverageIgnore
 	 */
 	public function delete($name)
 	{

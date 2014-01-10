@@ -12,6 +12,8 @@ class Utility {
 	 * Public Static: Get current page url
 	 *
 	 * Returns string
+	 *
+     * @codeCoverageIgnore
 	 */
 	public static function currentPageURL() {
 		$pageURL = 'http';
