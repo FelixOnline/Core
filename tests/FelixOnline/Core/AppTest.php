@@ -6,6 +6,8 @@ class AppTest extends DatabaseTestCase
 {
 	public function createApp($config)
 	{
+		$app = new \FelixOnline\Core\App($config);
+
 		$db = new \ezSQL_mysqli();
 		$db->quick_connect(
 			'root',
@@ -15,11 +17,14 @@ class AppTest extends DatabaseTestCase
 			3306,
 			'utf8'
 		);
+		$app['db'] = $db;
 
-		$safesql = new \SafeSQL_MySQLi($db->dbh);
-		$env = \FelixOnline\Core\Environment::mock();
+		$app['safesql'] = new \SafeSQL_MySQLi($db->dbh);
+		$app['env'] = \FelixOnline\Core\Environment::mock();
 
-		return new \FelixOnline\Core\App($config, $db, $safesql, $env);
+		$app->run();
+
+		return $app;
 	}
 
 	public function testApp()
@@ -92,6 +97,74 @@ class AppTest extends DatabaseTestCase
 		$app->getOption('bar');
 	}
 
+	public function testRunNoDbException()
+	{
+		\FelixOnline\Core\App::setInstance(null);
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'No db setup'
+		);
+
+		$app = new \FelixOnline\Core\App(array(
+			'base_url' => 'foo'
+		));
+		$app->run();
+	}
+
+	public function testRunWrongDbTypeException()
+	{
+		\FelixOnline\Core\App::setInstance(null);
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'No db setup'
+		);
+
+		$app = new \FelixOnline\Core\App(array(
+			'base_url' => 'foo'
+		));
+		$app['db'] = 'foo';
+		$app->run();
+	}
+
+	public function testRunNoSafesqlException()
+	{
+		\FelixOnline\Core\App::setInstance(null);
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'No safesql setup'
+		);
+
+		$app = new \FelixOnline\Core\App(array(
+			'base_url' => 'foo'
+		));
+
+		$db = new \ezSQL_mysqli();
+		$app['db'] = $db;
+		$app->run();
+	}
+
+	public function testRunNoWrongSafesqlException()
+	{
+		\FelixOnline\Core\App::setInstance(null);
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'No safesql setup'
+		);
+
+		$app = new \FelixOnline\Core\App(array(
+			'base_url' => 'foo'
+		));
+
+		$db = new \ezSQL_mysqli();
+		$app['db'] = $db;
+		$app['safesql'] = 'foo';
+		$app->run();
+	}
+
 	public function testQuery()
 	{
 		$app = $this->createApp(array(
@@ -100,7 +173,7 @@ class AppTest extends DatabaseTestCase
 
 		$this->assertEquals(
 			"SELECT id FROM foo",
-			$app->query("SELECT id FROM %s", array("foo"))
+			$app['safesql']->query("SELECT id FROM %s", array("foo"))
 		);
 	}
 }

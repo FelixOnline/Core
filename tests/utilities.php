@@ -6,6 +6,8 @@ require_once __DIR__ . '/../lib/SafeSQL.php';
  */
 
 function create_app($config = array('base_url' => 'foo')) {
+	$app = new \FelixOnline\Core\App($config);
+
 	$db = new \ezSQL_mysqli();
 	$db->quick_connect(
 		'root',
@@ -15,10 +17,13 @@ function create_app($config = array('base_url' => 'foo')) {
 		3306,
 		'utf8'
 	);
+	$app['db'] = $db;
 
-	$safesql = new \SafeSQL_MySQLi($db->dbh);
+	$app['safesql'] = new \SafeSQL_MySQLi($db->dbh);
 
-	$env = \FelixOnline\Core\Environment::mock();
+	$app['env'] = \FelixOnline\Core\Environment::mock();
 
-	return new \FelixOnline\Core\App($config, $db, $safesql, $env);
+	$app->run();
+
+	return $app;;
 }

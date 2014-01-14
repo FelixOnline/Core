@@ -3,10 +3,11 @@ namespace FelixOnline\Core;
 /**
  * App class
  */
-class App
+class App implements \ArrayAccess
 {
 	protected static $instance = null;
 	protected static $options = array();
+	protected $container;
 
 	/**
 	 * Required options
@@ -14,10 +15,6 @@ class App
 	protected $required = array(
 		'base_url'
 	);
-
-	public static $db = null;
-	protected static $safesql = null;
-	protected static $env = null;
 
 	/**
 	 * Constructor
@@ -27,24 +24,32 @@ class App
 	 * @param \SafeSQL_MySQLi $db - safesql object
 	 */
 	public function __construct(
-		$options = array(),
-		\ezSQL_mysqli $db,
-		\SafeSQL_MySQLi $safesql,
-		Environment $env = null
+		$options = array()
 	) {
 		$this->checkOptions($options);
 		self::$options = $options;
 
-		self::$db = $db;
-		self::$safesql = $safesql;
-
-		if (is_null($env)) {
-			self::$env = Environment::getInstance();
-		} else {
-			self::$env = $env;
-		}
+		unset($this->container);
 
 		self::$instance = $this;
+	}
+
+	/**
+	 * Initialize app
+	 */
+	public function run()
+	{
+		if (!isset($this->container['env']) || is_null($this->container['env'])) {
+			$this->container['env'] = Environment::getInstance();
+		}
+
+		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
+			throw new \FelixOnline\Exceptions\InternalException('No db setup');
+		}
+
+		if (!isset($this->container['safesql']) || !($this->container['safesql'] instanceof \SafeSQL_MySQLi)) {
+			throw new \FelixOnline\Exceptions\InternalException('No safesql setup');
+		}
 	}
 
 	/**
@@ -107,22 +112,27 @@ class App
 		return self::$options[$key];
 	}
 
-	/**
-	 * Get safesql query
-	 *
-	 * @param string $sql - sql string
-	 * $param array $values - array of values for query
-	 */
-	public static function query($sql, $values)
+	public function offsetSet($offset, $value)
 	{
-		return self::$safesql->query($sql, $values);
+		if (is_null($offset)) {
+            $this->container[] = $value;
+        } else {
+            $this->container[$offset] = $value;
+        }
+    }
+
+	public function offsetExists($offset)
+	{
+		return isset($this->container[$offset]);
 	}
 
-	/**
-	 * Get environment
-	 */
-	public static function getEnv()
+	public function offsetUnset($offset)
 	{
-		return self::$env;
-	}
+        unset($this->container[$offset]);
+    }
+
+	public function offsetGet($offset)
+	{
+        return isset($this->container[$offset]) ? $this->container[$offset] : null;
+    }
 }
