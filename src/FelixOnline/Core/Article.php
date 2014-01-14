@@ -288,7 +288,13 @@ class Article extends BaseModel {
 	 *
 	 * Returns db object
 	 */
-	public function getComments($ip) {
+	public function getComments($ip = NULL) {
+
+		if (is_null($ip)) {
+			$env = \FelixOnline\Core\Environment::getInstance();
+			$ip = $env['REMOTE_ADDR'];
+		}
+
 		$sql = App::query(
 			"SELECT
 				id
