@@ -167,6 +167,16 @@ class ArticleTest extends DatabaseTestCase
 		$this->assertInstanceOf('FelixOnline\Core\Comment', $comments[0]);
 	}
 
+	public function testGetCommentsNoIP()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+
+		$comments = $article->getComments();
+
+		$this->assertCount(5, $comments);
+		$this->assertInstanceOf('FelixOnline\Core\Comment', $comments[0]);
+	}
+
 	public function testGetImage()
 	{
 		$article = new \FelixOnline\Core\Article(1);
