@@ -70,10 +70,12 @@ class Comment extends BaseModel {
 	 * Returns comment object.
 	 */
 	public function __construct($id=NULL) {
+		$app = App::getInstance();
+
 		if ($id != NULL) {
 			if($id < self::EXTERNAL_COMMENT_ID) { // if comment is internal
 				$this->external = false; // comment is internal
-				$sql = App::query(
+				$sql = $app['safesql']->query(
 					"SELECT 
 						id, 
 						`article`,
@@ -90,10 +92,10 @@ class Comment extends BaseModel {
 						$id
 					));
 
-				parent::__construct(App::$db->get_row($sql), $id);
+				parent::__construct($app['db']->get_row($sql), $id);
 			} else {
 				$this->external = true; // comment is external
-				$sql = App::query(
+				$sql = $app['safesql']->query(
 					"SELECT 
 						id, 
 						`article`,
@@ -115,7 +117,7 @@ class Comment extends BaseModel {
 
 				$this->transfomers['name'] = parent::TRANSFORMER_NO_HTML;
 
-				parent::__construct(App::$db->get_row($sql), $id);
+				parent::__construct($app['db']->get_row($sql), $id);
 			}
 		} else {
 			$this->setFieldFilters(array(

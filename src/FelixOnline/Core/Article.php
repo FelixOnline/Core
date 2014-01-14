@@ -57,8 +57,10 @@ class Article extends BaseModel {
 	 * Returns article object
 	 */
 	function __construct($id = NULL) {
+		$app = App::getInstance();
+
 		if ($id !== NULL) { // if creating an already existing article object
-			$sql = App::query(
+			$sql = $app['safesql']->query(
 				"SELECT
 					`id`,
 					`title`,
@@ -82,7 +84,7 @@ class Article extends BaseModel {
 				WHERE id=%i",
 				array($id)
 			);
-			parent::__construct(App::$db->get_row($sql), $id);
+			parent::__construct($app['db']->get_row($sql), $id);
 			return $this;
 		} else {
 			// initialise new article
@@ -95,8 +97,10 @@ class Article extends BaseModel {
 	 * Returns array
 	 */
 	public function getAuthors() {
-		if(!$this->authors) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!$this->authors) {
+			$sql = $app['safesql']->query(
 				"SELECT
 					article_author.author as author
 				FROM `article_author`
@@ -107,7 +111,7 @@ class Article extends BaseModel {
 					$this->getId()
 				)
 			);
-			$authors = App::$db->get_results($sql);
+			$authors = $app['db']->get_results($sql);
 			foreach($authors as $author) {
 				$this->authors[] = new User($author->author);
 			}
@@ -163,8 +167,10 @@ class Article extends BaseModel {
 	 * Public: Get article content
 	 */
 	public function getContent() {
-		if(!$this->content) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!$this->content) {
+			$sql = $app['safesql']->query(
 				"SELECT
 					`content`
 				FROM `text_story`
@@ -173,7 +179,7 @@ class Article extends BaseModel {
 					$this->getText1()
 				)
 			);
-			$this->content = App::$db->get_var($sql);
+			$this->content = $app['db']->get_var($sql);
 		}
 		return $this->cleanText($this->content);
 	}
@@ -252,8 +258,10 @@ class Article extends BaseModel {
 	 * Returns int
 	 */
 	public function getNumComments() {
-		if(!isset($this->num_comments)) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!isset($this->num_comments)) {
+			$sql = $app['safesql']->query(
 				"SELECT
 					SUM(count) AS count
 				FROM (
@@ -275,7 +283,7 @@ class Article extends BaseModel {
 					$this->getId()
 				)
 			);
-			$this->num_comments = App::$db->get_var($sql);
+			$this->num_comments = $app['db']->get_var($sql);
 			if(!isset($this->num_comments)) $this->num_comments = 0;
 		}
 		return $this->num_comments;
@@ -289,13 +297,14 @@ class Article extends BaseModel {
 	 * Returns db object
 	 */
 	public function getComments($ip = NULL) {
+		$app = App::getInstance();
 
 		if (is_null($ip)) {
 			$env = \FelixOnline\Core\Environment::getInstance();
 			$ip = $env['REMOTE_ADDR'];
 		}
 
-		$sql = App::query(
+		$sql = $app['safesql']->query(
 			"SELECT
 				id
 			FROM (
@@ -333,7 +342,7 @@ class Article extends BaseModel {
 			)
 		);
 		$comments = array();
-		$rsc = App::$db->get_results($sql);
+		$rsc = $app['db']->get_results($sql);
 		if ($rsc) {
 			foreach($rsc as $key => $obj) {
 				$comments[] = new Comment($obj->id);
@@ -381,7 +390,7 @@ class Article extends BaseModel {
 	 * Check if user has visited page before (based on ip or user for a set length of time)
 	 */
 	public function logVisit() {
-		if(!$this->recentlyVisited()) {
+		if (!$this->recentlyVisited()) {
 			$this->logVisitor();
 			$this->hitArticle();
 		} else {
@@ -475,14 +484,16 @@ class Article extends BaseModel {
 	 * Public: Set content to article
 	 */
 	public function setContent($content) {
-		$sql = App::query(
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"INSERT INTO text_story (`content`) VALUES ('%s')",
 			array($content)
 		);
 
-		App::$db->query($sql);
+		$app['db']->query($sql);
 
-		$id = App::$db->insert_id;
+		$id = $app['db']->insert_id;
 
 		$this->setText1($id);
 
@@ -493,12 +504,14 @@ class Article extends BaseModel {
 	 * Public: Add authors to article
 	 */
 	public function addAuthors($authors) {
+		$app = App::getInstance();
+
 		foreach ($authors as $author) {
-			$sql = App::query(
+			$sql = $app['safesql']->query(
 				"INSERT INTO article_author (`article`, `author`) VALUES (%i, '%s')",
 				array($this->getId(), $author->getUser())
 			);
-			App::$db->query($sql);
+			$app['db']->query($sql);
 		}
 		return $authors;
 	}

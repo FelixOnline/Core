@@ -38,8 +38,10 @@ class User extends BaseModel {
 	);
 
 	function __construct($uname = NULL) {
+		$app = App::getInstance();
+
 		if ($uname !== NULL) {
-			$sql = App::query(
+			$sql = $app['safesql']->query(
 				"SELECT 
 					`user`,
 					`name`,
@@ -62,7 +64,7 @@ class User extends BaseModel {
 				)
 			);
 
-			parent::__construct(App::$db->get_row($sql), $uname);
+			parent::__construct($app['db']->get_row($sql), $uname);
 		} else {
 		}
 	}
@@ -74,8 +76,9 @@ class User extends BaseModel {
 	 */
 	public function getURL($pagenum = NULL) {
 		$app = App::getInstance();
+
 		$output = $app->getOption('base_url') . 'user/'.$this->getUser().'/'; 
-		if($pagenum != NULL) {
+		if ($pagenum != NULL) {
 			$output .= $pagenum.'/';
 		}
 		return $output;
@@ -86,6 +89,8 @@ class User extends BaseModel {
 	 * Get all articles from user
 	 */
 	public function getArticles($page = NULL) {
+		$app = App::getInstance();
+
 		$sql = "SELECT 
 				id 
 			FROM `article` 
@@ -104,9 +109,9 @@ class User extends BaseModel {
 			$values[] = ARTICLES_PER_USER_PAGE;
 		}
 
-		$sql = App::query($sql, $values);
+		$sql = $app['safesql']->query($sql, $values);
 
-		$results = App::$db->get_results($sql);	
+		$results = $app['db']->get_results($sql);	
 		$articles = array();
 		
 		foreach ($results as $article) {
@@ -121,8 +126,10 @@ class User extends BaseModel {
 	 * Get users popular articles
 	 */
 	public function getPopularArticles() {
-		if(!$this->popArticles) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!$this->popArticles) {
+			$sql = $app['safesql']->query(
 				"SELECT 
 					id 
 				FROM `article` 
@@ -135,7 +142,7 @@ class User extends BaseModel {
 					$this->getUser(),
 					NUMBER_OF_POPULAR_ARTICLES_USER,
 				));
-			$articles = App::$db->get_results($sql);
+			$articles = $app['db']->get_results($sql);
 			foreach($articles as $key => $obj) {
 				$this->popArticles[] = new Article($obj->id);
 			}
@@ -148,8 +155,10 @@ class User extends BaseModel {
 	 * Get all comments from user
 	 */
 	public function getComments() {
-		if(!$this->comments) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!$this->comments) {
+			$sql = $app['safesql']->query(
 				"SELECT 
 					id
 				FROM `comment` 
@@ -160,7 +169,7 @@ class User extends BaseModel {
 					$this->getUser(),
 					NUMBER_OF_POPULAR_COMMENTS_USER,
 				));
-			$comments = App::$db->get_results($sql);	
+			$comments = $app['db']->get_results($sql);	
 			if($comments) {
 				foreach($comments as $key => $obj) {
 					$this->comments[] = new Comment($obj->id);
@@ -191,8 +200,10 @@ class User extends BaseModel {
 	 * Get number of likes on comments by user
 	 */
 	public function getLikes() {
-		if(!$this->likes) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!$this->likes) {
+			$sql = $app['safesql']->query(
 				"SELECT 
 					SUM(likes) 
 				FROM `comment` 
@@ -201,7 +212,7 @@ class User extends BaseModel {
 				array(
 					$this->getUser(),
 				));
-			$this->likes = App::$db->get_var($sql);
+			$this->likes = $app['db']->get_var($sql);
 		}
 		return $this->likes;
 	}
@@ -211,8 +222,10 @@ class User extends BaseModel {
 	 * Get number of dislikes on comments by user
 	 */
 	public function getDislikes() {
-		if(!$this->dislikes) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!$this->dislikes) {
+			$sql = $app['safesql']->query(
 				"SELECT 
 					SUM(dislikes) 
 				FROM `comment` 
@@ -221,7 +234,7 @@ class User extends BaseModel {
 				array(
 					$this->getUser(),
 				));
-			$this->dislikes = App::$db->get_var($sql);
+			$this->dislikes = $app['db']->get_var($sql);
 		}
 		return $this->dislikes;
 	}
@@ -232,8 +245,10 @@ class User extends BaseModel {
 	 * Returns int 
 	 */
 	public function getNumPages() {
-		if(!$this->count) {
-			$sql = App::query(
+		$app = App::getInstance();
+
+		if (!$this->count) {
+			$sql = $app['safesql']->query(
 				"SELECT 
 					COUNT(id) as count 
 				FROM `article` 
@@ -245,7 +260,7 @@ class User extends BaseModel {
 				array(
 					$this->getUser()
 				));
-			$this->count = App::$db->get_var($sql);
+			$this->count = $app['db']->get_var($sql);
 		}
 
 		$pages = ceil(($this->count - ARTICLES_PER_USER_PAGE) / (ARTICLES_PER_USER_PAGE)) + 1;
@@ -283,7 +298,9 @@ class User extends BaseModel {
 	}
 
 	public function getFirstLogin() {
-		$sql = App::query(
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"SELECT 
 				UNIX_TIMESTAMP(timestamp) as timestamp 
 			FROM `login` 
@@ -293,7 +310,7 @@ class User extends BaseModel {
 			array(
 				$this->getUser()
 			));
-		$login = App::$db->get_var($sql);
+		$login = $app['db']->get_var($sql);
 		if($login) {
 			return $login;
 		} else {
@@ -302,7 +319,7 @@ class User extends BaseModel {
 	}
 
 	public function getLastLogin() {
-		$sql = App::query(
+		$sql = $app['safesql']->query(
 			"SELECT 
 				UNIX_TIMESTAMP(timestamp) as timestamp 
 			FROM `login` 
@@ -312,7 +329,7 @@ class User extends BaseModel {
 			array(
 				$this->getUser()
 			));
-		$login = App::$db->get_var($sql);
+		$login = $app['db']->get_var($sql);
 		if($login) {
 			return $login;
 		} else {
@@ -325,7 +342,7 @@ class User extends BaseModel {
 	 * Check to see whether user has personal info
 	 */
 	public function hasPersonalInfo() {
-		if($this->getDescription()
+		if ($this->getDescription()
 			|| $this->getFacebook()
 			|| $this->getTwitter()
 			|| $this->getEmail()
@@ -352,7 +369,9 @@ class User extends BaseModel {
 	 * Public: has Articles Hidden from Robots
 	 */
 	public function hasArticlesHiddenFromRobots() {
-		$sql = App::query(
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"SELECT
 				COUNT(id)
 			FROM `article_author`
@@ -363,7 +382,7 @@ class User extends BaseModel {
 			array(
 				$this->getUser())
 			);
-		$result = App::$db->get_var($sql);
+		$result = $app['db']->get_var($sql);
 		return ($result > 0 ? true: false);
 	}
 }

@@ -114,6 +114,8 @@ class BaseModel {
 	 *	  $obj->save();
 	 */
 	public function save() {
+		$app = App::getInstance();
+
 		$arrayLength = count($this->fields);
 		if (!$arrayLength) {
 			throw new \FelixOnline\Exceptions\InternalException('No fields in object');
@@ -136,20 +138,20 @@ class BaseModel {
 			if (!empty($changed)) {
 				$sql = $this->constructUpdateSQL($changed);
 
-				App::$db->query($sql);
-				if (App::$db->last_error) {
-					throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+				$app['db']->query($sql);
+				if ($app['db']->last_error) {
+					throw new \FelixOnline\Exceptions\InternalException($app['db']->last_error);
 				}
 			}
 		} else { // insert model
 			$sql = $this->constructInsertSQL($this->fields);
 
-			App::$db->query($sql);
-			if (App::$db->last_error) {
-				throw new \FelixOnline\Exceptions\InternalException(App::$db->last_error);
+			$app['db']->query($sql);
+			if ($app['db']->last_error) {
+				throw new \FelixOnline\Exceptions\InternalException($app['db']->last_error);
 			}
 
-			$this->fields[$this->primaryKey] = App::$db->insert_id;
+			$this->fields[$this->primaryKey] = $app['db']->insert_id;
 		}
 
 		return $this->fields[$this->primaryKey]; // return new id
@@ -159,6 +161,8 @@ class BaseModel {
 	 * Private: Construct SQL
 	 */
 	public function constructInsertSQL($fields) {
+		$app = App::getInstance();
+
 		$arrayLength = count($fields);
 		$values = array();
 
@@ -197,13 +201,15 @@ class BaseModel {
 
 		$sql .= ")";
 
-		return App::query($sql, $values);
+		return $app['safesql']->query($sql, $values);
 	}
 
 	/**
 	 * Public: Construct update SQL
 	 */
 	public function constructUpdateSQL($fields) {
+		$app = App::getInstance();
+
 		$arrayLength = count($fields);
 		$values = array();
 
@@ -237,7 +243,7 @@ class BaseModel {
 		}
 		$values[] = $this->fields[$this->primaryKey];
 
-		return App::query($sql, $values);
+		return $app['safesql']->query($sql, $values);
 	}
 
 	/**

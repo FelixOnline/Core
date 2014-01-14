@@ -56,6 +56,7 @@ class CurrentUser extends User {
 	 * Public: Set user
 	 */
 	public function setUser($username) {
+		$app = App::getInstance();
 		$env = Environment::getInstance();
 
 		try {
@@ -66,7 +67,7 @@ class CurrentUser extends User {
 		}
 
 		// TODO Remove?
-		$sql = App::query(
+		$sql = $app['safesql']->query(
 			"UPDATE login
 				SET timestamp = NOW()
 			WHERE session_id='%s'
@@ -81,7 +82,7 @@ class CurrentUser extends User {
 				$env['HTTP_USER_AGENT'],
 				SESSION_LENGTH,
 			));
-		App::$db->query($sql); // if this fails, it doesn't matter, we will
+		$app['db']->query($sql); // if this fails, it doesn't matter, we will
 								// just be auto logged out after a while
 	}
 
@@ -90,22 +91,24 @@ class CurrentUser extends User {
 	 * Public: Removes the permanent cookie, and removes associated database entries
 	 */
 	protected function removeCookie() {
-		$sql = App::query(
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"DELETE FROM cookies
 			WHERE hash = '%s'",
 			array(
 				$this->cookies['felixonline']
 			));
 
-		App::$db->query($sql);
+		$app['db']->query($sql);
 
 		// also remove any expired cookies for anyone
 		// TODO move to cron
-		$sql = App::query(
+		$sql = $app['safesql']->query(
 			"DELETE FROM cookies
 			WHERE expires < NOW()", array());
 
-		App::$db->query($sql);
+		$app['db']->query($sql);
 
 		$this->cookies->delete('felixonline');
 	}
@@ -117,12 +120,14 @@ class CurrentUser extends User {
 	 * TODO make sure there isn't redundant code
 	 */
 	protected function loginFromCookie() {
+		$app = App::getInstance();
+
 		// is there a cookie?
 		if (!isset($this->cookies['felixonline'])) {
 			return false;
 		}
 
-		$sql = App::query(
+		$sql = $app['safesql']->query(
 			"SELECT user
 			FROM `cookies`
 			WHERE hash='%s'
@@ -133,7 +138,7 @@ class CurrentUser extends User {
 				$this->cookies['felixonline']
 			));
 
-		$cookie = App::$db->get_row($sql);
+		$cookie = $app['db']->get_row($sql);
 		if (!$cookie) {
 			$this->removeCookie();
 			return false;
@@ -158,9 +163,11 @@ class CurrentUser extends User {
 	 */
 	protected function createSession()
 	{
+		$app = App::getInstance();
+
 		$env = Environment::getInstance();
 
-		$sql = App::query(
+		$sql = $app['safesql']->query(
 			"INSERT INTO `login` 
 			(
 				session_id,
@@ -181,7 +188,7 @@ class CurrentUser extends User {
 				$env['HTTP_USER_AGENT'],
 				$this->getUser(),
 			));
-		App::$db->query($sql);
+		$app['db']->query($sql);
 
 		$this->session['uname'] = $this->getUser();
 		$this->session['loggedin'] = true;
@@ -193,9 +200,11 @@ class CurrentUser extends User {
 	 * again, unless the cookie is valid
 	 */
 	protected function isSessionRecent() {
+		$app = App::getInstance();
+
 		$env = Environment::getInstance();
 
-		$sql = App::query(
+		$sql = $app['safesql']->query(
 			"SELECT
 				TIMESTAMPDIFF(SECOND,timestamp,NOW()) AS timediff,
 				ip,
@@ -212,7 +221,7 @@ class CurrentUser extends User {
 				$this->session['uname'],
 			));
 
-		$user = App::$db->get_row($sql);
+		$user = $app['db']->get_row($sql);
 
 		if (
 			$user

@@ -28,8 +28,10 @@ class Image extends BaseModel {
 	 * Returns image object
 	 */
 	function __construct($id=NULL) {
+		$app = App::getInstance();
+
 		if ($id !== NULL) { // if creating an already existing article object
-			$sql = App::query(
+			$sql = $app['safesql']->query(
 				"SELECT
 					`id`,
 					`title`,
@@ -49,7 +51,7 @@ class Image extends BaseModel {
 				array(
 					$id,
 				));
-			parent::__construct(App::$db->get_row($sql), $id);
+			parent::__construct($app['db']->get_row($sql), $id);
 		} else {
 			// initialise new image
 		}

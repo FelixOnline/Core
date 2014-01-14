@@ -31,8 +31,10 @@ class Category extends BaseModel
 	private $stories; // array of top story objects
 
 	function __construct($id = NULL) {
+		$app = App::getInstance();
+
 		if ($id !== NULL) {
-			$sql = App::query(
+			$sql = $app['safesql']->query(
 				"SELECT
 					id,
 					label,
@@ -56,7 +58,7 @@ class Category extends BaseModel
 				WHERE id=%i",
 				array($id)
 			);
-			parent::__construct(App::$db->get_row($sql), $id);
+			parent::__construct($app['db']->get_row($sql), $id);
 			return $this;
 		} else {
 		}
@@ -80,8 +82,10 @@ class Category extends BaseModel
 	 * Returns array of user objects
 	 */
 	public function getEditors() {
+		$app = App::getInstance();
+
 		if (!$this->editors) {
-			$sql = App::query(
+			$sql = $app['safesql']->query(
 				"SELECT 
 					user 
 				FROM `category_author` 
@@ -90,7 +94,7 @@ class Category extends BaseModel
 				array(
 					$this->getId()
 				));
-			$editors = App::$db->get_results($sql);
+			$editors = $app['db']->get_results($sql);
 			if (is_null($editors)) {
 				$this->editors = null;
 			} else {
@@ -110,7 +114,9 @@ class Category extends BaseModel
 	 * Returns dbobject
 	 */
 	public function getArticles($page) {
-		$sql = App::query(
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"SELECT 
 				id 
 			FROM `article` 
@@ -123,7 +129,7 @@ class Category extends BaseModel
 				($page-1) * ARTICLES_PER_CAT_PAGE,
 				ARTICLES_PER_CAT_PAGE
 			));
-		return App::$db->get_results($sql);
+		return $app['db']->get_results($sql);
 	}
 
 	/**
@@ -132,8 +138,10 @@ class Category extends BaseModel
 	 * Returns int 
 	 */
 	public function getNumPages() {
+		$app = App::getInstance();
+
 		if (!$this->count) {
-			$sql = App::query(
+			$sql = $app['safesql']->query(
 				"SELECT 
 					COUNT(id) as count 
 				FROM `article` 
@@ -142,7 +150,7 @@ class Category extends BaseModel
 				array(
 					$this->getId()
 				));
-			$this->count = App::$db->get_var($sql);
+			$this->count = $app['db']->get_var($sql);
 		}
 		$pages = ceil(($this->count - ARTICLES_PER_CAT_PAGE) / (ARTICLES_PER_SECOND_CAT_PAGE)) + 1;
 		return $pages;
@@ -154,7 +162,7 @@ class Category extends BaseModel
 	 * Returns array of articles
 	 */
 	public function getTopStories() {
-		if(!$this->stories) {
+		if (!$this->stories) {
 			$this->stories = array();
 
 			$sliders = array(
@@ -180,7 +188,9 @@ class Category extends BaseModel
 	 */
 	public static function getCategories()
 	{
-		$sql = App::query(
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"SELECT
 				`id`
 			FROM `category`
@@ -188,7 +198,7 @@ class Category extends BaseModel
 			AND id > 0
 			ORDER BY `order` ASC",
 			array());
-		$results = App::$db->get_results($sql);
+		$results = $app['db']->get_results($sql);
 		$cats = array();
 
 		if (!is_null($results)) {
