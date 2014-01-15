@@ -4,25 +4,20 @@ namespace FelixOnline\Core;
  * Current User class
  */
 class CurrentUser extends User {
-	protected $session; // current session id
-	protected $cookies; // cookie class
-
 	/*
 	 * Create current user object
 	 * Store session into object
 	 */
-	function __construct(Session $session = null, Cookies $cookies = null) {
-		if (is_null($session)) {
-			$this->session = new Session('felix');
-		} else {
-			$this->session = $session;
-		}
-		$this->session->start();
+	function __construct() {
+		$app = App::getInstance();
 
-		if (is_null($cookies)) {
-			$this->cookies = new Cookies();
-		} else {
-			$this->cookies = $cookies;
+		if (!isset($app['env']['session'])) {
+			$app['env']['session'] = new Session('felix');
+		}
+		$app['env']['session']->start();
+
+		if (!isset($app['env']['cookies'])) {
+			$app['env']['cookies'] = new Cookies();
 		}
 
 		if ($user = $this->isLoggedIn()) {
@@ -34,7 +29,8 @@ class CurrentUser extends User {
 	 * Public: Resets the session cookie, regenerating its ID, and ensures old session data is removed
 	 */
 	public function resetToGuest() {
-		$this->session->reset();
+		$app = App::getInstance();
+		$app['env']['session']->reset();
 	}
 
 	/**
@@ -43,7 +39,9 @@ class CurrentUser extends User {
 	 * Returns boolean
 	 */
 	public function isLoggedIn() {
-		if($this->session['loggedin'] && $this->isSessionRecent()){
+		$app = App::getInstance();
+
+		if ($app['env']['session']['loggedin'] && $this->isSessionRecent()){
 			return true;
 		} else {
 			// n.b. the session is cleared by isSessionRecent if invalid
@@ -57,7 +55,6 @@ class CurrentUser extends User {
 	 */
 	public function setUser($username) {
 		$app = App::getInstance();
-		$env = Environment::getInstance();
 
 		try {
 			parent::__construct($username);
@@ -77,9 +74,9 @@ class CurrentUser extends User {
 			AND valid=1
 			AND TIMESTAMPDIFF(SECOND,timestamp,NOW()) <= %i",
 			array(
-				$this->session->getId(),
-				$env['REMOTE_ADDR'],
-				$env['HTTP_USER_AGENT'],
+				$app['env']['session']->getId(),
+				$app['env']['REMOTE_ADDR'],
+				$app['env']['HTTP_USER_AGENT'],
 				SESSION_LENGTH,
 			));
 		$app['db']->query($sql); // if this fails, it doesn't matter, we will
@@ -97,7 +94,7 @@ class CurrentUser extends User {
 			"DELETE FROM cookies
 			WHERE hash = '%s'",
 			array(
-				$this->cookies['felixonline']
+				$app['env']['cookies']['felixonline']
 			));
 
 		$app['db']->query($sql);
@@ -110,7 +107,7 @@ class CurrentUser extends User {
 
 		$app['db']->query($sql);
 
-		$this->cookies->delete('felixonline');
+		$app['env']['cookies']->delete('felixonline');
 	}
 
 	/**
@@ -123,7 +120,7 @@ class CurrentUser extends User {
 		$app = App::getInstance();
 
 		// is there a cookie?
-		if (!isset($this->cookies['felixonline'])) {
+		if (!isset($app['env']['cookies']['felixonline'])) {
 			return false;
 		}
 
@@ -135,7 +132,7 @@ class CurrentUser extends User {
 			ORDER BY expires ASC
 			LIMIT 1",
 			array(
-				$this->cookies['felixonline']
+				$app['env']['cookies']['felixonline']
 			));
 
 		$cookie = $app['db']->get_row($sql);
@@ -165,8 +162,6 @@ class CurrentUser extends User {
 	{
 		$app = App::getInstance();
 
-		$env = Environment::getInstance();
-
 		$sql = $app['safesql']->query(
 			"INSERT INTO `login` 
 			(
@@ -183,15 +178,15 @@ class CurrentUser extends User {
 				1
 			)",
 			array(
-				$this->session->getId(),
-				$env['REMOTE_ADDR'],
-				$env['HTTP_USER_AGENT'],
+				$app['env']['session']->getId(),
+				$app['env']['REMOTE_ADDR'],
+				$app['env']['HTTP_USER_AGENT'],
 				$this->getUser(),
 			));
 		$app['db']->query($sql);
 
-		$this->session['uname'] = $this->getUser();
-		$this->session['loggedin'] = true;
+		$app['env']['session']['uname'] = $this->getUser();
+		$app['env']['session']['loggedin'] = true;
 	}
 
 	/*
@@ -201,8 +196,6 @@ class CurrentUser extends User {
 	 */
 	protected function isSessionRecent() {
 		$app = App::getInstance();
-
-		$env = Environment::getInstance();
 
 		$sql = $app['safesql']->query(
 			"SELECT
@@ -217,8 +210,8 @@ class CurrentUser extends User {
 			ORDER BY timediff ASC
 			LIMIT 1",
 			array(
-				$this->session->getId(),
-				$this->session['uname'],
+				$app['env']['session']->getId(),
+				$app['env']['session']['uname'],
 			));
 
 		$user = $app['db']->get_row($sql);
@@ -226,8 +219,8 @@ class CurrentUser extends User {
 		if (
 			$user
 			&& $user->timediff <= SESSION_LENGTH 
-			&& $user->ip == $env['REMOTE_ADDR']
-			&& $user->browser == $env['HTTP_USER_AGENT']
+			&& $user->ip == $app['env']['REMOTE_ADDR']
+			&& $user->browser == $app['env']['HTTP_USER_AGENT']
 		) {
 			return true;
 		} else {
@@ -237,10 +230,6 @@ class CurrentUser extends User {
 			// from the cookie
 			return false;
 		}
-	}
-
-	public function getSession() {
-		return $this->session;
 	}
 
 	/*

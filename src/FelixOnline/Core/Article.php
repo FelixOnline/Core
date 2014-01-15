@@ -300,8 +300,7 @@ class Article extends BaseModel {
 		$app = App::getInstance();
 
 		if (is_null($ip)) {
-			$env = \FelixOnline\Core\Environment::getInstance();
-			$ip = $env['REMOTE_ADDR'];
+			$ip = $app['env']['REMOTE_ADDR'];
 		}
 
 		$sql = $app['safesql']->query(
@@ -402,18 +401,24 @@ class Article extends BaseModel {
 	 * Private: Increment hit count on article
 	 */
 	private function hitArticle() {
-		$sql = $this->safesql->query("UPDATE `article` SET hits=hits+1 WHERE id=%i", array($this->getId()));
-		return $this->db->query($sql);
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query("UPDATE `article` SET hits=hits+1 WHERE id=%i", array($this->getId()));
+		return $app['db']->query($sql);
 	}
 
 	/*
 	 * Private: Add log of visitor into article_vist table
 	 */
 	private function logVisitor($repeat = 0) {
-		global $currentuser;
+		$app = App::getInstance();
+
 		$user = NULL;
-		if($currentuser->isLoggedIn()) $user = $currentuser->getUser();
-		$sql = $this->safesql->query(
+		if ($app['currentuser']->isLoggedIn()) {
+			$user = $app['currentuser']->getUser();
+		}
+
+		$sql = $app['safesql']->query(
 			"INSERT INTO
 				article_visit
 			(
@@ -428,14 +433,14 @@ class Article extends BaseModel {
 					array(
 						$this->getId(),
 						$user,
-						$_SERVER['REMOTE_ADDR'],
-						$_SERVER['HTTP_USER_AGENT'],
-						$_SERVER['HTTP_REFERER'],
+						$app['env']['REMOTE_ADDR'],
+						$app['env']['HTTP_USER_AGENT'],
+						$app['env']['HTTP_REFERER'],
 						$repeat
 					)
 				)
 			);
-		return $this->db->query($sql);
+		return $app['db']->query($sql);
 	}
 
 	/*
@@ -444,9 +449,10 @@ class Article extends BaseModel {
 	 * Returns boolean
 	 */
 	private function recentlyVisited() {
-		global $currentuser;
-		if($currentuser->isLoggedIn()) {
-			$sql = $this->safesql->query(
+		$app = App::getInstance();
+
+		if ($app['currentuser']->isLoggedIn()) {
+			$sql = $app['safesql']->query(
 				"SELECT
 					COUNT(id)
 				FROM
@@ -455,13 +461,13 @@ class Article extends BaseModel {
 				AND article = '%s'
 				AND UNIX_TIMESTAMP(timestamp) < now() - interval 4 week",
 				array(
-					$currentuser->getUser(),
+					$app['currentuser']->getUser(),
 					$this->getId()
 				)
 			);
-			return $this->db->get_var($sql);
+			return $app['db']->get_var($sql);
 		} else {
-			$sql = $this->safesql->query(
+			$sql = $app['safesql']->query(
 				"SELECT
 					COUNT(id)
 				FROM
@@ -471,12 +477,12 @@ class Article extends BaseModel {
 				AND article = %i
 				AND UNIX_TIMESTAMP(timestamp) < now() - interval 4 week",
 				array(
-					$_SERVER['REMOTE_ADDR'],
-					$_SERVER['HTTP_USER_AGENT'],
+					$app['env']['REMOTE_ADDR'],
+					$app['env']['HTTP_USER_AGENT'],
 					$this->getId()
 				)
 			);
-			return $this->db->get_var($sql);
+			return $app['db']->get_var($sql);
 		}
 	}
 

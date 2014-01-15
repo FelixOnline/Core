@@ -21,30 +21,33 @@ class CurrentUserTest extends DatabaseTestCase
 			'base_url' => 'http://localhost/'
 		));
 
-		$this->session = $this->mock('FelixOnline\\Core\\Session')
+		$app = \FelixOnline\Core\App::getInstance();
+
+		$session = $this->mock('FelixOnline\\Core\\Session')
 			->getId(1)
 			->start(1)
 			->reset()
 			->new();
 
-		$this->reflect($this->session)
+		$this->reflect($session)
 			->__set('session', array());
 
-		$this->cookies = $this->mock('FelixOnline\\Core\\Cookies')
+		$app['env']['session'] = $session;
+
+		$cookies = $this->mock('FelixOnline\\Core\\Cookies')
 			->set(true)
 			->delete(true)
 			->new();
 
-		$this->reflect($this->cookies)
+		$this->reflect($cookies)
 			->__set('cookies', array());
+
+		$app['env']['cookies'] = $cookies;
 	}
 
 	public function testNotLoggedIn()
 	{
-		$currentUser = new \FelixOnline\Core\CurrentUser(
-			$this->session,
-			$this->cookies
-		);
+		$currentUser = new \FelixOnline\Core\CurrentUser();
 
 		$this->assertFalse($currentUser->isLoggedIn());
 	}
@@ -53,15 +56,12 @@ class CurrentUserTest extends DatabaseTestCase
 	{
 		$env = \FelixOnline\Core\Environment::getInstance();
 
-		$currentUser = new \FelixOnline\Core\CurrentUser(
-			$this->session,
-			$this->cookies
-		);
+		$currentUser = new \FelixOnline\Core\CurrentUser();
 
 		$this->assertFalse($currentUser->isLoggedIn());
 
-		$this->session['loggedin'] = true;
-		$this->session['uname'] = 'felix';
+		$env['session']['loggedin'] = true;
+		$env['session']['uname'] = 'felix';
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
@@ -77,13 +77,10 @@ class CurrentUserTest extends DatabaseTestCase
 	{
 		$env = \FelixOnline\Core\Environment::getInstance();
 
-		$currentUser = new \FelixOnline\Core\CurrentUser(
-			$this->session,
-			$this->cookies
-		);
+		$currentUser = new \FelixOnline\Core\CurrentUser();
 
-		$this->session['loggedin'] = true;
-		$this->session['uname'] = 'felix';
+		$env['session']['loggedin'] = true;
+		$env['session']['uname'] = 'felix';
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
@@ -97,12 +94,11 @@ class CurrentUserTest extends DatabaseTestCase
 
 	public function testLoginFromCookie()
 	{
-		$currentUser = new \FelixOnline\Core\CurrentUser(
-			$this->session,
-			$this->cookies
-		);
+		$env = \FelixOnline\Core\Environment::getInstance();
 
-		$this->cookies['felixonline'] = 'foo';
+		$currentUser = new \FelixOnline\Core\CurrentUser();
+
+		$env['cookies']['felixonline'] = 'foo';
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
@@ -112,19 +108,18 @@ class CurrentUserTest extends DatabaseTestCase
 			('foo', 'felix', DATE_ADD(NOW(), INTERVAL 1 DAY))");
 
 		$this->assertTrue($currentUser->isLoggedIn());
-		$this->assertTrue($this->session['loggedin']);
-		$this->assertEquals('felix', $this->session['uname']);
+		$this->assertTrue($env['session']['loggedin']);
+		$this->assertEquals('felix', $env['session']['uname']);
 		$this->assertEquals(2, $this->getConnection()->getRowCount('login'));
 	}
 
 	public function testExpiredCookie()
 	{
-		$currentUser = new \FelixOnline\Core\CurrentUser(
-			$this->session,
-			$this->cookies
-		);
+		$env = \FelixOnline\Core\Environment::getInstance();
 
-		$this->cookies['felixonline'] = 'foo';
+		$currentUser = new \FelixOnline\Core\CurrentUser();
+
+		$env['cookies']['felixonline'] = 'foo';
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
