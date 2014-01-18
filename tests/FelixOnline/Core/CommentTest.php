@@ -1,10 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../../DatabaseTestCase.php';
-require_once __DIR__ . '/../../utilities.php';
+require_once __DIR__ . '/../../AppTestCase.php';
 require_once __DIR__ . '/../../../constants.php';
 
-class CommentTest extends DatabaseTestCase
+class CommentTest extends AppTestCase
 {
 	public $fixtures = array(
 		'articles',
@@ -14,14 +13,6 @@ class CommentTest extends DatabaseTestCase
 		'comments_ext',
 		'categories',
 	);
-
-	public function setUp()
-	{
-		parent::setUp();
-		create_app(array(
-			'base_url' => 'http://localhost/'
-		));
-	}
 
 	public function testInteralComment()
 	{

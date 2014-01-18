@@ -1,9 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../../DatabaseTestCase.php';
-require_once __DIR__ . '/../../utilities.php';
+require_once __DIR__ . '/../../AppTestCase.php';
 
-class ArticleTest extends DatabaseTestCase
+class ArticleTest extends AppTestCase
 {
 	public $fixtures = array(
 		'articles',
@@ -15,14 +14,6 @@ class ArticleTest extends DatabaseTestCase
 		'comments_ext',
 		'images',
 	);
-
-	public function setUp()
-	{
-		parent::setUp();
-		create_app(array(
-			'base_url' => 'http://localhost/'
-		));
-	}
 
 	public function testGetTitle()
 	{

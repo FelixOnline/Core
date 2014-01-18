@@ -1,21 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../../DatabaseTestCase.php';
-require_once __DIR__ . '/../../utilities.php';
+require_once __DIR__ . '/../../AppTestCase.php';
 
-class BaseModelTest extends DatabaseTestCase
+class BaseModelTest extends AppTestCase
 {
 	public $fixtures = array(
 		'users',
 	);
-
-	public function setUp()
-	{
-		parent::setUp();
-		create_app(array(
-			'base_url' => 'http://localhost/'
-		));
-	}
 
 	public function testNoModelFoundException()
 	{

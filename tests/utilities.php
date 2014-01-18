@@ -25,5 +25,5 @@ function create_app($config = array('base_url' => 'foo')) {
 
 	$app->run();
 
-	return $app;;
+	return $app;
 }
