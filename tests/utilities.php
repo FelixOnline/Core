@@ -1,29 +1,23 @@
 <?php
 
-require_once __DIR__ . '/../lib/SafeSQL.php';
+require_once __DIR__ . '/../constants.php';
+
 /**
  * Test utilities
  */
 
-function create_app($config = array('base_url' => 'foo')) {
-	$app = new \FelixOnline\Core\App($config);
+function loginUser($user)
+{
+	$app = \FelixOnline\Core\App::getInstance();
 
-	$db = new \ezSQL_mysqli();
-	$db->quick_connect(
-		'root',
-		'',
-		'test_media_felix',
-		'localhost',
-		3306,
-		'utf8'
-	);
-	$app['db'] = $db;
+	// Log in user
+	$app['env']['session']['loggedin'] = true;
+	$app['env']['session']['uname'] = $user;
 
-	$app['safesql'] = new \SafeSQL_MySQLi($db->dbh);
+	$app['db']->query("INSERT INTO `login` 
+		(`session_id`, `ip`, `browser`, `user`, `timestamp`, `valid`, `logged_in`)
+		VALUES 
+		('1', '".$app['env']['REMOTE_ADDR']."', '".$app['env']['HTTP_USER_AGENT']."', '".$user."', NOW(), 1, 1)");
 
-	$app['env'] = \FelixOnline\Core\Environment::mock();
-
-	$app->run();
-
-	return $app;
+	$app['currentuser']->setUser($user);
 }

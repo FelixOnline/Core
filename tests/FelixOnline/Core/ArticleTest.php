@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../../AppTestCase.php';
+require_once __DIR__ . '/../../utilities.php';
 
 class ArticleTest extends AppTestCase
 {
@@ -198,6 +199,26 @@ class ArticleTest extends AppTestCase
 		$stm->execute(array(':id' => 1));
 		$row = $stm->fetch();
 
-		$this->assertEquals($row['hits'], 2);
+		$this->assertEquals((int) $row['hits'], 2);
+	}
+
+	public function testLogVisitLoggedIn()
+	{
+		$app = \FelixOnline\Core\App::getInstance();
+
+		loginUser('felix');
+
+		$article = new \FelixOnline\Core\Article(1);
+
+		$article->logVisit();
+
+		$this->assertEquals(3, $this->getConnection()->getRowCount('article_visit'));
+
+		$pdo = $this->getConnection()->getConnection();
+		$stm = $pdo->prepare("SELECT hits FROM article WHERE id = :id");
+		$stm->execute(array(':id' => 1));
+		$row = $stm->fetch();
+
+		$this->assertEquals((int) $row['hits'], 2);
 	}
 }

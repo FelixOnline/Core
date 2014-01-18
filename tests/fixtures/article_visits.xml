@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="media_felix">
+	<table_data name="article_visit">
+	<row>
+		<field name="id">1</field>
+		<field name="article">1</field>
+		<field name="timestamp">2010-09-22 22:58:31</field>
+		<field name="user">felix</field>
+        <field name="IP">0.0.0.0</field>
+		<field name="browser"></field>
+		<field name="referrer" xsi:nil="true" />
+		<field name="repeat_visit">0</field>
+	</row>
+	<row>
+		<field name="id">2</field>
+		<field name="article">1</field>
+		<field name="timestamp">2010-09-22 22:59:00</field>
+		<field name="user">felix</field>
+        <field name="IP">0.0.0.0</field>
+		<field name="browser"></field>
+		<field name="referrer" xsi:nil="true" />
+		<field name="repeat_visit">1</field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>

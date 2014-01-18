@@ -72,6 +72,8 @@ class AppTestCase extends DatabaseTestCase
 
 	public function tearDown()
 	{
+		parent::tearDown();
+
 		$app = \FelixOnline\Core\App::getInstance();
 
 		$app['db']->dbh->close();
