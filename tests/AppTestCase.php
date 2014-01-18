@@ -62,7 +62,7 @@ class AppTestCase extends DatabaseTestCase
 		$app['env']['cookies'] = $cookies;
 
 		if ($this->setCurrentUser) {
-			$app['env']['currentuser'] = new \FelixOnline\Core\CurrentUser();
+			$app['currentuser'] = new \FelixOnline\Core\CurrentUser();
 		}
 
 		$app->run();

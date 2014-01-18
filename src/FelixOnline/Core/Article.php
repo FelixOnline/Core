@@ -403,7 +403,15 @@ class Article extends BaseModel {
 	private function hitArticle() {
 		$app = App::getInstance();
 
-		$sql = $app['safesql']->query("UPDATE `article` SET hits=hits+1 WHERE id=%i", array($this->getId()));
+		$sql = $app['safesql']->query(
+			"UPDATE
+				`article`
+			SET hits=hits+1
+			WHERE id=%i",
+			array(
+				$this->getId()
+			)
+		);
 		return $app['db']->query($sql);
 	}
 

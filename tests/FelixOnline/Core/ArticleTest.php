@@ -13,6 +13,7 @@ class ArticleTest extends AppTestCase
 		'comments',
 		'comments_ext',
 		'images',
+		'article_visits',
 	);
 
 	public function testGetTitle()
@@ -180,5 +181,23 @@ class ArticleTest extends AppTestCase
 
 		$image = $article->getImage();
 		$this->assertNull($image);
+	}
+
+	public function testLogVisit()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+
+		$article->logVisit();
+
+		$this->assertEquals(3, $this->getConnection()->getRowCount('article_visit'));
+
+		// Get article hit count
+		$pdo = $this->getConnection()->getConnection();
+
+		$stm = $pdo->prepare("SELECT hits FROM article WHERE id = :id");
+		$stm->execute(array(':id' => 1));
+		$row = $stm->fetch();
+
+		$this->assertEquals($row['hits'], 2);
 	}
 }
