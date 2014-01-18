@@ -176,4 +176,34 @@ class AppTest extends DatabaseTestCase
 			$app['safesql']->query("SELECT id FROM %s", array("foo"))
 		);
 	}
+
+	public function testNotSetException()
+	{
+		$app = $this->createApp(array(
+			'base_url' => 'foo',
+		));
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'Key "foo" is not set'
+		);
+
+		// Try and access key that doesn't exist
+		$app['foo'];
+	}
+
+	public function testUnset()
+	{
+		$app = $this->createApp(array(
+			'base_url' => 'foo',
+		));
+
+		$app['foo'] = 'bar';
+
+		$this->assertTrue(isset($app['foo']));
+
+		unset($app['foo']);
+
+		$this->assertFalse(isset($app['foo']));
+	}
 }

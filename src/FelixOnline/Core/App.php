@@ -1,5 +1,8 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Exceptions\InternalException;
+
 /**
  * App class
  */
@@ -44,11 +47,11 @@ class App implements \ArrayAccess
 		}
 
 		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
-			throw new \FelixOnline\Exceptions\InternalException('No db setup');
+			throw new InternalException('No db setup');
 		}
 
 		if (!isset($this->container['safesql']) || !($this->container['safesql'] instanceof \SafeSQL_MySQLi)) {
-			throw new \FelixOnline\Exceptions\InternalException('No safesql setup');
+			throw new InternalException('No safesql setup');
 		}
 	}
 
@@ -61,7 +64,7 @@ class App implements \ArrayAccess
 	{
 		foreach($this->required as $req) {
 			if (!array_key_exists($req, $options)) {
-				throw new \FelixOnline\Exceptions\InternalException('"' . $req . '" option has not been defined');
+				throw new InternalException('"' . $req . '" option has not been defined');
 			}
 		}
 	}
@@ -74,7 +77,7 @@ class App implements \ArrayAccess
 	public static function getInstance()
 	{
 		if (is_null(self::$instance)) {
-			throw new \FelixOnline\Exceptions\InternalException('App has not been initialised yet');
+			throw new InternalException('App has not been initialised yet');
 		}
 		return self::$instance;
 	}
@@ -106,7 +109,7 @@ class App implements \ArrayAccess
 			if (func_num_args() > 1) {
 				return func_get_arg(1);
 			} else {
-				throw new \FelixOnline\Exceptions\InternalException('Option "'.$key.'" has not been set');
+				throw new InternalException('Option "'.$key.'" has not been set');
 			}
 		}
 		return self::$options[$key];
@@ -133,6 +136,9 @@ class App implements \ArrayAccess
 
 	public function offsetGet($offset)
 	{
-        return isset($this->container[$offset]) ? $this->container[$offset] : null;
+		if (!isset($this->container[$offset])) {
+			throw new InternalException('Key "' . $offset . '" is not set');
+		}
+		return $this->container[$offset];
     }
 }
