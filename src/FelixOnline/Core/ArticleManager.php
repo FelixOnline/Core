@@ -9,7 +9,9 @@ class ArticleManager extends BaseManager
 	protected $class = 'Article';
 
 	public function getMostPopular($number_to_get) {
-		$sql = App::query(
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"SELECT
 				DISTINCT article AS id,
 				COUNT(article) AS c
@@ -24,7 +26,12 @@ class ArticleManager extends BaseManager
 			array($number_to_get)
 		);
 
-		return App::$db->get_results($sql);
+		$results = $app['db']->get_results($sql);
+		$articles = [];
+		foreach ($results as $result) {
+			$articles[] = new Article($result->id);
+		}
+		return $articles;
 	}
 
 	public static function getMostCommented($threshold, $number_to_get) {

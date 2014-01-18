@@ -15,6 +15,7 @@ class ArticleTest extends AppTestCase
 		'comments_ext',
 		'images',
 		'article_visits',
+		'logins',
 	);
 
 	public function testGetTitle()
