@@ -11,6 +11,7 @@ class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
 
 		// set up tables
 		$fixtureDataSet = $this->getDataSet($this->fixtures);
+		list($fixtureMeta, $fixtureKeys) = $this->getDataSetMeta($this->fixtures);
 		foreach ($fixtureDataSet->getTableNames() as $table) {
 			// drop table
 			$pdo->exec("DROP TABLE IF EXISTS `$table`;");
@@ -19,8 +20,18 @@ class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
 			$create = "CREATE TABLE IF NOT EXISTS `$table` ";
 			$cols = array();
 			foreach ($meta->getColumns() as $col) {
-				$cols[] = "`$col` VARCHAR(400)";
+				if (isset($fixtureMeta[$table][$col])) {
+					$cols[] = $this->createFieldSQL($col, $fixtureMeta[$table][$col]['@attributes']);
+				} else {
+					$cols[] = "`$col` VARCHAR(400)";
+				}
 			}
+
+			// Set primary key
+			if (isset($fixtureKeys[$table]) && isset($fixtureKeys[$table]['PRIMARY'])) {
+				$cols[] = 'PRIMARY KEY (`' . $fixtureKeys[$table]['PRIMARY']['@attributes']['Column_name'] . '`)';
+			}
+
 			$create .= '('.implode(',', $cols).');';
 			$pdo->exec($create);
 		}
@@ -68,6 +79,76 @@ class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
 			$compositeDs->addDataSet($ds);
 		}
 		return $compositeDs;
+	}
+	
+	public function getDataSetMeta($fixtures = array()) {
+		$fixturePath = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'fixtures';
+
+		$meta = array();
+		$keys = array();
+
+		foreach ($fixtures as $fixture) {
+			$file =  $fixturePath . DIRECTORY_SEPARATOR . "$fixture.xml";
+			$xmlFileContents = simplexml_load_file($file);
+
+			foreach ($xmlFileContents->xpath('./database/table_structure') as $tableElement) {
+
+				$tableName = (string) $tableElement['name'];
+
+				if (!isset($meta[$tableName])) {
+					$meta[$tableName] = array();
+				}
+
+				if (!isset($keys[$tableName])) {
+					$keys[$tableName] = array();
+				}
+
+				foreach ($tableElement->xpath('./field') as $fieldElement) {
+					if (empty($fieldElement['Field'])) {
+						throw new PHPUnit_Extensions_Database_Exception('<field> elements must include a Field attribute');
+					}
+
+					$columnName = (string) $fieldElement['Field'];
+
+					if (!isset($meta[$tableName][$columnName])) {
+						$meta[$tableName][$columnName] = (array) $fieldElement;
+					}
+				}
+
+				// get primary key
+				foreach ($tableElement->xpath('./key[@Key_name="PRIMARY"]') as $primaryKey) {
+					$keys[$tableName]['PRIMARY'] = (array) $primaryKey;
+				}
+			}
+		}
+
+		return array($meta, $keys);
+	}
+
+	public function createFieldSQL($column, $meta) {
+		$arr = array(
+			"`" . $column . "`"
+		);
+
+		if (isset($meta['Type'])) {
+			$arr[] = $meta['Type'];
+		} else {
+			$arr[] = "VARCHAR(400)";
+		}
+
+		if (isset($meta['Null']) && $meta['Null'] == 'NO') {
+			$arr[] = "NOT NULL";
+		}
+
+		if (isset($meta['Default'])) {
+			$arr[] = "DEFAULT " . $meta['Default'];
+		}
+
+		if (isset($meta['Extra'])) {
+			$arr[] = $meta['Extra'];
+		}
+
+		return implode(" ", $arr);
 	}
 
 	public function loadDataSet($dataSet) {

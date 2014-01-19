@@ -467,7 +467,7 @@ class Article extends BaseModel {
 					`article_visit`
 				WHERE user = '%s'
 				AND article = '%s'
-				AND UNIX_TIMESTAMP(timestamp) > NOW() - interval 4 week",
+				AND timestamp >= NOW() - INTERVAL 4 WEEK",
 				array(
 					$app['currentuser']->getUser(),
 					$this->getId()
@@ -483,13 +483,14 @@ class Article extends BaseModel {
 				WHERE IP = '%s'
 				AND browser = '%s'
 				AND article = %i
-				AND UNIX_TIMESTAMP(timestamp) > NOW() - interval 4 week",
+				AND timestamp >= NOW() - INTERVAL 4 WEEK",
 				array(
 					$app['env']['REMOTE_ADDR'],
 					$app['env']['HTTP_USER_AGENT'],
 					$this->getId()
 				)
 			);
+
 			return $app['db']->get_var($sql);
 		}
 	}

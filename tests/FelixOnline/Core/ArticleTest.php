@@ -71,7 +71,7 @@ class ArticleTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(1);
 		$this->assertEquals(
 			$article->getShortDesc(),
-			"In light of Simon Singh returning to Imperial to give a lecture on libel laws th"
+			"Simon Singh returning to Imperial!"
 		);
 	}
 
@@ -221,5 +221,42 @@ class ArticleTest extends AppTestCase
 		$row = $stm->fetch();
 
 		$this->assertEquals((int) $row['hits'], 2);
+	}
+
+	public function testLogVisitRepeat()
+	{
+		$app = \FelixOnline\Core\App::getInstance();
+		$pdo = $this->getConnection()->getConnection();
+
+		$article = new \FelixOnline\Core\Article(1);
+		$article->logVisit();
+
+		$stm = $pdo->prepare("SELECT hits FROM article WHERE id = :id");
+		$stm->execute(array(':id' => 1));
+		$row = $stm->fetch();
+
+		$this->assertEquals((int) $row['hits'], 2);
+
+		$this->assertEquals(3, $this->getConnection()->getRowCount('article_visit'));
+
+		$stm2 = $pdo->prepare("SELECT COUNT(*) as count FROM article_visit WHERE repeat_visit = 1");
+		$stm2->execute(array());
+		$row = $stm2->fetch();
+
+		$this->assertEquals((int) $row['count'], 1);
+
+		$article->logVisit();
+		$this->assertEquals(4, $this->getConnection()->getRowCount('article_visit'));
+
+		$stm->execute(array(':id' => 1));
+		$row = $stm->fetch();
+
+		$this->assertEquals((int) $row['hits'], 2);
+
+		$stm2 = $pdo->prepare("SELECT COUNT(*) as count FROM article_visit WHERE repeat_visit = 1");
+		$stm2->execute(array());
+		$row = $stm2->fetch();
+
+		$this->assertEquals((int) $row['count'], 2);
 	}
 }

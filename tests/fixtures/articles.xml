@@ -1,6 +1,38 @@
 <?xml version="1.0"?>
 <mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <database name="media_felix">
+	<table_structure name="article">
+		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+		<field Field="title" Type="varchar(100)" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="short_title" Type="varchar(20)" Null="YES" Key="" Extra="" Comment="" />
+		<field Field="teaser" Type="varchar(300)" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="author" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="category" Type="int(11)" Null="NO" Key="MUL" Extra="" Comment="" />
+		<field Field="date" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" Comment="" />
+		<field Field="approvedby" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="published" Type="timestamp" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="hidden" Type="tinyint(1)" Null="NO" Key="MUL" Default="0" Extra="" Comment="" />
+		<field Field="searchable" Type="tinyint(1)" Null="NO" Key="MUL" Default="1" Extra="" Comment="" />
+		<field Field="text1" Type="int(11)" Null="NO" Key="MUL" Extra="" Comment="" />
+		<field Field="img1" Type="int(11)" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="text2" Type="int(11)" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="img2" Type="int(11)" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="img2lr" Type="tinyint(1)" Null="YES" Key="" Extra="" Comment="0 left, 1 right (default)" />
+		<field Field="hits" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="short_desc" Type="varchar(100)" Null="YES" Key="" Extra="" Comment="" />
+		<key Table="article" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="3504" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="text1" Seq_in_index="1" Column_name="text1" Collation="A" Cardinality="3504" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="img1" Seq_in_index="1" Column_name="img1" Collation="A" Cardinality="3504" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="text2" Seq_in_index="1" Column_name="text2" Collation="A" Cardinality="14" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="img2" Seq_in_index="1" Column_name="img2" Collation="A" Cardinality="54" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="category" Seq_in_index="1" Column_name="category" Collation="A" Cardinality="34" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="author" Seq_in_index="1" Column_name="author" Collation="A" Cardinality="1752" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="approvedby" Seq_in_index="1" Column_name="approvedby" Collation="A" Cardinality="34" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="hidden" Seq_in_index="1" Column_name="hidden" Collation="A" Cardinality="4" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="published" Seq_in_index="1" Column_name="published" Collation="A" Cardinality="1168" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article" Non_unique="1" Key_name="searchable" Seq_in_index="1" Column_name="searchable" Collation="A" Cardinality="2" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="article" Engine="InnoDB" Version="10" Row_format="Compact" Rows="3504" Avg_row_length="453" Data_length="1589248" Max_data_length="0" Index_length="720896" Data_free="3145728" Auto_increment="3745" Create_time="2014-01-07 18:46:56" Collation="utf8_general_ci" Create_options="" Comment="" />
+	</table_structure>
 	<table_data name="article">
 	<row>
 		<field name="id">1</field>
@@ -20,7 +52,7 @@
 		<field name="img2" xsi:nil="true" />
 		<field name="img2lr" xsi:nil="true" />
 		<field name="hits">1</field>
-        <field name="short_desc">In light of Simon Singh returning to Imperial to give a lecture on libel laws that he is personally embroiled in!</field>
+        <field name="short_desc">Simon Singh returning to Imperial!</field>
 	</row>
 	<row>
 		<field name="id">2</field>
