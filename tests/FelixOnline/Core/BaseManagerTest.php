@@ -51,8 +51,6 @@ class BaseManagerTest extends AppTestCase
 		$filtered = $manager->filter('published IS NOT NULL')
 			->filter('`id` IN (1, 2)')
 			->values();
-		// OR
-		//$filtered = $manager->filter(array('published IS NOT NULL', 'published < NOW()'));
 
 		$this->assertCount(2, $filtered);
 		$this->assertInstanceOf('FelixOnline\Core\Article', $filtered[0]);
@@ -66,14 +64,22 @@ class BaseManagerTest extends AppTestCase
 			->filter('`id` IN (1, 2)')
 			->order('id', 'ASC');
 
-		// OR
-		//$ordered = $filtered->order(array('id', 'timestamp'), 'DESC');
-
 		$results = $query->values();
 
 		$this->assertCount(2, $results);
 		$this->assertInstanceOf('FelixOnline\Core\Article', $results[0]);
 		$this->assertEquals($results[0]->getId(), 1);
+	}
+
+	public function testOrderMultiple()
+	{
+		$manager = $this->getManager();
+
+		$query = $manager->order(array('id', 'title'), 'DESC');
+
+		$sql = $manager->getSQL();
+
+		$this->assertEquals($sql, "SELECT `id` FROM `article` ORDER BY `id`,`title` DESC");
 	}
 
 	public function testLimit()
@@ -102,5 +108,27 @@ class BaseManagerTest extends AppTestCase
 		$count = $query->count();
 
 		$this->assertEquals($count, 2);
+	}
+
+	public function testQueryExceptionsBadQuery()
+	{
+		$manager = $this->getManager();
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException'
+		);
+		$manager->filter('not valid sql')->values();
+	}
+
+	public function testQueryExceptionsNoResults()
+	{
+		$manager = $this->getManager();
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'DB query returned no results'
+		);
+
+		$manager->filter('true = false')->values();
 	}
 }

@@ -212,14 +212,18 @@ class BaseManager
 
 		// TODO cache here
 
+		set_error_handler(function($errno, $errstr) {
+			throw new InternalException($errstr);
+		});
 		$results = $app['db']->get_results($sql);
+		restore_error_handler(); // restore old error handler
 
 		if ($app['db']->last_error) {
 			throw new InternalException($app['db']->last_error);
 		}
 
 		if (is_null($results)) {
-			throw new InternalException('DB query returned no values');
+			throw new InternalException('DB query returned no results');
 		}
 
 		return $results;
@@ -237,24 +241,4 @@ class BaseManager
 		}
 		return $models;
 	}
-
-	/**
-	 * Get object based on id
-	 *
-	 * $id - array or single id
-	 */
-	public function get($id)
-	{
-		if (is_array($id)) {
-			$objects = [];
-			foreach($id as $i) {
-				$objects[] = new $this->class($i);
-			}
-			return $objects;
-		} else {
-			$object = new $this->class($id);
-			return $object;
-		}
-	}
-
 }
