@@ -17,33 +17,43 @@ class ArticleManagerTest extends AppTestCase
 	{
 		$manager = new \FelixOnline\Core\ArticleManager();
 
+		$faker = Faker\Factory::create();
+
+		$title1 = $faker->sentence();
+		$title2 = $faker->sentence();
+
+		$content1 = $faker->text();
+		$content2 = $faker->text();
+
 		// create a new article
 		$article = new \FelixOnline\Core\Article();
-		$article->setTitle('Hello');
-		$article->setContent('Hello World!');
-		$article->setTeaser('Hello!');
-		$article->setCategory(1);
-		$article->setPublished(date('Y-m-d H:i:s'));
-		$article->save();
+
+		$article->setTitle($title1)
+			->setContent($content1)
+			->setTeaser($title1)
+			->setCategory(1)
+			->setPublished(date('Y-m-d H:i:s'))
+			->save();
 
 		$article->logVisit();
 
-		$a2 = new \FelixOnline\Core\Article();
-		$a2->setTitle('Hello2');
-		$a2->setContent('Hello World!');
-		$a2->setTeaser('Hello2!');
-		$a2->setCategory(1);
-		$a2->setPublished(date('Y-m-d H:i:s'));
-		$a2->save();
+		$article2 = new \FelixOnline\Core\Article();
 
-		$a2->logVisit();
-		$a2->logVisit();
+		$article2->setTitle($title2)
+			->setContent($content2)
+			->setTeaser($title2)
+			->setCategory(1)
+			->setPublished(date('Y-m-d H:i:s'))
+			->save();
+
+		$article2->logVisit();
+		$article2->logVisit();
 
 		$articles = $manager->getMostPopular(5);
 
 		$this->assertCount(2, $articles);
 		$this->assertInstanceOf('FelixOnline\Core\Article', $articles[0]);
-		$this->assertEquals($articles[0]->getTitle(), 'Hello2');
+		$this->assertEquals($articles[0]->getTitle(), $title2);
 	}
 
 	public function testMostPopularQueryNone()
