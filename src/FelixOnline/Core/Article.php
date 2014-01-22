@@ -512,7 +512,7 @@ class Article extends BaseModel {
 
 		$this->setText1($id);
 
-		return $id;
+		return $this;
 	}
 
 	/**

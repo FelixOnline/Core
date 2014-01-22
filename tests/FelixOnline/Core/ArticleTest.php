@@ -124,9 +124,12 @@ class ArticleTest extends AppTestCase
 		$this->assertEquals(3, $this->getConnection()->getRowCount('text_story'));
 		$article = new \FelixOnline\Core\Article(1);
 
-		$id = $article->setContent('Foo bar');
+		$article->setContent('Foo bar');
 		$this->assertEquals(4, $this->getConnection()->getRowCount('text_story'));
-		$this->assertEquals($id, $article->getText1());
+
+		$app = \FelixOnline\Core\App::getInstance();
+		$insert_id = $app['db']->dbh->insert_id;
+		$this->assertEquals($insert_id, $article->getText1());
 	}
 
 	public function testAddAuthors()

@@ -75,7 +75,7 @@ class BaseModel {
 					$this->fields[$meth] = $arguments[0];
 				}
 
-				return $this->fields[$meth];
+				return $this;
 				break;
 			case 'has':
 				if (array_key_exists($meth, $this->fields)) {
