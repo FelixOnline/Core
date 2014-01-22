@@ -20,22 +20,28 @@ class ArticleManager extends BaseManager
 				INNER JOIN article AS a
 				ON (av.article=a.id)
 				WHERE a.published IS NOT NULL
-				AND a.published > FROM_UNIXTIME(UNIX_TIMESTAMP() - 1814400)
+				AND a.published >= NOW() - INTERVAL 3 WEEK
 				ORDER BY timestamp DESC LIMIT 500
 			) AS t GROUP BY article ORDER BY c DESC LIMIT %i",
 			array($number_to_get)
 		);
 
 		$results = $app['db']->get_results($sql);
-		$articles = [];
-		foreach ($results as $result) {
-			$articles[] = new Article($result->id);
+		if ($results) {
+			$articles = [];
+			foreach ($results as $result) {
+				$articles[] = new Article($result->id);
+			}
+			return $articles;
+		} else {
+			return null;
 		}
-		return $articles;
 	}
 
-	public static function getMostCommented($threshold, $number_to_get) {
-		$sql = App::query(
+	public function getMostCommented($number_to_get) {
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"SELECT
 				article AS id,
 				SUM(count) AS count
@@ -44,8 +50,9 @@ class ArticleManager extends BaseManager
 					FROM `comment` AS c
 					INNER JOIN `article` AS a ON (c.article=a.id)
 					WHERE c.`active`=1
-					AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
-					AND a.published<NOW()
+					AND timestamp >= NOW() - INTERVAL 3 WEEK
+					AND a.published IS NOT NULL
+					AND a.published < NOW()
 					GROUP BY article
 					ORDER BY timestamp DESC
 					LIMIT 20)
@@ -53,21 +60,30 @@ class ArticleManager extends BaseManager
 					(SELECT ce.article,COUNT(*) AS count
 					FROM `comment_ext` AS ce
 					INNER JOIN `article` AS a ON (ce.article=a.id)
-					WHERE ce.`active`=1
-					AND pending=0
-					AND timestamp>(DATE_SUB(NOW(),INTERVAL %i day))
-					AND a.published<NOW()
+					WHERE ce.`active` = 1
+					AND pending = 0
+					AND timestamp >= NOW() - INTERVAL 3 WEEK
+					AND a.published IS NOT NULL
+					AND a.published < NOW()
 					GROUP BY article
 					ORDER BY timestamp DESC)
 			) AS t
 			GROUP BY article
 			ORDER BY count DESC, article DESC LIMIT %i",
 			array(
-				$threshold,
-				$threshold,
 				$number_to_get
 			)
 		); // go for most recent comments instead
-		return App::$db->get_results($sql);
+
+		$results = $app['db']->get_results($sql);
+		if ($results) {
+			$articles = [];
+			foreach ($results as $result) {
+				$articles[] = new Article($result->id);
+			}
+			return $articles;
+		} else {
+			return null;
+		}
 	}
 }
