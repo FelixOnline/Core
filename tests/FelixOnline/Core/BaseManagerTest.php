@@ -67,6 +67,17 @@ class BaseManagerTest extends AppTestCase
 		$this->assertEquals($sql, 'SELECT `id` FROM `article` WHERE category = 1');
 	}
 
+	public function testFilterParamsException()
+	{
+		$manager = $this->getManager();
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'Values is not an array'
+		);
+		$manager->filter('category = %i', 1);
+	}
+
 	public function testOrder()
 	{
 		$manager = $this->getManager();

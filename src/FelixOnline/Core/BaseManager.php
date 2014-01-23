@@ -60,6 +60,10 @@ class BaseManager
 	{
 		$app = \FelixOnline\Core\App::getInstance();
 
+		if (!is_array($values)) {
+			throw new InternalException('Values is not an array');
+		}
+
 		$this->filters[] = $app['safesql']->query($filter, $values);
 
 		return $this;
