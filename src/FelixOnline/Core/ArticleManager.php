@@ -6,7 +6,7 @@ namespace FelixOnline\Core;
 class ArticleManager extends BaseManager
 {
 	protected $table = 'article';
-	protected $class = 'Article';
+	protected $class = 'FelixOnline\Core\Article';
 
 	public function getMostPopular($number_to_get) {
 		$app = App::getInstance();
