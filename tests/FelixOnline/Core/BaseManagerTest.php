@@ -56,6 +56,17 @@ class BaseManagerTest extends AppTestCase
 		$this->assertInstanceOf('FelixOnline\Core\Article', $filtered[0]);
 	}
 
+	public function testFilterParams()
+	{
+		$manager = $this->getManager();
+
+		$manager->filter('category = %i', array(1));
+
+		$sql = $manager->getSQL();
+
+		$this->assertEquals($sql, 'SELECT `id` FROM `article` WHERE category = 1');
+	}
+
 	public function testOrder()
 	{
 		$manager = $this->getManager();
@@ -120,15 +131,34 @@ class BaseManagerTest extends AppTestCase
 		$manager->filter('not valid sql')->values();
 	}
 
-	public function testQueryExceptionsNoResults()
+	public function testQueryNoResults()
+	{
+		$manager = $this->getManager();
+
+		$null = $manager->filter('true = false')->values();
+
+		$this->assertNull($null);
+	}
+
+	public function testGetOne()
+	{
+		$manager = $this->getManager();
+
+		$one = $manager->filter('published IS NOT NULL')
+			->filter('`id` IN (1, 2)')
+			->one();
+
+		$this->assertInstanceOf('FelixOnline\Core\Article', $one);
+	}
+
+	public function testGetOneException()
 	{
 		$manager = $this->getManager();
 
 		$this->setExpectedException(
 			'FelixOnline\Exceptions\InternalException',
-			'DB query returned no results'
+			'No results'
 		);
-
-		$manager->filter('true = false')->values();
+		$manager->filter('true = false')->one();
 	}
 }

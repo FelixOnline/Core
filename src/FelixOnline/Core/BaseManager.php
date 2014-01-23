@@ -56,9 +56,12 @@ class BaseManager
 	/**
 	 * Filter objects
 	 */
-	public function filter($filter)
+	public function filter($filter, $values = array())
 	{
-		$this->filters[] = $filter;
+		$app = \FelixOnline\Core\App::getInstance();
+
+		$this->filters[] = $app['safesql']->query($filter, $values);
+
 		return $this;
 	}
 
@@ -96,7 +99,7 @@ class BaseManager
 		// Remove null values
 		$statement = array_filter($statement);
 
-		$sql = $this->safe(implode(" ", $statement));
+		$sql = implode(" ", $statement);
 
 		$results = $this->query($sql);
 
@@ -111,6 +114,10 @@ class BaseManager
 		$sql = $this->getSQL();
 
 		$results = $this->query($sql);
+
+		if (is_null($results)) {
+			return null;
+		}
 
 		$models = $this->resultToModels($results);
 
@@ -133,7 +140,25 @@ class BaseManager
 		// Remove null values
 		$statement = array_filter($statement);
 
-		return $this->safe(implode(" ", $statement));
+		return implode(" ", $statement);
+	}
+
+	/**
+	 * Get one
+	 */
+	public function one()
+	{
+		$_limit = $this->limit;
+		$this->limit = array(0, 1);
+
+		$values = $this->values();
+
+		if (is_null($values)) {
+			throw new InternalException('No results');
+		}
+
+		$this->limit = $_limit;
+		return $values[0];
 	}
 
 	/**
@@ -194,16 +219,6 @@ class BaseManager
 	}
 
 	/**
-	 * Safe
-	 */
-	protected function safe($sql)
-	{
-		$app = \FelixOnline\Core\App::getInstance();
-
-		return $app['safesql']->query($sql, array());
-	}
-
-	/**
 	 * Query sql
 	 */
 	protected function query($sql)
@@ -220,10 +235,6 @@ class BaseManager
 
 		if ($app['db']->last_error) {
 			throw new InternalException($app['db']->last_error);
-		}
-
-		if (is_null($results)) {
-			throw new InternalException('DB query returned no results');
 		}
 
 		return $results;
