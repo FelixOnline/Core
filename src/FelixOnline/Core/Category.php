@@ -139,6 +139,8 @@ class Category extends BaseModel
 	/**
 	 * Public: Get number of pages in a category
 	 *
+	 * TODO
+	 *
 	 * Returns int 
 	 */
 	public function getNumPages() {
