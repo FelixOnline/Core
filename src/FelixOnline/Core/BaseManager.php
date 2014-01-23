@@ -149,12 +149,16 @@ class BaseManager
 	public function one()
 	{
 		$_limit = $this->limit;
-		$this->limit = array(0, 1);
+		$this->limit = null;
 
 		$values = $this->values();
 
 		if (is_null($values)) {
 			throw new InternalException('No results');
+		}
+
+		if (count($values) > 1) {
+			throw new InternalException('More than one result');
 		}
 
 		$this->limit = $_limit;

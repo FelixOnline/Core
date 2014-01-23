@@ -144,11 +144,24 @@ class BaseManagerTest extends AppTestCase
 	{
 		$manager = $this->getManager();
 
-		$one = $manager->filter('published IS NOT NULL')
-			->filter('`id` IN (1, 2)')
+		$one = $manager->filter('id = %i', array(1))
 			->one();
 
 		$this->assertInstanceOf('FelixOnline\Core\Article', $one);
+	}
+
+	public function testGetOneMoreThanOne()
+	{
+		$manager = $this->getManager();
+
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\InternalException',
+			'More than one result'
+		);
+
+		$one = $manager->filter('published IS NOT NULL')
+			->filter('`id` IN (1, 2)')
+			->one();
 	}
 
 	public function testGetOneException()
