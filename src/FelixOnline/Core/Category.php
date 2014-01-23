@@ -107,6 +107,10 @@ class Category extends BaseModel
 	}
 
 	/**
+	 * TODO Remove? Should be done using managers
+	 */
+
+	/**
 	 * Public: Get category articles
 	 *
 	 * $page - page number to limit article list
