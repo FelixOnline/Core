@@ -26,16 +26,13 @@ class ArticleManager extends BaseManager
 			array($number_to_get)
 		);
 
-		$results = $app['db']->get_results($sql);
-		if ($results) {
-			$articles = [];
-			foreach ($results as $result) {
-				$articles[] = new Article($result->id);
-			}
-			return $articles;
-		} else {
+		$results = $this->query($sql);
+
+		if (is_null($results)) {
 			return null;
 		}
+
+		return $this->resultToModels($results);
 	}
 
 	public function getMostCommented($number_to_get) {
@@ -75,15 +72,12 @@ class ArticleManager extends BaseManager
 			)
 		); // go for most recent comments instead
 
-		$results = $app['db']->get_results($sql);
-		if ($results) {
-			$articles = [];
-			foreach ($results as $result) {
-				$articles[] = new Article($result->id);
-			}
-			return $articles;
-		} else {
+		$results = $this->query($sql);
+
+		if (is_null($results)) {
 			return null;
 		}
+
+		return $this->resultToModels($results);
 	}
 }
