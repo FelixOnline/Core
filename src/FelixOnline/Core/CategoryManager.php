@@ -5,6 +5,6 @@ namespace FelixOnline\Core;
  */
 class CategoryManager extends BaseManager
 {
-	protected $table = 'category';
-	protected $class = 'FelixOnline\Core\Category';
+	public $table = 'category';
+	public $class = 'FelixOnline\Core\Category';
 }

@@ -1,12 +1,12 @@
 <?php
 namespace FelixOnline\Core;
 /**
- * Article manager
+ * Article Author manager
  */
-class ArticleManager extends BaseManager
+class ArticleAuthorManager extends BaseManager
 {
-	public $table = 'article';
-	public $class = 'FelixOnline\Core\Article';
+	public $table = 'article_author';
+	public $pk = 'article';
 
 	public function getMostPopular($number_to_get) {
 		$app = App::getInstance();
