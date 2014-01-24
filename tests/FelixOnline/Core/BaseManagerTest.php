@@ -216,4 +216,21 @@ class BaseManagerTest extends AppTestCase
 
 		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` ) WHERE `article`.published < NOW() AND `article_author`.author = "felix" ORDER BY `article`.`id` ASC');
 	}
+
+	public function testLeftJoin()
+	{
+		$m1 = $this->getManager();
+		$m2 = $this->getManager();
+
+		$m2->table = 'article_author';
+		$m2->pk = 'article';
+
+		$m2->filter('author = "%s"', array('felix'));
+
+		$m1->join($m2, 'LEFT');
+
+		$sql = $m1->getSQL();
+
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` ) WHERE `article_author`.author = "felix"');
+	}
 }
