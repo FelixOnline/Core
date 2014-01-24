@@ -11,22 +11,22 @@ class BaseManager
 	/**
 	 * database table
 	 */
-	protected $table;
+	public $table;
 
 	/**
 	 * object class name
 	 */
-	protected $class;
+	public $class;
 
 	/**
 	 * primary key
 	 */
-	protected $pk = 'id';
+	public $pk = 'id';
 
 	/**
 	 * Array of query filters
 	 */
-	protected $filters = array();
+	public $filters = array();
 
 	/**
 	 * Order statement
@@ -37,6 +37,11 @@ class BaseManager
 	 * Limit
 	 */
 	protected $limit;
+
+	/**
+	 * Joins
+	 */
+	protected $joins = array();
 
 	/**
 	 * Get all objects
@@ -64,7 +69,9 @@ class BaseManager
 			throw new InternalException('Values is not an array');
 		}
 
-		$this->filters[] = $app['safesql']->query($filter, $values);
+		$filter = trim($filter);
+
+		$this->filters[] = "`" . $this->table . "`." . $app['safesql']->query($filter, $values);
 
 		return $this;
 	}
@@ -135,8 +142,9 @@ class BaseManager
 	{
 		$statement = [];
 
-		$statement[] = "SELECT `" . $this->pk . "`";
+		$statement[] = "SELECT `" . $this->table . "`.`" . $this->pk . "`";
 		$statement[] = $this->getFrom();
+		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
 		$statement[] = $this->getOrder();
 		$statement[] = $this->getLimit();
@@ -170,6 +178,18 @@ class BaseManager
 	}
 
 	/**
+	 * Join managers together
+	 */
+	public function join(BaseManager $manager, $type = null)
+	{
+		$this->joins[$manager->table] = array(
+			'manager' => $manager,
+			'type' => $type,
+		);
+		return $this;
+	}
+
+	/**
 	 * From
 	 */
 	protected function getFrom()
@@ -178,13 +198,56 @@ class BaseManager
 	}
 
 	/**
+	 * Get Join
+	 */
+	protected function getJoin()
+	{
+		if (!empty($this->joins)) {
+			$joins = array();
+			foreach ($this->joins as $join) {
+				$manager = $join['manager'];
+				$st = array();
+
+				if ($join['type']) {
+					$st[] = $join['type'];
+				}
+				   
+				$st[] = "JOIN `" . $manager->table . "`";
+
+				$st[] = "ON (";
+				$st[] = "`" . $this->table . "`.`" . $this->pk . "`";
+				$st[] = "=";
+				$st[] = "`" . $manager->table . "`.`" . $manager->pk . "`";
+				$st[] = ")";
+				$joins[] = implode(' ', $st);
+			}
+			return implode(" ", $joins);
+		}
+		return null;
+	}
+
+	/**
 	 * Where
 	 */
 	protected function getWhere()
 	{
+		$filters = [];
+
 		if (!empty($this->filters)) {
-			return "WHERE " . implode(" AND ", $this->filters);
+			$filters = $this->filters;
 		}
+
+		if (!empty($this->joins)) {
+			foreach ($this->joins as $join) {
+				$manager = $join['manager'];
+				$filters = array_merge($filters, $manager->filters);
+			}
+		}
+
+		if (!empty($filters)) {
+			return "WHERE " . implode(" AND ", $filters);
+		}
+
 		return null;
 	}
 
@@ -199,11 +262,11 @@ class BaseManager
 			if (is_array($this->order[0])) {
 				$columns = array();
 				foreach ($this->order[0] as $column) {
-					$columns[] = "`" . $column . "`";
+					$columns[] = $this->getColumnReference($column);
 				}
 				$order .= implode(",", $columns);
 			} else {
-				$order .= "`" . $this->order[0] . "`";
+				$order .= $this->getColumnReference($this->order[0]);
 			}
 
 			$order .= " ";
@@ -213,6 +276,19 @@ class BaseManager
 			return $order;
 		}
 		return null;
+	}
+	
+	/**
+	 * Get column reference
+	 */
+	protected function getColumnReference($column)
+	{
+		// check if table is already defined
+		if (count(explode(".", $column)) > 1) {
+			return $column;
+		}
+
+		return "`" . $this->table . "`.`" . $column . "`";
 	}
 
 	/**

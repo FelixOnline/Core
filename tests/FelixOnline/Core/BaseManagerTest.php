@@ -31,7 +31,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `id` FROM `article` WHERE title IS NOT NULL AND category IS NOT NULL ORDER BY `id` DESC LIMIT 0, 10');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.title IS NOT NULL AND `article`.category IS NOT NULL ORDER BY `article`.`id` DESC LIMIT 0, 10');
 	}
 
 	public function testAll()
@@ -64,7 +64,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `id` FROM `article` WHERE category = 1');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.category = 1');
 	}
 
 	public function testFilterParamsException()
@@ -101,7 +101,18 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, "SELECT `id` FROM `article` ORDER BY `id`,`title` DESC");
+		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` ORDER BY `article`.`id`,`article`.`title` DESC");
+	}
+
+	public function testOrderWithTable()
+	{
+		$manager = $this->getManager();
+
+		$query = $manager->order('another_table.id', 'DESC');
+
+		$sql = $manager->getSQL();
+
+		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` ORDER BY another_table.id DESC");
 	}
 
 	public function testLimit()
@@ -146,7 +157,7 @@ class BaseManagerTest extends AppTestCase
 	{
 		$manager = $this->getManager();
 
-		$null = $manager->filter('true = false')->values();
+		$null = $manager->filter('id = 0')->values();
 
 		$this->assertNull($null);
 	}
@@ -183,6 +194,26 @@ class BaseManagerTest extends AppTestCase
 			'FelixOnline\Exceptions\InternalException',
 			'No results'
 		);
-		$manager->filter('true = false')->one();
+		$manager->filter('id = 0')->one();
+	}
+
+	public function testJoin()
+	{
+		$m1 = $this->getManager();
+		$m1->filter('published < NOW()');
+
+		$m2 = $this->getManager();
+
+		$m2->table = 'article_author';
+		$m2->pk = 'article';
+
+		$m2->filter('author = "%s"', array('felix'));
+
+		$m1->join($m2);
+		$m1->order('id', 'ASC');
+
+		$sql = $m1->getSQL();
+
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` ) WHERE `article`.published < NOW() AND `article_author`.author = "felix" ORDER BY `article`.`id` ASC');
 	}
 }
