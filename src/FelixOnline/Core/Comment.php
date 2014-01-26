@@ -275,7 +275,7 @@ class Comment extends BaseModel {
 				$this->getId()
 			));
 		$count = $app['db']->get_var($sql);
-		return $count;
+		return (boolean) $count;
 	}
 
 	/*

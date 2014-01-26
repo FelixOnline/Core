@@ -11,6 +11,7 @@ class CommentTest extends AppTestCase
 		'users',
 		'comments',
 		'comments_ext',
+		'comment_likes',
 		'categories',
 	);
 
@@ -121,5 +122,11 @@ class CommentTest extends AppTestCase
 
 		$external = new \FelixOnline\Core\Comment(80000003);
 		$this->assertTrue($external->isRejected());
+	}
+
+	public function testUserLikedComment()
+	{
+		$comment = new \FelixOnline\Core\Comment(1);
+		$this->assertTrue($comment->userLikedComment('felix'));
 	}
 }
