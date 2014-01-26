@@ -262,7 +262,9 @@ class Comment extends BaseModel {
 	 * Returns true or false
 	 */
 	public function userLikedComment($user) {
-		$sql = $this->safesql->query(
+		$app = \FelixOnline\Core\App::getInstance();
+
+		$sql = $app['safesql']->query(
 			"SELECT 
 				COUNT(*) 
 			FROM `comment_like` 
@@ -272,7 +274,7 @@ class Comment extends BaseModel {
 				$user,
 				$this->getId()
 			));
-		$count = $this->db->get_var($sql);
+		$count = $app['db']->get_var($sql);
 		return $count;
 	}
 
