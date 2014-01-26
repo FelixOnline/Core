@@ -16,7 +16,8 @@
 		"robmorgan/phinx": "0.2.*",
 		"rzeka/akismet-api": "dev-master#3b59ac27e401ab0fe18565d38b6185868238045c",
 		"jv2222/ezsql": "dev-master#4036408076",
-		"d11wtq/boris": "1.0.*"
+		"d11wtq/boris": "1.0.*",
+		"tedivm/stash": "0.11.*"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "3.7.*",

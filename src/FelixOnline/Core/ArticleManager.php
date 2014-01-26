@@ -11,73 +11,89 @@ class ArticleManager extends BaseManager
 	public function getMostPopular($number_to_get) {
 		$app = App::getInstance();
 
-		$sql = $app['safesql']->query(
-			"SELECT
-				DISTINCT article AS id,
-				COUNT(article) AS c
-			FROM (
-				SELECT article FROM article_visit AS av
-				INNER JOIN article AS a
-				ON (av.article=a.id)
-				WHERE a.published IS NOT NULL
-				AND a.published >= NOW() - INTERVAL 3 WEEK
-				ORDER BY timestamp DESC LIMIT 500
-			) AS t GROUP BY article ORDER BY c DESC LIMIT %i",
-			array($number_to_get)
-		);
+		$item = $app['cache']->getItem('articles/most_popular');
+		$articles = $item->get();
 
-		$results = $this->query($sql);
+		if ($item->isMiss()) {
+			$sql = $app['safesql']->query(
+				"SELECT
+					DISTINCT article AS id,
+					COUNT(article) AS c
+				FROM (
+					SELECT article FROM article_visit AS av
+					INNER JOIN article AS a
+					ON (av.article=a.id)
+					WHERE a.published IS NOT NULL
+					AND a.published >= NOW() - INTERVAL 3 WEEK
+					ORDER BY timestamp DESC LIMIT 500
+				) AS t GROUP BY article ORDER BY c DESC LIMIT %i",
+				array($number_to_get)
+			);
 
-		if (is_null($results)) {
-			return null;
+			$results = $this->query($sql);
+
+			if (!is_null($results)) {
+				$articles = $this->resultToModels($results);
+			} else {
+				$articles = null;
+			}
+
+			$item->set($articles);
 		}
 
-		return $this->resultToModels($results);
+		return $articles;
 	}
 
 	public function getMostCommented($number_to_get) {
 		$app = App::getInstance();
 
-		$sql = $app['safesql']->query(
-			"SELECT
-				article AS id,
-				SUM(count) AS count
-			FROM (
-					(SELECT c.article,COUNT(*) AS count
-					FROM `comment` AS c
-					INNER JOIN `article` AS a ON (c.article=a.id)
-					WHERE c.`active`=1
-					AND timestamp >= NOW() - INTERVAL 3 WEEK
-					AND a.published IS NOT NULL
-					AND a.published < NOW()
-					GROUP BY article
-					ORDER BY timestamp DESC
-					LIMIT 20)
-				UNION ALL
-					(SELECT ce.article,COUNT(*) AS count
-					FROM `comment_ext` AS ce
-					INNER JOIN `article` AS a ON (ce.article=a.id)
-					WHERE ce.`active` = 1
-					AND pending = 0
-					AND timestamp >= NOW() - INTERVAL 3 WEEK
-					AND a.published IS NOT NULL
-					AND a.published < NOW()
-					GROUP BY article
-					ORDER BY timestamp DESC)
-			) AS t
-			GROUP BY article
-			ORDER BY count DESC, article DESC LIMIT %i",
-			array(
-				$number_to_get
-			)
-		); // go for most recent comments instead
+		$item = $app['cache']->getItem('articles/most_commented');
+		$articles = $item->get();
 
-		$results = $this->query($sql);
+		if ($item->isMiss()) {
+			$sql = $app['safesql']->query(
+				"SELECT
+					article AS id,
+					SUM(count) AS count
+				FROM (
+						(SELECT c.article,COUNT(*) AS count
+						FROM `comment` AS c
+						INNER JOIN `article` AS a ON (c.article=a.id)
+						WHERE c.`active`=1
+						AND timestamp >= NOW() - INTERVAL 3 WEEK
+						AND a.published IS NOT NULL
+						AND a.published < NOW()
+						GROUP BY article
+						ORDER BY timestamp DESC
+						LIMIT 20)
+					UNION ALL
+						(SELECT ce.article,COUNT(*) AS count
+						FROM `comment_ext` AS ce
+						INNER JOIN `article` AS a ON (ce.article=a.id)
+						WHERE ce.`active` = 1
+						AND pending = 0
+						AND timestamp >= NOW() - INTERVAL 3 WEEK
+						AND a.published IS NOT NULL
+						AND a.published < NOW()
+						GROUP BY article
+						ORDER BY timestamp DESC)
+				) AS t
+				GROUP BY article
+				ORDER BY count DESC, article DESC LIMIT %i",
+				array(
+					$number_to_get
+				)
+			); // go for most recent comments instead
 
-		if (is_null($results)) {
-			return null;
+			$results = $this->query($sql);
+
+			if (!is_null($results)) {
+				$articles = $this->resultToModels($results);
+			} else {
+				$articles = null;
+			}
 		}
 
-		return $this->resultToModels($results);
+		return $articles;
 	}
 }

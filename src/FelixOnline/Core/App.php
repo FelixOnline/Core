@@ -42,16 +42,20 @@ class App implements \ArrayAccess
 	 */
 	public function run()
 	{
-		if (!isset($this->container['env']) || is_null($this->container['env'])) {
-			$this->container['env'] = Environment::getInstance();
-		}
-
 		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
 			throw new InternalException('No db setup');
 		}
 
 		if (!isset($this->container['safesql']) || !($this->container['safesql'] instanceof \SafeSQL_MySQLi)) {
 			throw new InternalException('No safesql setup');
+		}
+
+		if (!isset($this->container['env']) || is_null($this->container['env'])) {
+			$this->container['env'] = Environment::getInstance();
+		}
+
+		if (!isset($this->container['cache']) || is_null($this->container['cache'])) {
+			$this->container['cache'] = new \Stash\Pool(new \Stash\Driver\FileSystem());
 		}
 	}
 
