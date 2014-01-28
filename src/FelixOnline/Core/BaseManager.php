@@ -101,7 +101,7 @@ class BaseManager
 	{
 		$statement = [];
 
-		$statement[] = "SELECT COUNT(`" . $this->pk . "`) AS count";
+		$statement[] = "SELECT COUNT(`" . $this->table . "`.`" . $this->pk . "`) AS count";
 		$statement[] = $this->getFrom();
 		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
