@@ -103,6 +103,7 @@ class BaseManager
 
 		$statement[] = "SELECT COUNT(`" . $this->pk . "`) AS count";
 		$statement[] = $this->getFrom();
+		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
 		$statement[] = $this->getOrder();
 		$statement[] = $this->getLimit();

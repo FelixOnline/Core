@@ -7,6 +7,7 @@ class BaseManagerTest extends AppTestCase
 {
 	public $fixtures = array(
 		'articles',
+		'article_authors',
 	);
 
 	public function getManager()
@@ -232,5 +233,25 @@ class BaseManagerTest extends AppTestCase
 		$sql = $m1->getSQL();
 
 		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` ) WHERE `article_author`.author = "felix"');
+	}
+
+	public function testJoinCount()
+	{
+		$m1 = $this->getManager();
+		$m1->filter('published < NOW()');
+
+		$m2 = $this->getManager();
+
+		$m2->table = 'article_author';
+		$m2->pk = 'article';
+
+		$m2->filter('author = "%s"', array('felix'));
+
+		$m1->join($m2);
+		$m1->order('id', 'ASC');
+
+		$count = $m1->count();
+
+		$this->assertEquals($count, 3);
 	}
 }
