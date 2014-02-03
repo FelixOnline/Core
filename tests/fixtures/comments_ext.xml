@@ -10,6 +10,9 @@
 		<field name="timestamp">2010-11-02 02:12:50</field>
 		<field name="active">1</field>
 		<field name="IP">0.0.0.0</field>
+		<field name="email"></field>
+		<field name="useragent"></field>
+		<field name="referer"></field>
 		<field name="pending">0</field>
 		<field name="reply" xsi:nil="true" />
 		<field name="spam">0</field>
@@ -24,6 +27,9 @@
 		<field name="timestamp">2010-11-02 02:30:25</field>
 		<field name="active">0</field>
 		<field name="IP">0.0.0.0</field>
+		<field name="email"></field>
+		<field name="useragent"></field>
+		<field name="referer"></field>
 		<field name="pending">0</field>
 		<field name="reply" xsi:nil="true" />
 		<field name="spam">1</field>
@@ -38,6 +44,9 @@
 		<field name="timestamp">2010-11-02 03:29:40</field>
 		<field name="active">0</field>
 		<field name="IP">0.0.0.0</field>
+		<field name="email"></field>
+		<field name="useragent"></field>
+		<field name="referer"></field>
 		<field name="pending">0</field>
 		<field name="reply" xsi:nil="true" />
 		<field name="spam">0</field>
@@ -52,6 +61,9 @@
 		<field name="timestamp">2010-11-02 03:31:24</field>
 		<field name="active">1</field>
 		<field name="IP">0.0.0.0</field>
+		<field name="email"></field>
+		<field name="useragent"></field>
+		<field name="referer"></field>
 		<field name="pending">1</field>
 		<field name="reply" xsi:nil="true" />
 		<field name="spam">0</field>
@@ -66,6 +78,9 @@
 		<field name="timestamp">2010-11-02 03:31:24</field>
 		<field name="active">1</field>
 		<field name="IP">0.0.0.0</field>
+		<field name="email"></field>
+		<field name="useragent"></field>
+		<field name="referer"></field>
 		<field name="pending">0</field>
 		<field name="reply" xsi:nil="true" />
 		<field name="spam">0</field>
