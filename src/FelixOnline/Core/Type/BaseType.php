@@ -10,7 +10,8 @@ class BaseType
 	public function __construct($config = array())
 	{
 		$this->config = $config + array(
-			'primary' => false	
+			'primary' => false,
+			'null' => true,
 		);
 	}
 
@@ -28,6 +29,11 @@ class BaseType
 	public function getSQL()
 	{
 		$app = \FelixOnline\Core\App::getInstance();
+
+		if (is_null($this->value) && $this->config['null'] == true) {
+			return 'NULL';
+		}
+
 		return $app['safesql']->query($this->placeholder, array($this->value));
 	}
 }

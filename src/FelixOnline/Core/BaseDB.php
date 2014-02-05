@@ -10,7 +10,7 @@ use FelixOnline\Exceptions\ModelNotFoundException;
 class BaseDB extends BaseModel
 {
 	public $fields = array(); // array that holds all the database fields
-	protected $dbtable; // name of database table
+	public $dbtable; // name of database table
 	protected $pk;
 
 	function __construct($fields, $id, $dbtable = null)
@@ -137,47 +137,35 @@ class BaseDB extends BaseModel
 	 * Public: Construct SQL
 	 */
 	public function constructInsertSQL($fields) {
-		$app = App::getInstance();
+		$sql = array();
 
-		$arrayLength = count($fields);
-		$values = array();
+		$sql[] = "INSERT INTO";
+		$sql[] = "`" . $this->dbtable . "`";
+		$sql[] = "(";
 
-		$sql = "INSERT INTO `";
-
-		$sql .= $this->dbtable;
-
-		$sql .= "` (";
-		$i = 1; // counter
+		$columns = array();
 		foreach($fields as $key => $value) {
+			/* TODO
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];
 			}
+			 */
 
-			$sql .= '`';
-			$sql .= $key;
-			$sql .= '`';
-
-			if($i !== $arrayLength) {
-				$sql .= ', ';
-			}
-			$i++;
+			$columns[] = "`" . $key . "`";
 		}
+		$sql[] = implode(", ", $columns);
 
-		$sql .= ") VALUES (";
+		$sql[] = ") VALUES (";
 
-		$i = 1;
+		$values = [];
 		foreach($fields as $key => $value) {
-			$sql .= $this->getFieldValue($value, $values);
+			$values[] = $value->getSQL();
 
-			if($i != $arrayLength) {
-				$sql .= ", ";
-			}
-			$i++;
 		}
+		$sql[] = implode(", ", $values);
+		$sql[] = ")";
 
-		$sql .= ")";
-
-		return $app['safesql']->query($sql, $values);
+		return implode(" ", $sql);
 	}
 
 	/**

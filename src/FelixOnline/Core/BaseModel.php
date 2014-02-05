@@ -56,7 +56,7 @@ class BaseModel {
 				);
 				break;
 			case 'set':
-				if(array_key_exists($meth, $this->transformers)) {
+				if (array_key_exists($meth, $this->transformers)) {
 					switch($this->transformers[$meth]) {
 						case self::TRANSFORMER_NO_HTML:
 							$this->fields[$meth]->setValue(strip_tags($arguments[0]));
