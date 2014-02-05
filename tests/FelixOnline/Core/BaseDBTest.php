@@ -83,22 +83,25 @@ class BaseModelTest extends AppTestCase
 		);
 	}
 
-	public function xtestConstructUpdateSQL()
+	public function testConstructUpdateSQL()
 	{
-		$model = new \FelixOnline\Core\BaseModel(array(
-			'id' => 1,
-			'foo' => 'bar', // string
-			'fizz' => 1, // number
-			'buzz' => NULL, // null
-			'empty' => '', // empty
-		));
-		$model->setDbtable('test');
+		$model = $this->mock('FelixOnline\\Core\\BaseDB')
+			->new();
+
+		$model->this()->dbtable = 'test';
+		$model->this()->pk = 'id';
+
+		$fields = array(
+			'id' => (new IntegerField())->setValue(1),
+			'foo' => (new CharField())->setValue('bar'), // string
+			'fizz' => (new IntegerField())->setValue(1), // number
+			'buzz' => (new CharField())->setValue(NULL), // null
+			'empty' => (new CharField())->setValue(''), // empty
+		);
 
 		$this->assertEquals(
-			$model->constructUpdateSQL(array(
-				'foo' => 'bars',
-			)),
-			"UPDATE `test` SET `foo`='bars' WHERE `id`=1"
+			$model->constructUpdateSQL($fields),
+			"UPDATE `test` SET `foo`='bar', `fizz`=1, `buzz`=NULL, `empty`='' WHERE `id`=1"
 		);
 	}
 

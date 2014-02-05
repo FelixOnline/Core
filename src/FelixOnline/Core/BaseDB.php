@@ -12,6 +12,7 @@ class BaseDB extends BaseModel
 	public $fields = array(); // array that holds all the database fields
 	public $dbtable; // name of database table
 	protected $pk;
+	protected $initialFields;
 
 	function __construct($fields, $id, $dbtable = null)
 	{
@@ -173,42 +174,32 @@ class BaseDB extends BaseModel
 	 */
 	public function constructUpdateSQL($fields)
 	{
-		$app = App::getInstance();
+		$sql = array();
 
-		$arrayLength = count($fields);
+		$sql[] = "UPDATE";
+		$sql[] = "`" . $this->dbtable . "`";
+		$sql[] = "SET";
+
 		$values = array();
-
-		$sql = "UPDATE `";
-
-		$sql .= $this->dbtable;
-
-		$sql .= "` SET ";
-
-		$i = 1;
 		foreach($fields as $key => $value) {
+			/* TODO118.97
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];
 			}
-			$sql .= '`'.$key.'`'."=";
+			 */
 
-			$sql .= $this->getFieldValue($value, $values);
-
-			if($i != $arrayLength) {
-				$sql .= ", ";
+			// Don't include the primary key
+			if ($key == $this->pk) {
+				continue;
 			}
-			$i++;
-		}
 
-		$sql .= " WHERE `" . $this->primaryKey . "`=";
-		$primaryKey = $this->fields[$this->primaryKey];
-		if (is_numeric($primaryKey)) {
-			$sql .= "%i";
-		} else {
-			$sql .= "'%s'";
+			$values[] = "`" . $key . "`=" . $value->getSQL();
 		}
-		$values[] = $this->fields[$this->primaryKey];
+		$sql[] = implode(", ", $values);
 
-		return $app['safesql']->query($sql, $values);
+		$sql[] = "WHERE `" . $this->pk . "`=" . $fields[$this->pk]->getSQL();
+
+		return implode(" ", $sql);
 	}
 
 	/**
