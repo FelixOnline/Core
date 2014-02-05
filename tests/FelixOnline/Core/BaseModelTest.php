@@ -8,15 +8,6 @@ class BaseModelTest extends AppTestCase
 		'users',
 	);
 
-	public function testNoModelFoundException()
-	{
-		$this->setExpectedException(
-			'FelixOnline\Exceptions\ModelNotFoundException',
-			'No model in database'
-		);
-		$model = new \FelixOnline\Core\BaseModel(null);
-	}
-
 	public function testGetField()
 	{
 		$model = new \FelixOnline\Core\BaseModel(array(
