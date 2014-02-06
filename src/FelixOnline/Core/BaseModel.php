@@ -6,11 +6,9 @@ namespace FelixOnline\Core;
  * Creates dynamic getter functions for model fields
  */
 class BaseModel {
-	protected $fields = array(); // array that holds all the database fields
+	public $fields = array(); // array that holds all the database fields
 	protected $class;
 	protected $item;
-	private $imported = array();
-	private $importedFunctions = array();
 	protected $filters = array();
 	protected $transformers = array();
 
@@ -110,29 +108,6 @@ class BaseModel {
 	public function setTransformers($transformers) {
 		$this->transformers = $transformers;
 		return $this->transformers;
-	}
-
-	/*
-	 * Public: Get all fields
-	 */
-	public function getFields() {
-		return $this->fields;
-	}
-
-	/**
-	 * Public: Set field
-	 */
-	public function setField($field, $value) {
-		$this->fields[$field] = $value;
-		return $this->fields[$field];
-	}
-
-	/**
-	 * Public: Set fields
-	 */
-	public function setFields($fields) {
-		$this->fields = $fields;
-		return $this->fields;
 	}
 
 	/*

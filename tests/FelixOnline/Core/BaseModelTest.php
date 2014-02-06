@@ -62,14 +62,4 @@ class BaseModelTest extends AppTestCase
 		);
 		$model->geeFoo();
 	}
-
-	public function testGetFields()
-	{
-		$fields = array(
-			'foo' => (new CharField())->setValue('bar')
-		);
-		$model = new \FelixOnline\Core\BaseModel($fields);
-
-		$this->assertEquals($fields, $model->getFields());
-	}
 }

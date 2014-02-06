@@ -179,8 +179,12 @@ class BaseModelTest extends AppTestCase
 		));
 	}
 
-	public function xtestFieldFilters()
+	public function testFieldFilters()
 	{
+		$this->markTestSkipped(
+			'TODO'
+		);
+
 		$model = new \FelixOnline\Core\BaseModel(array(
 			'id' => 1,
 			'foo' => 'bar',
