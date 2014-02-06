@@ -105,21 +105,35 @@ class BaseModelTest extends AppTestCase
 		);
 	}
 
-	public function xtestSave()
+	public function testSave()
 	{
 		$this->assertEquals(3, $this->getConnection()->getRowCount('user'));
 
-		$user = new \FelixOnline\Core\BaseModel(array(
-			'user' => 'test',
-			'name' => 'Joe Blogs',
-			'role' => 10
-		));
-
-		$user->setDbtable('user');
+		$user = new \FelixOnline\Core\BaseDB(array(
+			'user' => (new CharField(array('primary' => true)))->setValue('test'),
+			'name' => (new CharField())->setValue('Joe Blogs'),
+			'role' => (new IntegerField())->setValue(10),
+		), null, 'user');
 
 		$user->save();
 
 		$this->assertEquals(4, $this->getConnection()->getRowCount('user'));
+	}
+
+	public function testSaveArticle()
+	{
+		$this->assertEquals(3, $this->getConnection()->getRowCount('article'));
+
+		$user = new \FelixOnline\Core\BaseDB(array(
+			'title' => (new CharField())->setValue('test'),
+			'teaser' => (new CharField())->setValue('test'),
+			'category' => (new IntegerField())->setValue(1),
+			'text1' => (new IntegerField())->setValue(1),
+		), null, 'article');
+
+		$user->save();
+
+		$this->assertEquals(4, $this->getConnection()->getRowCount('article'));
 	}
 
 	public function xtestSaveUpdate()

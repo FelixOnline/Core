@@ -14,7 +14,7 @@ class BaseDB extends BaseModel
 	protected $pk;
 	protected $initialFields;
 
-	function __construct($fields, $id, $dbtable = null)
+	function __construct($fields, $id = null, $dbtable = null)
 	{
 		$app = \FelixOnline\Core\App::getInstance();
 
@@ -22,34 +22,30 @@ class BaseDB extends BaseModel
 			$this->dbtable = $dbtable;
 		}
 
-		$this->pk = $this->findPk($fields);
+		if (!is_null($id)) {
+			$this->pk = $this->findPk($fields);
 
-		if (is_null($this->pk)) {
-			$fields['id'] = new \FelixOnline\Core\Type\IntegerField(array('primary' => true));
-			$this->pk = 'id';
-		}
+			$fields[$this->pk]->setValue($id);
 
-		$fields[$this->pk]->setValue($id);
+			$sql = $this->constructSelectSQL($fields);
 
-		$sql = $this->constructSelectSQL($fields);
+			// TODO Cache here
+			$results = $app['db']->get_row($sql);
 
-		// TODO Cache here
-		$results = $app['db']->get_row($sql);
+			if ($app['db']->last_error) {
+				throw new InternalException($app['db']->last_error);
+			}
 
-		if ($app['db']->last_error) {
-			throw new InternalException($app['db']->last_error);
-		}
+			if (is_null($results)) {
+				throw new ModelNotFoundException('No model in database', $this->class);
+			}
 
-		if (is_null($results)) {
-			throw new ModelNotFoundException('No model in database', $this->class);
-		}
-
-		foreach ($results as $column => $value) {
-			$fields[$column]->setValue($value);
+			foreach ($results as $column => $value) {
+				$fields[$column]->setValue($value);
+			}
 		}
 
 		$this->initialFields = $this->fields;
-
 		parent::__construct($fields);
 
 		/*
@@ -76,8 +72,7 @@ class BaseDB extends BaseModel
 	{
 		$app = App::getInstance();
 
-		$arrayLength = count($this->fields);
-		if (!$arrayLength) {
+		if (empty($this->fields)) {
 			throw new \FelixOnline\Exceptions\InternalException('No fields in object');
 		}
 
@@ -86,7 +81,7 @@ class BaseDB extends BaseModel
 		}
 
 		// update model
-		if (array_key_exists($this->primaryKey, $this->fields) && $this->fields[$this->primaryKey]) {
+		if ($this->pk && $this->fields[$this->pk]->getValue()) {
 			// Determine what has been modified
 			$changed = array();
 			foreach ($this->initialFields as $field => $value) {
@@ -111,10 +106,14 @@ class BaseDB extends BaseModel
 				throw new \FelixOnline\Exceptions\InternalException($app['db']->last_error);
 			}
 
-			$this->fields[$this->primaryKey] = $app['db']->insert_id;
+			$this->pk = $this->findPk($this->fields);
+
+			if ($app['db']->insert_id) {
+				$this->fields[$this->pk]->setValue($app['db']->insert_id);
+			}
 		}
 
-		return $this->fields[$this->primaryKey]; // return new id
+		return $this->fields[$this->pk]->getValue(); // return new id
 	}
 
 	/**
@@ -182,7 +181,7 @@ class BaseDB extends BaseModel
 
 		$values = array();
 		foreach($fields as $key => $value) {
-			/* TODO118.97
+			/* TODO
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];
 			}
@@ -205,7 +204,7 @@ class BaseDB extends BaseModel
 	/**
 	 * Find pk
 	 */
-	private function findPk($fields)
+	private function findPk(&$fields)
 	{
 		$pk = null;
 		foreach ($fields as $column => $field) {
@@ -214,6 +213,13 @@ class BaseDB extends BaseModel
 				break;
 			}
 		}
+
+		// If there isn't a primary key defined then add a default one
+		if (is_null($pk)) {
+			$pk = 'id';
+			$fields[$pk] = new \FelixOnline\Core\Type\IntegerField(array('primary' => true));
+		}
+
 		return $pk;
 	}
 
