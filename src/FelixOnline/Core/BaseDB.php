@@ -22,6 +22,14 @@ class BaseDB extends BaseModel
 			$this->dbtable = $dbtable;
 		}
 
+		if (!is_array($fields) || empty($fields)) {
+			throw new \FelixOnline\Exceptions\InternalException('No fields defined');
+		}
+
+		if (!$this->dbtable) {
+			throw new \FelixOnline\Exceptions\InternalException('No table specified');
+		}
+
 		if (!is_null($id)) {
 			$this->pk = $this->findPk($fields);
 
@@ -77,14 +85,6 @@ class BaseDB extends BaseModel
 	public function save()
 	{
 		$app = App::getInstance();
-
-		if (empty($this->fields)) {
-			throw new \FelixOnline\Exceptions\InternalException('No fields in object');
-		}
-
-		if (!$this->dbtable) {
-			throw new \FelixOnline\Exceptions\InternalException('No table specified');
-		}
 
 		// update model
 		if ($this->pk && $this->fields[$this->pk]->getValue()) {
@@ -227,22 +227,5 @@ class BaseDB extends BaseModel
 		}
 
 		return $pk;
-	}
-
-	/**
-	 * Private: Get field value
-	 */
-	private function getFieldValue($value, &$values) {
-		if (is_null($value)) {
-			return 'NULL';
-		}
-
-		$values[] = $value;
-
-		if (is_numeric($value)) {
-			return "%i";
-		}
-
-		return "'%s'";
 	}
 }

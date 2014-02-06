@@ -72,33 +72,4 @@ class BaseModelTest extends AppTestCase
 
 		$this->assertEquals($fields, $model->getFields());
 	}
-
-	public function testFieldFilters()
-	{
-		$model = new \FelixOnline\Core\BaseModel(array(
-			'id' => 1,
-			'foo' => 'bar',
-			'xxx' => 'bbb',
-		));
-
-		$model->setFieldFilters(array(
-			'foo' => 'fizz',
-			'xxx' => 'yyy',
-		));
-
-		$model->setDbtable('test');
-
-		$this->assertEquals(
-			$model->constructInsertSQL($model->getFields()),
-			"INSERT INTO `test` (`id`, `fizz`, `yyy`) VALUES (1, 'bar', 'bbb')"
-		);
-
-		$this->assertEquals(
-			$model->constructUpdateSQL(array(
-				'foo' => 'bars',
-				'xxx' => 'aaa'
-			)),
-			"UPDATE `test` SET `fizz`='bars', `yyy`='aaa' WHERE `id`=1"
-		);
-	}
 }

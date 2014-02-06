@@ -163,24 +163,48 @@ class BaseModelTest extends AppTestCase
 		$this->assertEquals($info, 'Foo bar');
 	}
 
-	public function xtestSaveNoFieldsException()
+	public function testSaveNoFieldsException()
 	{
-		$model = new \FelixOnline\Core\BaseModel(array());
+		$this->setExpectedException('FelixOnline\Exceptions\InternalException', 'No fields defined');
 
-		$this->setExpectedException('FelixOnline\Exceptions\InternalException', 'No fields in object');
-
-		$model->save();
+		$model = new \FelixOnline\Core\BaseDB(array());
 	}
 
-	public function xtestSaveNoDbtableException()
+	public function testSaveNoDbtableException()
 	{
-		$model = new \FelixOnline\Core\BaseModel(array(
-			'foo' => 'bar'
-		));
-
 		$this->setExpectedException('FelixOnline\Exceptions\InternalException', 'No table specified');
 
-		$model->save();
+		$model = new \FelixOnline\Core\BaseDB(array(
+			'foo' => 'bar'
+		));
 	}
 
+	public function xtestFieldFilters()
+	{
+		$model = new \FelixOnline\Core\BaseModel(array(
+			'id' => 1,
+			'foo' => 'bar',
+			'xxx' => 'bbb',
+		));
+
+		$model->setFieldFilters(array(
+			'foo' => 'fizz',
+			'xxx' => 'yyy',
+		));
+
+		$model->setDbtable('test');
+
+		$this->assertEquals(
+			$model->constructInsertSQL($model->getFields()),
+			"INSERT INTO `test` (`id`, `fizz`, `yyy`) VALUES (1, 'bar', 'bbb')"
+		);
+
+		$this->assertEquals(
+			$model->constructUpdateSQL(array(
+				'foo' => 'bars',
+				'xxx' => 'aaa'
+			)),
+			"UPDATE `test` SET `fizz`='bars', `yyy`='aaa' WHERE `id`=1"
+		);
+	}
 }
