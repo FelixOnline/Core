@@ -45,6 +45,8 @@ class BaseDB extends BaseModel
 			}
 		}
 
+		// PHP passes all objects by refernce so we need to clone the fields 
+		// so that the initial fields don't get updated when the fields change
 		$_fields = array();
 		foreach ($fields as $k => $f) {
 			$_fields[$k] = clone $f;
