@@ -99,9 +99,13 @@ class BaseModelTest extends AppTestCase
 			'empty' => (new CharField())->setValue(''), // empty
 		);
 
+		$changed = array(
+			'foo' => (new CharField())->setValue('fizz'), // string
+		);
+
 		$this->assertEquals(
-			$model->constructUpdateSQL($fields),
-			"UPDATE `test` SET `foo`='bar', `fizz`=1, `buzz`=NULL, `empty`='' WHERE `id`=1"
+			$model->constructUpdateSQL($changed, $fields),
+			"UPDATE `test` SET `foo`='fizz' WHERE `id`=1"
 		);
 	}
 
@@ -136,24 +140,27 @@ class BaseModelTest extends AppTestCase
 		$this->assertEquals(4, $this->getConnection()->getRowCount('article'));
 	}
 
-	public function xtestSaveUpdate()
+	public function testSaveUpdate()
 	{
 		$this->assertEquals(3, $this->getConnection()->getRowCount('user'));
 
-		$user = new \FelixOnline\Core\BaseModel(array(
-			'user' => 'felix',
-			'name' => 'Joseph Letts - Felix Editor',
-			'role' => 100,
-			'info' => '',
-		));
-
-		$user->setPrimaryKey('user');
-		$user->setDbtable('user');
+		$user = new \FelixOnline\Core\BaseDB(array(
+			'user' => new CharField(array('primary' => true)),
+			'name' => new CharField(),
+			'role' => new IntegerField(),
+			'info' => new CharField(),
+		), 'felix', 'user');
 
 		$user->setInfo('Foo bar');
 		$user->save();
 
 		$this->assertEquals(3, $this->getConnection()->getRowCount('user'));
+
+		$pdo = $this->getConnection()->getConnection();
+		$sth = $pdo->prepare("SELECT info FROM user WHERE user = 'felix'");
+		$sth->execute();
+		$info = $sth->fetchColumn();
+		$this->assertEquals($info, 'Foo bar');
 	}
 
 	public function xtestSaveNoFieldsException()

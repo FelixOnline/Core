@@ -45,7 +45,11 @@ class BaseDB extends BaseModel
 			}
 		}
 
-		$this->initialFields = $this->fields;
+		$_fields = array();
+		foreach ($fields as $k => $f) {
+			$_fields[$k] = clone $f;
+		}
+		$this->initialFields = $_fields;
 		parent::__construct($fields);
 
 		/*
@@ -84,14 +88,14 @@ class BaseDB extends BaseModel
 		if ($this->pk && $this->fields[$this->pk]->getValue()) {
 			// Determine what has been modified
 			$changed = array();
-			foreach ($this->initialFields as $field => $value) {
-				if ($this->fields[$field] !== $value) {
-					$changed[$field] = $this->fields[$field];
+			foreach ($this->initialFields as $column => $field) {
+				if ($this->fields[$column]->getValue() !== $field->getValue()) {
+					$changed[$column] = $this->fields[$column];
 				}
 			}
 
 			if (!empty($changed)) {
-				$sql = $this->constructUpdateSQL($changed);
+				$sql = $this->constructUpdateSQL($changed, $this->fields);
 
 				$app['db']->query($sql);
 				if ($app['db']->last_error) {
@@ -171,7 +175,7 @@ class BaseDB extends BaseModel
 	/**
 	 * Public: Construct update SQL
 	 */
-	public function constructUpdateSQL($fields)
+	public function constructUpdateSQL($changed, $fields)
 	{
 		$sql = array();
 
@@ -180,7 +184,7 @@ class BaseDB extends BaseModel
 		$sql[] = "SET";
 
 		$values = array();
-		foreach($fields as $key => $value) {
+		foreach($changed as $key => $value) {
 			/* TODO
 			if(array_key_exists($key, $this->filters)) {
 				$key = $this->filters[$key];

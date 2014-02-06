@@ -31,8 +31,6 @@ class BaseModel {
 			$this->fields[$key] = $value;
 		}
 		*/
-
-		$this->initialFields = $this->fields;
 		return $this->fields;
 	}
 

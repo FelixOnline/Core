@@ -24,7 +24,7 @@ namespace FelixOnline\Core;
  *	  hits			- number of views the article has had
  *	  short_desc	  - short description of article for boxes on front page [optional]
  */
-class Article extends BaseModel {
+class Article extends BaseDB {
 	const TEASER_LENGTH = 200;
 
 	private $authors; // array of authors of article
@@ -56,36 +56,29 @@ class Article extends BaseModel {
 	 *
 	 * Returns article object
 	 */
-	function __construct($id = NULL) {
+	function __construct($id = NULL)
+	{
+		$fields = array(
+			'title' => new CharField(),
+			'short_title' => new CharField(),
+			'teaser' => new CharField(),
+			//'author' => new ForeignKey('User'),
+			'approvedby' => new ForeignKey('User'),
+			'category' => new ForeignKey('Category'),
+			'date' => new DateTimeField(),
+			'published' => new DateTimeField(),
+			'hidden' => new BooleanField(),
+			'searchable' => new BooleanField(),
+			'text1' => new ForeignKey('Text'),
+			'img1' => new ForeignKey('Image'),
+			'hits' => new IntegerField(),
+			'short_desc' => new CharField(),
+		);
+
 		$app = App::getInstance();
 
 		if ($id !== NULL) { // if creating an already existing article object
-			$sql = $app['safesql']->query(
-				"SELECT
-					`id`,
-					`title`,
-					`short_title`,
-					`teaser`,
-					`author`,
-					`approvedby`,
-					`category`,
-					UNIX_TIMESTAMP(`date`) as date,
-					UNIX_TIMESTAMP(`published`) as published,
-					`hidden`,
-					`searchable`,
-					`text1`,
-					`text2`,
-					`img1`,
-					`img2`,
-					`img2lr`,
-					`hits`,
-					`short_desc`
-				FROM `article`
-				WHERE id=%i",
-				array($id)
-			);
-			parent::__construct($app['db']->get_row($sql), $id);
-			return $this;
+			parent::__construct($fields, $id);
 		} else {
 			// initialise new article
 		}
