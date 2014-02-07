@@ -254,4 +254,13 @@ class BaseManagerTest extends AppTestCase
 
 		$this->assertEquals($count, 3);
 	}
+
+	public function testBuild()
+	{
+		$manager = \FelixOnline\Core\BaseManager::build('FelixOnline\Core\Article', 'article', 'id');
+
+		$this->assertEquals($manager->class, 'FelixOnline\Core\Article');
+		$this->assertEquals($manager->table, 'article');
+		$this->assertEquals($manager->pk, 'id');
+	}
 }
