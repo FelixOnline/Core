@@ -1,5 +1,7 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Core\Type;
 /*
  * Article class
  * Deals with both article retrieval and article submission
@@ -46,7 +48,7 @@ class Article extends BaseDB {
 		'@</?[^>]*>*@' 		  // html tags
 	);
 
-	protected $dbtable = 'article';
+	public $dbtable = 'article';
 
 	/*
 	 * Constructor for Article class
@@ -59,29 +61,23 @@ class Article extends BaseDB {
 	function __construct($id = NULL)
 	{
 		$fields = array(
-			'title' => new CharField(),
-			'short_title' => new CharField(),
-			'teaser' => new CharField(),
+			'title' => new Type\CharField(),
+			'short_title' => new Type\CharField(),
+			'teaser' => new Type\CharField(),
 			//'author' => new ForeignKey('User'),
-			'approvedby' => new ForeignKey('User'),
-			'category' => new ForeignKey('Category'),
-			'date' => new DateTimeField(),
-			'published' => new DateTimeField(),
-			'hidden' => new BooleanField(),
-			'searchable' => new BooleanField(),
-			'text1' => new ForeignKey('Text'),
-			'img1' => new ForeignKey('Image'),
-			'hits' => new IntegerField(),
-			'short_desc' => new CharField(),
+			'approvedby' => new Type\ForeignKey('FelixOnline\Core\User'),
+			'category' => new Type\ForeignKey('FelixOnline\Core\Category'),
+			'date' => new Type\DateTimeField(),
+			'published' => new Type\DateTimeField(),
+			'hidden' => new Type\BooleanField(),
+			'searchable' => new Type\BooleanField(),
+			'text1' => new Type\ForeignKey('FelixOnline\Core\Text'),
+			'img1' => new Type\ForeignKey('FelixOnline\Core\Image'),
+			'hits' => new Type\IntegerField(),
+			'short_desc' => new Type\CharField(),
 		);
 
-		$app = App::getInstance();
-
-		if ($id !== NULL) { // if creating an already existing article object
-			parent::__construct($fields, $id);
-		} else {
-			// initialise new article
-		}
+		parent::__construct($fields, $id);
 	}
 
 	/*
@@ -112,18 +108,6 @@ class Article extends BaseDB {
 		return $this->authors;
 	}
 
-	/*
-	 * Public: Get approved by user
-	 *
-	 * Returns User object
-	 */
-	public function getApprovedBy() {
-		if(!$this->approvedby) {
-			$this->approvedby = new User($this->fields['approvedby']);
-		}
-		return $this->approvedby;
-	}
-
 	/**
 	 * Public: Get list of authors in english
 	 *
@@ -147,34 +131,10 @@ class Article extends BaseDB {
 	}
 
 	/**
-	 * Public: Get category class
-	 */
-	public function getCategory() {
-		if(!$this->category) {
-			$this->category = new Category($this->fields['category']);
-		}
-		return $this->category;
-	}
-
-	/**
 	 * Public: Get article content
 	 */
 	public function getContent() {
-		$app = App::getInstance();
-
-		if (!$this->content) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					`content`
-				FROM `text_story`
-				WHERE id = %i",
-				array(
-					$this->getText1()
-				)
-			);
-			$this->content = $app['db']->get_var($sql);
-		}
-		return $this->cleanText($this->content);
+		return $this->getText1()->getContent();
 	}
 
 	/**
@@ -238,8 +198,8 @@ class Article extends BaseDB {
 	 * $limit - character limit for description [defaults to 80]
 	 */
 	public function getShortDesc($limit = 80) {
-		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']) {
-			return substr($this->fields['short_desc'], 0, $limit);
+		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']->getValue()) {
+			return substr($this->fields['short_desc']->getValue(), 0, $limit);
 		} else {
 			return substr(trim(strip_tags($this->getContent())), 0, $limit);
 		}
@@ -347,12 +307,7 @@ class Article extends BaseDB {
 	 * Public: Get image class
 	 */
 	public function getImage() {
-		if (!$this->image) {
-			if ($this->getImg1()) {
-				$this->image = new Image($this->getImg1());
-			}
-		}
-		return $this->image;
+		return $this->getImg1();
 	}
 
 	/*
@@ -362,7 +317,7 @@ class Article extends BaseDB {
 	 */
 	public function getURL() {
 		$app = App::getInstance();
-		return $app->getOption('base_url').$this->constructURL();
+		return $app->getOption('base_url') . $this->constructURL();
 	}
 
 	/*
@@ -494,16 +449,11 @@ class Article extends BaseDB {
 	public function setContent($content) {
 		$app = App::getInstance();
 
-		$sql = $app['safesql']->query(
-			"INSERT INTO text_story (`content`) VALUES ('%s')",
-			array($content)
-		);
+		$text = new \FelixOnline\Core\Text();
+		$text->setContent($content);
+		$text->save();
 
-		$app['db']->query($sql);
-
-		$id = $app['db']->insert_id;
-
-		$this->setText1($id);
+		$this->setText1($text);
 
 		return $this;
 	}

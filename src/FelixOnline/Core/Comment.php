@@ -37,17 +37,17 @@ namespace FelixOnline\Core;
  * Examples
  *	  // Get comment
  *	  $comment = new Comment(300);
- *	  echo $comment->getContent(); 
+ *	  echo $comment->getComment(); 
  *
  *	  // Submit comment
  *	  $comment = new Comment();
  *	  $comment->setExternal(false); // internal comment
  *	  $comment->setArticle(100); // article id
- *	  $comment->setContent('Hello world');
+ *	  $comment->setComment('Hello world');
  *	  $comment->setUser('felix');
  *	  if($id = $comment->save()) echo 'Success!';
  */
-class Comment extends BaseModel {
+class Comment extends BaseDB {
 	const EXTERNAL_COMMENT_ID = 80000000; // external comment id start
 
 	private $article; // article class comment is on
@@ -55,11 +55,10 @@ class Comment extends BaseModel {
 	private $reply; // comment class of reply
 	private $external = false; // if comment is external or not. Default false
 	private $commentsToApprove;
-	protected $db;
 	protected $transformers = array(
 		'content' => parent::TRANSFORMER_NO_HTML
 	);
-	
+
 	/**
 	 * Constructor for Comment class
 	 * If initialised with an id then store relevant data
@@ -69,104 +68,66 @@ class Comment extends BaseModel {
 	 *
 	 * Returns comment object.
 	 */
-	public function __construct($id=NULL) {
-		$app = App::getInstance();
+	public function __construct($id = NULL) {
+		// common fields
+		$fields = array(
+			'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'comment' => new Type\CharField(),
+			'timestamp' => new Type\DateTimeField(),
+			'active' => new Type\BooleanField(),
+			'reply' => new Type\ForeignKey('FelixOnline\Core\Comment'),
+			'likes' => new Type\IntegerField(),
+			'dislikes' => new Type\IntegerField(),
+		);
+
+		$internal = array(
+			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
+		);
+
+		$external = array(
+			'name' => new Type\CharField(),
+			'IP' => new Type\CharField(),
+			'email' => new Type\CharField(),
+			'useragent' => new Type\CharField(),
+			'referer' => new Type\CharField(),
+			'pending' => new Type\BooleanField(),
+			'spam' => new Type\BooleanField(),
+		);
 
 		if ($id != NULL) {
-			if($id < self::EXTERNAL_COMMENT_ID) { // if comment is internal
+			if ($id < self::EXTERNAL_COMMENT_ID) { // if comment is internal
 				$this->external = false; // comment is internal
-				$sql = $app['safesql']->query(
-					"SELECT 
-						id, 
-						`article`,
-						`user`,
-						`comment` as content,
-						UNIX_TIMESTAMP(`timestamp`) as timestamp,
-						`active`,
-						`reply`,
-						`likes`,
-						`dislikes` 
-					FROM `comment` 
-					WHERE id=%i",
-					array(
-						$id
-					));
 
-				parent::__construct($app['db']->get_row($sql), $id);
+				$_fields = $fields + $internal;
+				parent::__construct($_fields, $id);
 			} else {
 				$this->external = true; // comment is external
-				$sql = $app['safesql']->query(
-					"SELECT 
-						id, 
-						`article`,
-						`name`,
-						`comment` as content,
-						UNIX_TIMESTAMP(`timestamp`) as timestamp,
-						`active`,
-						`IP` as ip,
-						`email`,
-						`useragent`,
-						`referer`,
-						`pending`,
-						`reply`,
-						`spam`,
-						`likes`,
-						`dislikes` 
-					FROM `comment_ext` 
-					WHERE id=%i",
-					array(
-						$id
-					));
+
+				$_fields = $fields + $external;
 
 				$this->transfomers['name'] = parent::TRANSFORMER_NO_HTML;
 
-				parent::__construct($app['db']->get_row($sql), $id);
+				parent::__construct($_fields, $id);
 			}
 		} else {
 			$this->setFieldFilters(array(
 				'content' => 'comment',
 				'ip' => 'IP'
 			));
-		}
-	}
 
-	/**
-	 * Public: Get article class that comment is on
-	 */
-	public function getArticle() { 
-		if (!$this->article) {
-			$this->article = new Article($this->fields['article']);
+			$_fields = $fields + $internal + $external;
+			parent::__construct($_fields);
 		}
-		return $this->article;
 	}
 
 	/**
 	 * Public: Get user class
 	 */
 	public function getUser() {
-		if (!$this->user) {
-			if ($this->hasUser()) {
-				$this->user = new User($this->fields['user']);
-			} else {
-				throw new \FelixOnline\Exceptions\InternalException('External comment does not have a user');
-			}
-		}
-		return $this->user;
-	}
-
-	/*
-	 * Public: Get comment object of the comment this comment is replying to
-	 *
-	 * Returns comment object of reply. Returns false if no reply
-	 */
-	public function getReply() {
-		if ($this->fields['reply']) {
-			if(!$this->reply) {
-				$this->reply = new Comment($this->fields['reply']); // initialise new comment as reply
-			}
-			return $this->reply;
+		if ($this->hasUser()) {
+			return $this->fields['user']->getValue();
 		} else {
-			return false;
+			throw new \FelixOnline\Exceptions\InternalException('External comment does not have a user');
 		}
 	}
 
@@ -174,7 +135,7 @@ class Comment extends BaseModel {
 	 * Public: Get comment content
 	 */
 	public function getContent() { 
-		$output = nl2br(trim($this->fields['content'])); 
+		$output = nl2br(trim($this->fields['comment']->getValue())); 
 		return $output;
 	}
 
@@ -182,9 +143,9 @@ class Comment extends BaseModel {
 	 * Public: Get commenter's name
 	 */
 	public function getName() {
-		if($this->isExternal()) {
+		if ($this->isExternal()) {
 			if($this->fields['name']) { // if external commenter has a name
-				return $this->fields['name'];
+				return $this->fields['name']->getValue();
 			} else {
 				return 'Anonymous'; // else return Anonymous
 			}
@@ -284,6 +245,8 @@ class Comment extends BaseModel {
 	/*
 	 * Public: Check if comment already exists
 	 *
+	 * TODO
+	 *
 	 * Returns the number of rows that the query will return
 	 *  i.e. 0 for none found. >0 if found
 	 */
@@ -330,6 +293,8 @@ class Comment extends BaseModel {
 
 	/* 
 	 * Public: Save new comment into database
+	 *
+	 * TODO
 	 *
 	 * Returns id of new comment
 	 */

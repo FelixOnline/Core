@@ -23,45 +23,36 @@ namespace FelixOnline\Core;
  *	  description	 -
  *	  hidden		  -
  */
-class Category extends BaseModel
+class Category extends BaseDB
 {
-	protected $db;
 	private $editors = array();
 	private $count; // number of articles in catgeory
 	private $stories; // array of top story objects
+	public $dbtable = 'category';
 
 	function __construct($id = NULL) {
-		$app = App::getInstance();
 
-		if ($id !== NULL) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					id,
-					label,
-					cat,
-					uri,
-					colourclass,
-					active,
-					top_slider_1,
-					top_slider_2,
-					top_slider_3,
-					top_slider_4,
-					top_sidebar_1,
-					top_sidebar_2,
-					top_sidebar_3,
-					top_sidebar_4,
-					email,
-					twitter,
-					description,
-					hidden
-				FROM category
-				WHERE id=%i",
-				array($id)
-			);
-			parent::__construct($app['db']->get_row($sql), $id);
-			return $this;
-		} else {
-		}
+		$fields = array(
+			'label' => new Type\CharField(),
+			'cat' => new Type\CharField(),
+			'uri' => new Type\CharField(),
+			'colourclass' => new Type\CharField(),
+			'active' => new Type\BooleanField(),
+			'top_slider_1' => new Type\IntegerField(),
+			'top_slider_2' => new Type\IntegerField(),
+			'top_slider_3' => new Type\IntegerField(),
+			'top_slider_4' => new Type\IntegerField(),
+			'top_sidebar_1' => new Type\IntegerField(),
+			'top_sidebar_2' => new Type\IntegerField(),
+			'top_sidebar_3' => new Type\IntegerField(),
+			'top_sidebar_4' => new Type\IntegerField(),
+			'email' => new Type\CharField(),
+			'twitter' => new Type\CharField(),
+			'description' => new Type\CharField(),
+			'hidden' => new Type\BooleanField(),
+		);
+
+		parent::__construct($fields, $id);
 	}
 
 	/**

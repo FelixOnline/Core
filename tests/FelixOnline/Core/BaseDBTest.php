@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../AppTestCase.php';
 use FelixOnline\Core\Type\IntegerField;
 use FelixOnline\Core\Type\CharField;
 
-class BaseModelTest extends AppTestCase
+class BaseDBTest extends AppTestCase
 {
 	public $fixtures = array(
 		'articles',

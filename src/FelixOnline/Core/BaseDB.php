@@ -11,7 +11,7 @@ class BaseDB extends BaseModel
 {
 	public $fields = array(); // array that holds all the database fields
 	public $dbtable; // name of database table
-	protected $pk;
+	public $pk;
 	protected $initialFields;
 
 	function __construct($fields, $id = null, $dbtable = null)

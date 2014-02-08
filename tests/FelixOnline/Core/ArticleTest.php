@@ -113,7 +113,7 @@ class ArticleTest extends AppTestCase
 	public function testGetApprovedBy()
 	{
 		$article = new \FelixOnline\Core\Article(1);
-		$user = $article->getApprovedBy();
+		$user = $article->getApprovedby();
 
 		$this->assertInstanceOf('FelixOnline\Core\User', $user);
 		$this->assertEquals($user->getUser(), 'felix');

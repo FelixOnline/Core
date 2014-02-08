@@ -18,7 +18,8 @@ namespace FelixOnline\Core;
  *	  websiteurl  -
  *	  img		 -
  */
-class User extends BaseModel {
+class User extends BaseDB
+{
 	private $articles;
 	private $count;
 	private $popArticles = array();
@@ -26,8 +27,7 @@ class User extends BaseModel {
 	private $likes;
 	private $dislikes;
 	private $image;
-	protected $dbtable = 'user';
-	protected $primaryKey = 'user';
+	public $dbtable = 'user';
 	protected $transformers = array(
 		'description' => parent::TRANSFORMER_NO_HTML,
 		'email' => parent::TRANSFORMER_NO_HTML,
@@ -38,35 +38,25 @@ class User extends BaseModel {
 	);
 
 	function __construct($uname = NULL) {
-		$app = App::getInstance();
 
-		if ($uname !== NULL) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					`user`,
-					`name`,
-					`visits`,
-					`ip`,
-					UNIX_TIMESTAMP(`timestamp`) as timestamp,
-					`role`,
-					`info`,
-					`description`,
-					`email`,
-					`facebook`,
-					`twitter`,
-					`websitename`,
-					`websiteurl`,
-					`img` 
-				FROM `user` 
-				WHERE user='%s'",
-				array(
-					$uname
-				)
-			);
+		$fields = array(
+			'user' => new Type\CharField(array('primary' => true)),
+			'name' => new Type\CharField(),
+			'visits' => new Type\IntegerField(),
+			'ip' => new Type\CharField(),
+			'timestamp' => new Type\DateTimeField(),
+			'role' => new Type\IntegerField(),
+			'info' => new Type\CharField(),
+			'description' => new Type\CharField(),
+			'email' => new Type\CharField(),
+			'facebook' => new Type\CharField(),
+			'twitter' => new Type\CharField(),
+			'websitename' => new Type\CharField(),
+			'websiteurl' => new Type\CharField(),
+			'img' => new Type\ForeignKey('FelixOnline\Core\Image'),
+		);
 
-			parent::__construct($app['db']->get_row($sql), $uname);
-		} else {
-		}
+		parent::__construct($fields, $uname);
 	}
 
 	/*
