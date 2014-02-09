@@ -173,6 +173,14 @@ class ArticleTest extends AppTestCase
 		$this->assertInstanceOf('FelixOnline\Core\Comment', $comments[0]);
 	}
 
+	public function testGetCommentsNoComments()
+	{
+		$article = new \FelixOnline\Core\Article(3);
+
+		$comments = $article->getComments();
+		$this->assertEmpty($comments);
+	}
+
 	public function testGetImage()
 	{
 		$article = new \FelixOnline\Core\Article(1);

@@ -219,7 +219,7 @@ class Article extends BaseDB {
 	 *
 	 * $ip - server ip
 	 *
-	 * Returns db object
+	 * Returns array
 	 */
 	public function getComments($ip = NULL) {
 		$app = App::getInstance();
@@ -230,6 +230,8 @@ class Article extends BaseDB {
 			->filter("pending = 0")
 			->filter("spam = 0 ")
 			->values();
+
+		$comments = is_null($comments) ? array() : $comments;
 
 		if (is_null($ip)) {
 			$ip = $app['env']['REMOTE_ADDR'];
@@ -243,6 +245,8 @@ class Article extends BaseDB {
 			->filter("pending = 1")
 			->filter("spam = 0 ")
 			->values();
+
+		$pending = is_null($pending) ? array() : $pending;
 
 		return array_merge($comments, $pending);
 	}
