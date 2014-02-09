@@ -73,7 +73,7 @@ class BaseDB extends BaseModel
 	}
 
 	/**
-	 * Public: Save all fields to database TODO
+	 * Public: Save all fields to database
 	 *
 	 * Example:
 	 *	  $obj = new Obj();

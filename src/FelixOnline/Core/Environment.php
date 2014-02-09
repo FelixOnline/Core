@@ -58,6 +58,8 @@ class Environment implements \ArrayAccess
      * Constructor (private access)
      *
      * @param  array|null $settings If present, these are used instead of global server variables
+	 *
+	 * @codeCoverageIgnore
      */
     private function __construct($settings = null)
     {
