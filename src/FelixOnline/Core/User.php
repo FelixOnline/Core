@@ -201,6 +201,8 @@ class User extends BaseDB
 	}
 
 	public function getLastLogin() {
+		$app = App::getInstance();
+
 		$sql = $app['safesql']->query(
 			"SELECT 
 				UNIX_TIMESTAMP(timestamp) as timestamp 
