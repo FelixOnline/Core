@@ -28,14 +28,6 @@ class User extends BaseDB
 	private $dislikes;
 	private $image;
 	public $dbtable = 'user';
-	protected $transformers = array(
-		'description' => parent::TRANSFORMER_NO_HTML,
-		'email' => parent::TRANSFORMER_NO_HTML,
-		'facebook' =>parent::TRANSFORMER_NO_HTML,
-		'twitter' => parent::TRANSFORMER_NO_HTML,
-		'websitename' => parent::TRANSFORMER_NO_HTML,
-		'websiteurl' => parent::TRANSFORMER_NO_HTML
-	);
 
 	function __construct($uname = NULL) {
 		$fields = array(
@@ -46,12 +38,36 @@ class User extends BaseDB
 			'timestamp' => new Type\DateTimeField(),
 			'role' => new Type\IntegerField(),
 			'info' => new Type\TextField(),
-			'description' => new Type\TextField(),
-			'email' => new Type\CharField(),
-			'facebook' => new Type\CharField(),
-			'twitter' => new Type\CharField(),
-			'websitename' => new Type\CharField(),
-			'websiteurl' => new Type\CharField(),
+			'description' => new Type\TextField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
+			'email' => new Type\CharField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
+			'facebook' => new Type\CharField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
+			'twitter' => new Type\CharField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
+			'websitename' => new Type\CharField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
+			'websiteurl' => new Type\CharField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
 			'image' => new Type\ForeignKey('FelixOnline\Core\Image'),
 		);
 

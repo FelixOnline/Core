@@ -56,9 +56,6 @@ class Comment extends BaseDB
 	private $reply; // comment class of reply
 	private $external = false; // if comment is external or not. Default false
 	private $commentsToApprove;
-	protected $transformers = array(
-		'content' => parent::TRANSFORMER_NO_HTML
-	);
 
 	public $dbtable = 'comment';
 
@@ -79,13 +76,13 @@ class Comment extends BaseDB
 			'external' => new Type\BooleanField(),
 			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'name' => new Type\CharField(array(
-				'transfomers' => array(
-					parent::TRANSFORMER_NO_HTML
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
 				)
 			)),
 			'comment' => new Type\CharField(array(
-				'transfomers' => array(
-					parent::TRANSFORMER_NO_HTML
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
 				)
 			)),
 			'timestamp' => new Type\DateTimeField(),

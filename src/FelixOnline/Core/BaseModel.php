@@ -9,10 +9,6 @@ class BaseModel {
 	public $fields = array(); // array that holds all the database fields
 	protected $class;
 	protected $item;
-	protected $transformers = array();
-
-	const TRANSFORMER_NONE = 1;
-	const TRANSFORMER_NO_HTML = 2;
 
 	function __construct($fields, $item = NULL) {
 		$this->class = get_class($this);
@@ -43,20 +39,7 @@ class BaseModel {
 				);
 				break;
 			case 'set':
-				if (array_key_exists($meth, $this->transformers)) {
-					switch($this->transformers[$meth]) {
-						case self::TRANSFORMER_NO_HTML:
-							$this->fields[$meth]->setValue(strip_tags($arguments[0]));
-							break;
-						case self::TRANSFORMER_NONE:
-						default:
-							$this->fields[$meth]->setValue($arguments[0]);
-							break;
-					}
-				} else {
-					$this->fields[$meth]->setValue($arguments[0]);
-				}
-
+				$this->fields[$meth]->setValue($arguments[0]);
 				return $this;
 				break;
 			case 'has':
@@ -78,22 +61,11 @@ class BaseModel {
 	}
 
 	/*
-	 * Public: Set field transformers
-	 *
-	 $ $transformers - array
-	 *
-	 * Returns transformers
-	 */
-	public function setTransformers($transformers) {
-		$this->transformers = $transformers;
-		return $this->transformers;
-	}
-
-	/*
 	 * Convert camel case to underscore
 	 * http://www.paulferrett.com/2009/php-camel-case-functions/
 	 */
-	function from_camel_case($str) {
+	protected function from_camel_case($str)
+	{
 		$str[0] = strtolower($str[0]);
 		$func = create_function('$c', 'return "_" . strtolower($c[1]);');
 		return preg_replace_callback('/([A-Z])/', $func, $str);

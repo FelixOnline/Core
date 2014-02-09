@@ -7,7 +7,7 @@ class BooleanField extends BaseType
 
 	public function setValue($value)
 	{
-		$this->value = (boolean) $value;
+		parent::setValue((boolean) $value);
 		return $this;
 	}
 
