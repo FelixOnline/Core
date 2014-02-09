@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../../../AppTestCase.php';
 require_once __DIR__ . '/../../../utilities.php';
 
-class ForeignKeyTest extends AppTestCase
+class DateTimeFieldTest extends AppTestCase
 {
 	public function testSetDateString()
 	{
