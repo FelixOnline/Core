@@ -142,7 +142,8 @@ class BaseDB extends BaseModel
 	/**
 	 * Public: Construct SQL
 	 */
-	public function constructInsertSQL($fields) {
+	public function constructInsertSQL($fields)
+	{
 		$sql = array();
 
 		$sql[] = "INSERT INTO";
