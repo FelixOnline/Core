@@ -11,6 +11,8 @@ class DateTimeField extends BaseType
 			$this->value = strtotime($value);
 		} else if (is_int($value)) {
 			$this->value = $value;
+		} else if (is_null($value)) {
+			$this->value = $value;
 		} else {
 			throw new \FelixOnline\Exceptions\InternalException('Invalid date');
 		}

@@ -99,12 +99,6 @@ class Comment extends BaseDB
 		);
 
 		parent::__construct($fields, $id);
-		/*
-			$this->setFieldFilters(array(
-				'content' => 'comment',
-				'ip' => 'IP'
-			));
-		 */
 	}
 
 	/**
