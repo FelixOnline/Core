@@ -61,15 +61,6 @@ class BaseDB extends BaseModel
 		}
 		$this->initialFields = $_fields;
 		parent::__construct($fields);
-
-		/*
-		foreach($fields as $key => $value) {
-			if(!empty($this->filters) && array_key_exists($key, $this->filters)) {
-				$key = $this->filters[$key];
-			}
-			$this->fields[$key] = $value;
-		}
-		*/
 	}
 
 	/**
@@ -152,12 +143,6 @@ class BaseDB extends BaseModel
 
 		$columns = array();
 		foreach($fields as $key => $value) {
-			/* TODO
-			if(array_key_exists($key, $this->filters)) {
-				$key = $this->filters[$key];
-			}
-			 */
-
 			$columns[] = "`" . $key . "`";
 		}
 		$sql[] = implode(", ", $columns);
@@ -188,12 +173,6 @@ class BaseDB extends BaseModel
 
 		$values = array();
 		foreach($changed as $key => $value) {
-			/* TODO
-			if(array_key_exists($key, $this->filters)) {
-				$key = $this->filters[$key];
-			}
-			 */
-
 			// Don't include the primary key
 			if ($key == $this->pk) {
 				continue;

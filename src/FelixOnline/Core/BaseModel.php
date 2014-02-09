@@ -9,7 +9,6 @@ class BaseModel {
 	public $fields = array(); // array that holds all the database fields
 	protected $class;
 	protected $item;
-	protected $filters = array();
 	protected $transformers = array();
 
 	const TRANSFORMER_NONE = 1;
@@ -21,14 +20,6 @@ class BaseModel {
 
 		$this->fields = $fields;
 
-		/*
-		foreach($fields as $key => $value) {
-			if (!empty($this->filters) && array_key_exists($key, $this->filters)) {
-				$key = $this->filters[$key];
-			}
-			$this->fields[$key] = $value;
-		}
-		*/
 		return $this->fields;
 	}
 
@@ -84,18 +75,6 @@ class BaseModel {
 				);
 				break;
 		}
-	}
-
-	/*
-	 * Public: Set field filters
-	 *
-	 * $filters - array
-	 *
-	 * Returns filters
-	 */
-	public function setFieldFilters($filters) {
-		$this->filters = $filters;
-		return $this->filters;
 	}
 
 	/*
