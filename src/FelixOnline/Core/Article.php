@@ -89,32 +89,15 @@ class Article extends BaseDB {
 	/*
 	 * Public: Get array of authors of article
 	 *
-	 * TODO
-	 *
 	 * Returns array
 	 */
 	public function getAuthors()
 	{
-		$app = App::getInstance();
+		$authors = BaseManager::build('FelixOnline\Core\User', 'article_author', 'author')
+			->filter('article = %i', array($this->getId()))
+			->values();
 
-		if (!$this->authors) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					article_author.author as author
-				FROM `article_author`
-				INNER JOIN `article`
-				ON (article_author.article=article.id)
-				WHERE article.id=%i",
-				array(
-					$this->getId()
-				)
-			);
-			$authors = $app['db']->get_results($sql);
-			foreach($authors as $author) {
-				$this->authors[] = new User($author->author);
-			}
-		}
-		return $this->authors;
+		return $authors;
 	}
 
 	/**
