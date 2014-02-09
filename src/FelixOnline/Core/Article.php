@@ -210,36 +210,16 @@ class Article extends BaseDB {
 	 *
 	 * Returns int
 	 */
-	public function getNumComments() {
-		$app = App::getInstance();
+	public function getNumComments()
+	{
+		$count = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("active = 1")
+			->filter("pending = 0")
+			->filter("spam = 0 ")
+			->count();
 
-		if (!isset($this->num_comments)) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					SUM(count) AS count
-				FROM (
-					SELECT article,COUNT(*) AS count
-					FROM `comment`
-					WHERE article=%i
-					AND `active`=1
-					GROUP BY article
-					UNION ALL
-					SELECT article,COUNT(*) AS count
-					FROM `comment_ext`
-					WHERE article=%i
-					AND `active`=1
-					AND `pending`=0
-					GROUP BY article
-				) AS t GROUP BY article",
-				array(
-					$this->getId(),
-					$this->getId()
-				)
-			);
-			$this->num_comments = $app['db']->get_var($sql);
-			if(!isset($this->num_comments)) $this->num_comments = 0;
-		}
-		return $this->num_comments;
+		return $count;
 	}
 
 	/*
@@ -252,55 +232,27 @@ class Article extends BaseDB {
 	public function getComments($ip = NULL) {
 		$app = App::getInstance();
 
+		$comments = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("active = 1")
+			->filter("pending = 0")
+			->filter("spam = 0 ")
+			->values();
+
 		if (is_null($ip)) {
 			$ip = $app['env']['REMOTE_ADDR'];
 		}
 
-		$sql = $app['safesql']->query(
-			"SELECT
-				id
-			FROM (
-				SELECT
-					comment.id,
-					UNIX_TIMESTAMP(comment.timestamp) AS timestamp
-				FROM `comment`
-				WHERE article=%i
-				AND active=1 # select all internal comments
-				UNION SELECT
-					comment_ext.id,
-					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
-				FROM `comment_ext`
-				WHERE article=%i
-				AND active = 1
-				AND pending  =0
-				AND spam = 0 # select external comments that are not spam
-				UNION SELECT
-					comment_ext.id,
-					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
-					FROM `comment_ext`
-				WHERE article=%i
-				AND IP = '%s'
-				AND active = 1
-				AND pending = 1
-				AND spam = 0 # select external comments that are pending and are from current ip
-			) AS t
-			ORDER BY timestamp ASC
-			LIMIT 500",
-			array(
-				$this->getId(),
-				$this->getId(),
-				$this->getId(),
-				$ip,
-			)
-		);
-		$comments = array();
-		$rsc = $app['db']->get_results($sql);
-		if ($rsc) {
-			foreach($rsc as $key => $obj) {
-				$comments[] = new Comment($obj->id);
-			}
-		}
-		return $comments;
+		// Get pending comments for current ip
+		$pending = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("ip = '%s'", array($ip))
+			->filter("active = 1")
+			->filter("pending = 1")
+			->filter("spam = 0 ")
+			->values();
+
+		return array_merge($comments, $pending);
 	}
 
 	/*
