@@ -47,7 +47,7 @@ class Category extends BaseDB
 			'top_sidebar_4' => new Type\ForeignKey('FelixOnline\Core\Article'),
 			'email' => new Type\CharField(),
 			'twitter' => new Type\CharField(),
-			'description' => new Type\CharField(),
+			'description' => new Type\TextField(),
 			'hidden' => new Type\BooleanField(),
 		);
 

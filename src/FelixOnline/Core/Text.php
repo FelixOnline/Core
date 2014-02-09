@@ -16,7 +16,7 @@ class Text extends BaseDB
 
 		$fields = array(
 			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
-			'content' => new Type\CharField(), // TODO
+			'content' => new Type\TextField(),
 			'timestamp' => new Type\DateTimeField(),
 		);
 
