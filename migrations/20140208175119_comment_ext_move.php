@@ -53,6 +53,7 @@ class CommentExtMove extends AbstractMigration
 				likes,
 				dislikes
 			FROM comment_ext
+			WHERE comment_ext.spam = 0
 		');
 
 		$this->execute('DROP TABLE comment_ext');
