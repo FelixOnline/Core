@@ -47,7 +47,8 @@ namespace FelixOnline\Core;
  *	  $comment->setUser('felix');
  *	  if($id = $comment->save()) echo 'Success!';
  */
-class Comment extends BaseDB {
+class Comment extends BaseDB
+{
 	const EXTERNAL_COMMENT_ID = 80000000; // external comment id start
 
 	private $article; // article class comment is on
@@ -70,7 +71,8 @@ class Comment extends BaseDB {
 	 *
 	 * Returns comment object.
 	 */
-	public function __construct($id = NULL) {
+	public function __construct($id = NULL)
+	{
 		// common fields
 		$fields = array(
 			'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
@@ -123,7 +125,7 @@ class Comment extends BaseDB {
 	 * Public: Get comment content
 	 */
 	public function getContent() { 
-		$output = nl2br(trim($this->fields['comment']->getValue())); 
+		$output = nl2br(trim($this->getComment())); 
 		return $output;
 	}
 
@@ -219,45 +221,15 @@ class Comment extends BaseDB {
 	 * Returns the number of rows that the query will return
 	 *  i.e. 0 for none found. >0 if found
 	 */
-	public function commentExists() {
-		if(!$this->external) {
-			$sql = $this->safesql->query(
-				"SELECT 
-					COUNT(*) 
-				FROM `comment` 
-				WHERE article=%i 
-				AND user='%s' 
-				AND comment='%s' 
-				AND `active`=1",
-				array(
-					$this->getArticle()->getId(),
-					$this->getUser()->getUser(),
-					$this->getContent(),
-				));
-		} else {
-			$sql = $this->safesql->query(
-				"SELECT 
-					COUNT(*) 
-				FROM `comment_ext` 
-				WHERE article=%i 
-				AND name='%s' 
-				AND comment='%s'",
-				array(
-					$this->getArticle()->getId(),
-					$this->getName(),
-					$this->getContent(),
-				));
-		}
-		return $this->db->get_var($sql);
-	}
+	public function commentExists()
+	{
+		$count = (new ArticleManager())
+			->filter('article = %i', array($this->getArticle()->getId()))
+			->filter("user = '%s'", array($this->getUser()->getUser()))
+			->filter("comment = '%s'", array($this->getComment()))
+			->count();
 
-	/*
-	 * Public: Set external
-	 * Set whether comment is external or not
-	 */
-	public function setExternal($external) {
-		$this->external = $external;
-		return $this->external;
+		return (boolean) $count;
 	}
 
 	/* 
@@ -267,55 +239,38 @@ class Comment extends BaseDB {
 	 *
 	 * Returns id of new comment
 	 */
-	public function save() {
+	public function save()
+	{
 		global $akismet;
-		if(!$this->external) { // if internal
-			$this->setDbtable('comment');
-		} else {
-			$this->setDbtable('comment_ext');
-			// TODO
-			$this->setIp($_SERVER['REMOTE_ADDR']);
-			$this->setUseragent($_SERVER['HTTP_USER_AGENT']);
-			$this->setReferer($_SERVER['HTTP_REFERER']);
 
-			// check spam using akismet
+		// TODO
+		$this->setIp($_SERVER['REMOTE_ADDR']);
+		$this->setUseragent($_SERVER['HTTP_USER_AGENT']);
+		$this->setReferer($_SERVER['HTTP_REFERER']);
 
-			$check = $akismet->check(array(
-				'permalink' => $this->getArticle()->getURL(),
-				'comment_type' => 'comment',
-				'comment_author' => $this->fields['name'](),
-				'comment_content' => $this->getContent(),
-				'comment_author_email' => $this->getEmail(),
-				'user_ip' => $this->getIp(),
-				'user_agent' => $_SERVER['HTTP_USER_AGENT'],
-				'referrer' => $_SERVER['HTTP_REFERER'],
-				'user_agent' => $this->getUseragent(),
-				'referrer' => $this->getReferer(),
-			));
+		// check spam using akismet
 
-			if($check == true) { // if comment is spam
-				$this->setActive(0);
-				$this->setPending(0);
-				$this->setSpam(1);
+		$check = $akismet->check(array(
+			'permalink' => $this->getArticle()->getURL(),
+			'comment_type' => 'comment',
+			'comment_author' => $this->fields['name']->getValue(),
+			'comment_content' => $this->getComment(),
+			'comment_author_email' => $this->getEmail(),
+			'user_ip' => $this->getIp(),
+			'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+			'referrer' => $_SERVER['HTTP_REFERER'],
+			'user_agent' => $this->getUseragent(),
+			'referrer' => $this->getReferer(),
+		));
 
-				$sql = $this->safesql->query(
-					"INSERT IGNORE INTO `comment_spam` 
-					(
-						IP, 
-						date
-					) VALUES (
-						'%s', 
-						DATE_ADD(NOW(), INTERVAL 2 MONTH)
-					)",
-					array(
-						$_SERVER['REMOTE_ADDR'],
-					)); // insert comment ip into comment_spam
-				$this->db->query($sql);
-			} else { // Not spam
-				$this->setActive(1);
-				$this->setPending(1);
-				$this->setSpam(0);
-			}
+		if ($check == true) { // if comment is spam
+			$this->setActive(0);
+			$this->setPending(0);
+			$this->setSpam(1);
+		} else { // Not spam
+			$this->setActive(1);
+			$this->setPending(1);
+			$this->setSpam(0);
 		}
 
 		// check for akismet errors
@@ -324,7 +279,6 @@ class Comment extends BaseDB {
 		}
 
 		parent::save();
-		$this->setId($this->db->insert_id); // get id of inserted comment
 
 		// Send emails
 
