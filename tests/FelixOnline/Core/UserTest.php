@@ -22,42 +22,6 @@ class UserTest extends AppTestCase
 		$this->assertEquals($user->getURL(1), "http://localhost/user/felix/1/");
 	}
 
-	public function testGetArticles()
-	{
-		$user = new \FelixOnline\Core\User('felix');
-
-		$articles = $user->getArticles();
-		$this->assertCount(3, $articles);
-		$this->assertInstanceOf('FelixOnline\Core\Article', $articles[0]);
-	}
-
-	public function testGetArticlesPage()
-	{
-		$user = new \FelixOnline\Core\User('felix');
-
-		$articles = $user->getArticles(1);
-		$this->assertCount(3, $articles);
-		$this->assertInstanceOf('FelixOnline\Core\Article', $articles[0]);
-	}
-
-	public function testGetPopularArticles()
-	{
-		$user = new \FelixOnline\Core\User('felix');
-
-		$articles = $user->getPopularArticles();
-		$this->assertCount(3, $articles);
-		$this->assertInstanceOf('FelixOnline\Core\Article', $articles[0]);
-	}
-
-	public function testGetComments()
-	{
-		$user = new \FelixOnline\Core\User('felix');
-
-		$comments = $user->getComments();
-		$this->assertCount(1, $comments);
-		$this->assertInstanceOf('FelixOnline\Core\Comment', $comments[0]);
-	}
-
 	public function testGetLikes()
 	{
 		$user = new \FelixOnline\Core\User('jk708');
@@ -84,14 +48,6 @@ class UserTest extends AppTestCase
 		$user = new \FelixOnline\Core\User('felix');
 		$popularity = $user->getCommentPopularity();
 		$this->assertEquals(0, $popularity);
-	}
-
-	public function testGetNumPages()
-	{
-		$user = new \FelixOnline\Core\User('felix');
-
-		$pages = $user->getNumPages();
-		$this->assertEquals(1, $pages);
 	}
 
 	public function testFirstName()

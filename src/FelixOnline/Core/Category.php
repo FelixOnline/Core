@@ -31,21 +31,20 @@ class Category extends BaseDB
 	public $dbtable = 'category';
 
 	function __construct($id = NULL) {
-
 		$fields = array(
 			'label' => new Type\CharField(),
 			'cat' => new Type\CharField(),
 			'uri' => new Type\CharField(),
 			'colourclass' => new Type\CharField(),
 			'active' => new Type\BooleanField(),
-			'top_slider_1' => new Type\IntegerField(),
-			'top_slider_2' => new Type\IntegerField(),
-			'top_slider_3' => new Type\IntegerField(),
-			'top_slider_4' => new Type\IntegerField(),
-			'top_sidebar_1' => new Type\IntegerField(),
-			'top_sidebar_2' => new Type\IntegerField(),
-			'top_sidebar_3' => new Type\IntegerField(),
-			'top_sidebar_4' => new Type\IntegerField(),
+			'top_slider_1' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_slider_2' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_slider_3' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_slider_4' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_1' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_2' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_3' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_4' => new Type\ForeignKey('FelixOnline\Core\Article'),
 			'email' => new Type\CharField(),
 			'twitter' => new Type\CharField(),
 			'description' => new Type\CharField(),
@@ -72,85 +71,14 @@ class Category extends BaseDB
 	 *
 	 * Returns array of user objects
 	 */
-	public function getEditors() {
-		$app = App::getInstance();
+	public function getEditors()
+	{
+		$editors = BaseManager::build('FelixOnline\Core\User', 'category_author', 'user')
+			->filter("category = %i", array($this->getId()))
+			->filter("admin = 1")
+			->values();
 
-		if (!$this->editors) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					user 
-				FROM `category_author` 
-				WHERE category=%i 
-				AND admin=1",
-				array(
-					$this->getId()
-				));
-			$editors = $app['db']->get_results($sql);
-			if (is_null($editors)) {
-				$this->editors = null;
-			} else {
-				foreach ($editors as $key => $object) {
-					$this->editors[] = new User($object->user);
-				}
-			}
-		}
-		return $this->editors;
-	}
-
-	/**
-	 * TODO Remove? Should be done using managers
-	 */
-
-	/**
-	 * Public: Get category articles
-	 *
-	 * $page - page number to limit article list
-	 *
-	 * Returns dbobject
-	 */
-	public function getArticles($page) {
-		$app = App::getInstance();
-
-		$sql = $app['safesql']->query(
-			"SELECT 
-				id 
-			FROM `article` 
-			WHERE published < NOW() 
-			AND category=%i
-			ORDER BY published DESC 
-			LIMIT %i, %i",
-			array(
-				$this->getId(),
-				($page-1) * ARTICLES_PER_CAT_PAGE,
-				ARTICLES_PER_CAT_PAGE
-			));
-		return $app['db']->get_results($sql);
-	}
-
-	/**
-	 * Public: Get number of pages in a category
-	 *
-	 * TODO
-	 *
-	 * Returns int 
-	 */
-	public function getNumPages() {
-		$app = App::getInstance();
-
-		if (!$this->count) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					COUNT(id) as count 
-				FROM `article` 
-				WHERE published < NOW() 
-				AND category=%i",
-				array(
-					$this->getId()
-				));
-			$this->count = $app['db']->get_var($sql);
-		}
-		$pages = ceil(($this->count - ARTICLES_PER_CAT_PAGE) / (ARTICLES_PER_SECOND_CAT_PAGE)) + 1;
-		return $pages;
+		return $editors;
 	}
 
 	/**
@@ -170,11 +98,7 @@ class Category extends BaseDB
 			);
 
 			foreach($sliders as $slider) {
-				if (!is_null($this->fields[$slider])) {
-					$this->stories[] = new Article($this->fields[$slider]);
-				} else {
-					$this->stories[] = null;
-				}
+				$this->stories[] = $this->fields[$slider]->getValue();
 			}
 		}
 		return $this->stories;

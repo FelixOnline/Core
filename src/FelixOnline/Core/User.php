@@ -52,7 +52,7 @@ class User extends BaseDB
 			'twitter' => new Type\CharField(),
 			'websitename' => new Type\CharField(),
 			'websiteurl' => new Type\CharField(),
-			'img' => new Type\ForeignKey('FelixOnline\Core\Image'),
+			'image' => new Type\ForeignKey('FelixOnline\Core\Image'),
 		);
 
 		parent::__construct($fields, $uname);
