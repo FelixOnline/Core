@@ -62,7 +62,7 @@ class CommentTest extends AppTestCase
 	public function testGetReply()
 	{
 		$comment = new \FelixOnline\Core\Comment(1);
-		$this->assertFalse($comment->getReply());
+		$this->assertNull($comment->getReply());
 
 		$comment = new \FelixOnline\Core\Comment(2);
 		$reply = $comment->getReply();

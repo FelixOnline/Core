@@ -59,6 +59,8 @@ class Comment extends BaseDB {
 		'content' => parent::TRANSFORMER_NO_HTML
 	);
 
+	public $dbtable = 'comment';
+
 	/**
 	 * Constructor for Comment class
 	 * If initialised with an id then store relevant data
@@ -72,63 +74,49 @@ class Comment extends BaseDB {
 		// common fields
 		$fields = array(
 			'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'comment' => new Type\CharField(),
+			'external' => new Type\BooleanField(),
+			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
+			'name' => new Type\CharField(array(
+				'transfomers' => array(
+					parent::TRANSFORMER_NO_HTML
+				)
+			)),
+			'comment' => new Type\CharField(array(
+				'transfomers' => array(
+					parent::TRANSFORMER_NO_HTML
+				)
+			)),
 			'timestamp' => new Type\DateTimeField(),
+			'ip' => new Type\CharField(),
+			'email' => new Type\CharField(),
+			'useragent' => new Type\CharField(),
+			'referer' => new Type\CharField(),
 			'active' => new Type\BooleanField(),
+			'pending' => new Type\BooleanField(),
+			'spam' => new Type\BooleanField(),
 			'reply' => new Type\ForeignKey('FelixOnline\Core\Comment'),
 			'likes' => new Type\IntegerField(),
 			'dislikes' => new Type\IntegerField(),
 		);
 
-		$internal = array(
-			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
-		);
-
-		$external = array(
-			'name' => new Type\CharField(),
-			'IP' => new Type\CharField(),
-			'email' => new Type\CharField(),
-			'useragent' => new Type\CharField(),
-			'referer' => new Type\CharField(),
-			'pending' => new Type\BooleanField(),
-			'spam' => new Type\BooleanField(),
-		);
-
-		if ($id != NULL) {
-			if ($id < self::EXTERNAL_COMMENT_ID) { // if comment is internal
-				$this->external = false; // comment is internal
-
-				$_fields = $fields + $internal;
-				parent::__construct($_fields, $id);
-			} else {
-				$this->external = true; // comment is external
-
-				$_fields = $fields + $external;
-
-				$this->transfomers['name'] = parent::TRANSFORMER_NO_HTML;
-
-				parent::__construct($_fields, $id);
-			}
-		} else {
+		parent::__construct($fields, $id);
+		/*
 			$this->setFieldFilters(array(
 				'content' => 'comment',
 				'ip' => 'IP'
 			));
-
-			$_fields = $fields + $internal + $external;
-			parent::__construct($_fields);
-		}
+		 */
 	}
 
 	/**
 	 * Public: Get user class
 	 */
 	public function getUser() {
-		if ($this->hasUser()) {
-			return $this->fields['user']->getValue();
-		} else {
+		if ($this->getExternal()) {
 			throw new \FelixOnline\Exceptions\InternalException('External comment does not have a user');
 		}
+
+		return $this->fields['user']->getValue();
 	}
 
 	/**
@@ -143,8 +131,8 @@ class Comment extends BaseDB {
 	 * Public: Get commenter's name
 	 */
 	public function getName() {
-		if ($this->isExternal()) {
-			if($this->fields['name']) { // if external commenter has a name
+		if ($this->getExternal()) {
+			if ($this->fields['name']->getValue()) { // if external commenter has a name
 				return $this->fields['name']->getValue();
 			} else {
 				return 'Anonymous'; // else return Anonymous
@@ -167,10 +155,10 @@ class Comment extends BaseDB {
 	 * Returns true if is author. False if not.
 	 */
 	public function byAuthor() {
-		if($this->isExternal()) {
+		if ($this->getExternal()) {
 			return false;
 		} else {
-			if(in_array($this->getUser(), $this->getArticle()->getAuthors())) {
+			if (in_array($this->getUser(), $this->getArticle()->getAuthors())) {
 				return true;
 			} else {
 				return false;
@@ -179,24 +167,11 @@ class Comment extends BaseDB {
 	}
 
 	/*
-	 * Public: Check if comment is from an external author or not
-	 *
-	 * Returns true if external, false if internal
-	 */
-	public function isExternal() {
-		if($this->external) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/*
 	 * Public: Check if comment is rejected
 	 */
 	public function isRejected() {
-		if(!$this->isExternal() && !$this->getActive() 
-		   || $this->isExternal() && !$this->getActive() && !$this->getPending()) { // if comment that is rejected
+		if (!$this->getExternal() && !$this->getActive() 
+		   || $this->getExternal() && !$this->getActive() && !$this->getPending()) { // if comment that is rejected
 			return true; 
 		} else {
 			return false;
@@ -207,10 +182,10 @@ class Comment extends BaseDB {
 	 * Public: Check if comment is pending approval
 	 */
 	public function isPending() {
-		if($this->isExternal()
+		if ($this->getExternal()
 			&& $this->getActive()
 			&& $this->getPending()
-			&& $this->getIp() == $_SERVER['REMOTE_ADDR']
+			&& $this->getIp() == $_SERVER['REMOTE_ADDR'] // TODO
 		) { // if comment is pending for this ip address
 			return true;
 		} else {
@@ -226,19 +201,13 @@ class Comment extends BaseDB {
 	 * Returns true or false
 	 */
 	public function userLikedComment($user) {
-		$app = \FelixOnline\Core\App::getInstance();
+		$app = App::getInstance();
 
-		$sql = $app['safesql']->query(
-			"SELECT 
-				COUNT(*) 
-			FROM `comment_like` 
-			WHERE user='%s' 
-			AND comment=%i",
-			array(
-				$user,
-				$this->getId()
-			));
-		$count = $app['db']->get_var($sql);
+		$count = BaseManager::build(null, 'comment_like')
+			->filter("user = '%s'", array($user))
+			->filter("comment = %i", array($this->getId()))
+			->count();
+
 		return (boolean) $count;
 	}
 
@@ -359,7 +328,7 @@ class Comment extends BaseDB {
 
 		// Send emails
 
-		if ($this->isExternal()) {
+		if ($this->getExternal()) {
 			// If pending comment
 			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
 				$this->emailExternalComment();
@@ -410,7 +379,7 @@ class Comment extends BaseDB {
 	 * Private: Email comment author with reply
 	 */
 	private function emailReply() {
-		if($this->getReply()->isExternal()) { // check that comment replied to isn't external
+		if($this->getReply()->getExternal()) { // check that comment replied to isn't external
 			return false;
 		}
 		$email = new Email();
