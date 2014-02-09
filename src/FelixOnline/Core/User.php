@@ -38,7 +38,6 @@ class User extends BaseDB
 	);
 
 	function __construct($uname = NULL) {
-
 		$fields = array(
 			'user' => new Type\CharField(array('primary' => true)),
 			'name' => new Type\CharField(),
@@ -72,101 +71,6 @@ class User extends BaseDB
 			$output .= $pagenum.'/';
 		}
 		return $output;
-	}
-
-	/*
-	 * Public: Get articles
-	 * Get all articles from user
-	 */
-	public function getArticles($page = NULL) {
-		$app = App::getInstance();
-
-		$sql = "SELECT 
-				id 
-			FROM `article` 
-			INNER JOIN `article_author` 
-				ON (article.id=article_author.article) 
-			WHERE article_author.author='%s'
-			AND published < NOW()
-			ORDER BY article.date DESC";
-		$values = array(
-			$this->getUser()
-		);
-
-		if ($page) {
-			$sql .= " LIMIT %i, %i";
-			$values[] = ($page-1) * ARTICLES_PER_USER_PAGE;
-			$values[] = ARTICLES_PER_USER_PAGE;
-		}
-
-		$sql = $app['safesql']->query($sql, $values);
-
-		$results = $app['db']->get_results($sql);	
-		$articles = array();
-		
-		foreach ($results as $article) {
-			$articles[] = new Article($article->id);
-		}
-
-		return $articles;
-	}
-
-	/*
-	 * Public: Get popular articles
-	 * Get users popular articles
-	 */
-	public function getPopularArticles() {
-		$app = App::getInstance();
-
-		if (!$this->popArticles) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					id 
-				FROM `article` 
-				INNER JOIN `article_author` 
-					ON (article.id=article_author.article) 
-				WHERE article_author.author='%s' 
-				AND published < NOW()
-				ORDER BY hits DESC LIMIT 0, %i",
-				array(
-					$this->getUser(),
-					NUMBER_OF_POPULAR_ARTICLES_USER,
-				));
-			$articles = $app['db']->get_results($sql);
-			foreach($articles as $key => $obj) {
-				$this->popArticles[] = new Article($obj->id);
-			}
-		}
-		return $this->popArticles;
-	}
-
-	/*
-	 * Public: Get comments
-	 * Get all comments from user
-	 */
-	public function getComments() {
-		$app = App::getInstance();
-
-		if (!$this->comments) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					id
-				FROM `comment` 
-				WHERE user='%s' 
-				ORDER BY timestamp DESC 
-				LIMIT 0, %i",
-				array(
-					$this->getUser(),
-					NUMBER_OF_POPULAR_COMMENTS_USER,
-				));
-			$comments = $app['db']->get_results($sql);	
-			if($comments) {
-				foreach($comments as $key => $obj) {
-					$this->comments[] = new Comment($obj->id);
-				} 
-			}
-		}
-		return $this->comments;
 	}
 
 	/*
@@ -230,34 +134,6 @@ class User extends BaseDB
 	}
 
 	/*
-	 * Public: Get number of pages in a category
-	 *
-	 * Returns int 
-	 */
-	public function getNumPages() {
-		$app = App::getInstance();
-
-		if (!$this->count) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					COUNT(id) as count 
-				FROM `article` 
-				INNER JOIN `article_author` 
-					ON (article.id=article_author.article) 
-				WHERE article_author.author='%s'
-				AND published < NOW()
-				ORDER BY article.date DESC",
-				array(
-					$this->getUser()
-				));
-			$this->count = $app['db']->get_var($sql);
-		}
-
-		$pages = ceil(($this->count - ARTICLES_PER_USER_PAGE) / (ARTICLES_PER_USER_PAGE)) + 1;
-		return $pages;
-	}
-
-	/*
 	 * Public: Get first name of user
 	 *
 	 * Returns string
@@ -284,7 +160,7 @@ class User extends BaseDB
 	 * Returns array
 	 */
 	public function getInfo() {
-		return Utility::jsonDecode($this->fields['info']);
+		return Utility::jsonDecode($this->fields['info']->getValue());
 	}
 
 	public function getFirstLogin() {
@@ -341,18 +217,6 @@ class User extends BaseDB
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Public: Get image
-	 */
-	public function getImage() {
-		if (!$this->image) {
-			if ($this->getImg()) {
-				$this->image = new Image($this->getImg());
-			}
-		}
-		return $this->image;
 	}
 
 	/*
