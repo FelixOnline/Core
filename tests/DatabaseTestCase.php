@@ -1,7 +1,7 @@
 <?php
  
-class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase {
-
+class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
+{
 	public $fixtures = array();
 	private $conn = null;
 

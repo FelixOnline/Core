@@ -12,7 +12,6 @@ class ArticleTest extends AppTestCase
 		'users',
 		'article_authors',
 		'comments',
-		'comments_ext',
 		'images',
 		'article_visits',
 		'logins',
@@ -113,7 +112,7 @@ class ArticleTest extends AppTestCase
 	public function testGetApprovedBy()
 	{
 		$article = new \FelixOnline\Core\Article(1);
-		$user = $article->getApprovedBy();
+		$user = $article->getApprovedby();
 
 		$this->assertInstanceOf('FelixOnline\Core\User', $user);
 		$this->assertEquals($user->getUser(), 'felix');
@@ -129,7 +128,7 @@ class ArticleTest extends AppTestCase
 
 		$app = \FelixOnline\Core\App::getInstance();
 		$insert_id = $app['db']->dbh->insert_id;
-		$this->assertEquals($insert_id, $article->getText1());
+		$this->assertEquals($insert_id, $article->getText1()->getId());
 	}
 
 	public function testAddAuthors()

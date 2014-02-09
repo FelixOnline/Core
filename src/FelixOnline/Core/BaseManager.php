@@ -43,6 +43,19 @@ class BaseManager
 	 */
 	protected $joins = array();
 
+	public static function build($class, $table, $pk = null)
+	{
+		$manager = new self();
+		$manager->class = $class;
+		$manager->table = $table;
+
+		if (!is_null($pk)) {
+			$manager->pk = $pk;
+		}
+
+		return $manager;
+	}
+
 	/**
 	 * Get all objects
 	 */

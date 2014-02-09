@@ -18,7 +18,10 @@ namespace FelixOnline\Core;
  *	  width
  *	  height
  */
-class Image extends BaseModel {
+class Image extends BaseDB
+{
+	public $dbtable = 'image';
+
 	/**
 	 * Constructor for Image class
 	 * If initialised with id then store relevant data in object
@@ -28,33 +31,22 @@ class Image extends BaseModel {
 	 * Returns image object
 	 */
 	function __construct($id=NULL) {
-		$app = App::getInstance();
+		$fields = array(
+			'title' => new Type\CharField(),
+			'uri' => new Type\CharField(),
+			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
+			'description' => new Type\CharField(),
+			'timestamp' => new Type\DateTimeField(),
+			'v_offset' => new Type\IntegerField(),
+			'h_offset' => new Type\IntegerField(),
+			'caption' => new Type\CharField(),
+			'attribution' => new Type\CharField(),
+			'attr_link' => new Type\CharField(),
+			'width' => new Type\IntegerField(),
+			'height' => new Type\IntegerField(),
+		);
 
-		if ($id !== NULL) { // if creating an already existing article object
-			$sql = $app['safesql']->query(
-				"SELECT
-					`id`,
-					`title`,
-					`uri`,
-					`user`,
-					`description`,
-					UNIX_TIMESTAMP(`timestamp`) as timestamp,
-					`v_offset`,
-					`h_offset`,
-					`caption`,
-					`attribution`,
-					`attr_link`,
-					`width`,
-					`height`
-				FROM `image`
-				WHERE id=%i",
-				array(
-					$id,
-				));
-			parent::__construct($app['db']->get_row($sql), $id);
-		} else {
-			// initialise new image
-		}
+		parent::__construct($fields, $id);
 	}
 
 	/**
