@@ -10,7 +10,6 @@ class CommentTest extends AppTestCase
 		'article_authors',
 		'users',
 		'comments',
-		'comments_ext',
 		'comment_likes',
 		'categories',
 	);

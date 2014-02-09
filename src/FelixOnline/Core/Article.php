@@ -69,11 +69,17 @@ class Article extends BaseDB {
 			'category' => new Type\ForeignKey('FelixOnline\Core\Category'),
 			'date' => new Type\DateTimeField(),
 			'published' => new Type\DateTimeField(),
-			'hidden' => new Type\BooleanField(),
-			'searchable' => new Type\BooleanField(),
+			'hidden' => new Type\BooleanField(array(
+				'null' => false,
+			)),
+			'searchable' => new Type\BooleanField(array(
+				'null' => false,
+			)),
 			'text1' => new Type\ForeignKey('FelixOnline\Core\Text'),
 			'img1' => new Type\ForeignKey('FelixOnline\Core\Image'),
-			'hits' => new Type\IntegerField(),
+			'hits' => new Type\IntegerField(array(
+				'null' => false,
+			)),
 			'short_desc' => new Type\CharField(),
 		);
 
@@ -83,9 +89,12 @@ class Article extends BaseDB {
 	/*
 	 * Public: Get array of authors of article
 	 *
+	 * TODO
+	 *
 	 * Returns array
 	 */
-	public function getAuthors() {
+	public function getAuthors()
+	{
 		$app = App::getInstance();
 
 		if (!$this->authors) {

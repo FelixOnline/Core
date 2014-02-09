@@ -8,7 +8,9 @@ class ArticleManager extends BaseManager
 	public $table = 'article';
 	public $class = 'FelixOnline\Core\Article';
 
-	public function getMostPopular($number_to_get) {
+	// TODO
+	public function getMostPopular($number_to_get)
+	{
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
@@ -35,7 +37,9 @@ class ArticleManager extends BaseManager
 		return $this->resultToModels($results);
 	}
 
-	public function getMostCommented($number_to_get) {
+	// TODO
+	public function getMostCommented($number_to_get)
+	{
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
@@ -43,27 +47,16 @@ class ArticleManager extends BaseManager
 				article AS id,
 				SUM(count) AS count
 			FROM (
-					(SELECT c.article,COUNT(*) AS count
-					FROM `comment` AS c
-					INNER JOIN `article` AS a ON (c.article=a.id)
-					WHERE c.`active`=1
-					AND timestamp >= NOW() - INTERVAL 3 WEEK
-					AND a.published IS NOT NULL
-					AND a.published < NOW()
-					GROUP BY article
-					ORDER BY timestamp DESC
-					LIMIT 20)
-				UNION ALL
-					(SELECT ce.article,COUNT(*) AS count
-					FROM `comment_ext` AS ce
-					INNER JOIN `article` AS a ON (ce.article=a.id)
-					WHERE ce.`active` = 1
-					AND pending = 0
-					AND timestamp >= NOW() - INTERVAL 3 WEEK
-					AND a.published IS NOT NULL
-					AND a.published < NOW()
-					GROUP BY article
-					ORDER BY timestamp DESC)
+				SELECT c.article,COUNT(*) AS count
+				FROM `comment` AS c
+				INNER JOIN `article` AS a ON (c.article=a.id)
+				WHERE c.`active`=1
+				AND timestamp >= NOW() - INTERVAL 3 WEEK
+				AND a.published IS NOT NULL
+				AND a.published < NOW()
+				GROUP BY article
+				ORDER BY timestamp DESC
+				LIMIT 20
 			) AS t
 			GROUP BY article
 			ORDER BY count DESC, article DESC LIMIT %i",

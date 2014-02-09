@@ -12,7 +12,6 @@ class ArticleTest extends AppTestCase
 		'users',
 		'article_authors',
 		'comments',
-		'comments_ext',
 		'images',
 		'article_visits',
 		'logins',
