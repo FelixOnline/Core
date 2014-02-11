@@ -46,6 +46,12 @@ class App implements \ArrayAccess
 			$this->container['env'] = Environment::getInstance();
 		}
 
+		if (!isset($this->container['akismet']) || is_null($this->container['akismet'])) {
+			// Initialize Akismet
+			$connector = new \RzekaE\Akismet\Connector\Curl();
+			$this->container['akismet'] = new \RzekaE\Akismet\Akismet($connector);
+		}
+
 		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
 			throw new InternalException('No db setup');
 		}

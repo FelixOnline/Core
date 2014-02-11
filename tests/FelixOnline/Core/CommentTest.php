@@ -128,4 +128,140 @@ class CommentTest extends AppTestCase
 		$comment = new \FelixOnline\Core\Comment(1);
 		$this->assertTrue($comment->userLikedComment('felix'));
 	}
+
+	public function testNewExternalComment()
+	{
+		$faker = Faker\Factory::create();
+		$name = $faker->name;
+		$email = $faker->email;
+		$content = $faker->text;
+
+		$this->assertEquals(7, $this->getConnection()->getRowCount('comment'));
+
+		$article = new \FelixOnline\Core\Article(1);
+		$comment = new \FelixOnline\Core\Comment();
+
+		$comment->setExternal(1)
+			->setName($name)
+			->setComment($content)
+			->setEmail($email)
+			->setArticle($article)
+			->save();
+
+		$this->assertEquals(8, $this->getConnection()->getRowCount('comment'));
+
+		// Get comment details
+		$pdo = $this->getConnection()->getConnection();
+
+		$stm = $pdo->prepare("SELECT * FROM comment WHERE id = :id");
+		$stm->execute(array(':id' => $comment->getId()));
+		$row = $stm->fetch();
+
+		$this->assertEquals($row['name'], $name);
+		$this->assertEquals($row['email'], $email);
+		$this->assertEquals($row['comment'], $content);
+		$this->assertNull($row['user']);
+		$this->assertEquals((int) $row['external'], 1);
+		$this->assertEquals((int) $row['active'], 1);
+		$this->assertEquals((int) $row['pending'], 1);
+		$this->assertEquals((int) $row['spam'], 0);
+		$this->assertEquals((int) $row['likes'], 0);
+		$this->assertEquals((int) $row['dislikes'], 0);
+	}
+
+	public function testNewInternalComment()
+	{
+		$faker = Faker\Factory::create();
+		$content = $faker->text;
+
+		$this->assertEquals(7, $this->getConnection()->getRowCount('comment'));
+
+		$article = new \FelixOnline\Core\Article(1);
+		$user = new \FelixOnline\Core\User('felix');
+		$comment = new \FelixOnline\Core\Comment();
+
+		$comment->setExternal(0)
+			->setUser($user)
+			->setComment($content)
+			->setArticle($article)
+			->save();
+
+		$this->assertEquals(8, $this->getConnection()->getRowCount('comment'));
+
+		// Get comment details
+		$pdo = $this->getConnection()->getConnection();
+
+		$stm = $pdo->prepare("SELECT * FROM comment WHERE id = :id");
+		$stm->execute(array(':id' => $comment->getId()));
+		$row = $stm->fetch();
+
+		$this->assertEquals($row['user'], $user->getUser());
+		$this->assertEquals($row['comment'], $content);
+		$this->assertNull($row['name']);
+		$this->assertNull($row['email']);
+		$this->assertEquals((int) $row['external'], 0);
+		$this->assertEquals((int) $row['active'], 1);
+		$this->assertEquals((int) $row['pending'], 0);
+		$this->assertEquals((int) $row['spam'], 0);
+		$this->assertEquals((int) $row['likes'], 0);
+		$this->assertEquals((int) $row['dislikes'], 0);
+	}
+
+	public function testCommentExists()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$comment = new \FelixOnline\Core\Comment();
+
+		$faker = Faker\Factory::create();
+		$name = $faker->name;
+		$email = $faker->email;
+		$content = $faker->text;
+
+		$comment->setExternal(1)
+			->setName($name)
+			->setComment($content)
+			->setEmail($email)
+			->setArticle($article);
+
+		$this->assertFalse($comment->commentExists());
+
+		$comment->save();
+
+		$duplicate = new \FelixOnline\Core\Comment();
+
+		$duplicate->setExternal(1)
+			->setName($name)
+			->setComment($content)
+			->setArticle($article);
+
+		$this->assertTrue($duplicate->commentExists());
+	}
+
+	public function testInteralCommentExists()
+	{
+		$article = new \FelixOnline\Core\Article(1);
+		$user = new \FelixOnline\Core\User('felix');
+		$comment = new \FelixOnline\Core\Comment();
+
+		$faker = Faker\Factory::create();
+		$content = $faker->text;
+
+		$comment->setExternal(0)
+			->setUser($user)
+			->setComment($content)
+			->setArticle($article);
+
+		$this->assertFalse($comment->commentExists());
+
+		$comment->save();
+
+		$duplicate = new \FelixOnline\Core\Comment();
+
+		$duplicate->setExternal(0)
+			->setUser($user)
+			->setComment($content)
+			->setArticle($article);
+
+		$this->assertTrue($duplicate->commentExists());
+	}
 }

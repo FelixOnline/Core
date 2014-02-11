@@ -40,6 +40,10 @@ class AppTestCase extends DatabaseTestCase
 
 		$app['env'] = \FelixOnline\Core\Environment::mock();
 
+		// Initialize Akismet
+		$connector = new \RzekaE\Akismet\Connector\Test();
+		$app['akismet'] = new \RzekaE\Akismet\Akismet($connector);
+
 		$session = $this->mock('FelixOnline\\Core\\Session')
 			->getId(1)
 			->start(1)
