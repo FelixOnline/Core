@@ -316,4 +316,34 @@ class CommentTest extends AppTestCase
 
 		$this->assertTrue($duplicate->commentExists());
 	}
+
+	public function testSendExtEmail()
+	{
+		$faker = Faker\Factory::create();
+		$name = $faker->name;
+		$email = $faker->email;
+		$content = $faker->text;
+		$article = new \FelixOnline\Core\Article(1);
+		$comment = new \FelixOnline\Core\Comment();
+
+		$test = $this;
+
+		$emailMock = $this->mock('\Swift_Mailer')
+			->send(function($message) use ($test, $article) {
+				$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $article->getTitle()));
+				$test->assertArrayHasKey('jkimbo@gmail.com', $message->getTo());
+
+				return true;
+			}, $this->once())
+			->new();
+
+		$this->app['email'] = $emailMock;
+
+		$comment->setExternal(1)
+			->setName($name)
+			->setComment($content)
+			->setEmail($email)
+			->setArticle($article)
+			->save();
+	}
 }

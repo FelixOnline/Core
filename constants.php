@@ -37,3 +37,5 @@
 
 	/* EMAIL */
 	if(!defined('EMAIL_ERRORS'))					define('EMAIL_ERRORS', 'jkimbo@gmail.com, philip.kent@me.com'); // people to email on errors
+	if(!defined('EMAIL_EXTCOMMENT_NOTIFYADDR'))		define('EMAIL_EXTCOMMENT_NOTIFYADDR', 'jkimbo@gmail.com, felix@imperial.ac.uk'); // comma-separated list of addresses to notify when a new external comment needs approval
+

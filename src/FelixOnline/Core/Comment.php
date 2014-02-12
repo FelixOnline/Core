@@ -290,7 +290,6 @@ class Comment extends BaseDB
 		parent::save();
 
 		// TODO
-		/*
 		// Send emails
 		if ($this->getExternal()) {
 			// If pending comment
@@ -299,14 +298,12 @@ class Comment extends BaseDB
 			}
 		} else { // internal emails
 			if ($this->getReply()) { // if comment is replying to an internal comment 
-				$this->emailReply();
+				//$this->emailReply();
 			}
 
 			/* email authors of article */
-			/*
-			$this->emailAuthors();
+			//$this->emailAuthors();
 		}
-		*/
 		
 		return $this->getId(); // return new comment id
 	}
@@ -345,7 +342,8 @@ class Comment extends BaseDB
 	/*
 	 * Private: Email comment author with reply
 	 */
-	private function emailReply() {
+	private function emailReply()
+	{
 		if($this->getReply()->getExternal()) { // check that comment replied to isn't external
 			return false;
 		}
@@ -368,20 +366,34 @@ class Comment extends BaseDB
 	/*
 	 * Private: Email felix on new external comment
 	 */
-	private function emailExternalComment() {
-		/* Send email */
-		$email = new Email();
-		$email->setTo(EMAIL_EXTCOMMENT_NOTIFYADDR);
-		$email->setSubject('New comment to approve on "'.$this->getArticle()->getTitle().'"');
+	private function emailExternalComment()
+	{
+		$app = App::getInstance();
 
+		// Get content
 		ob_start();
-		$comment = $this;
-		include(BASE_DIRECTORY.'/templates/emails/new_external_comment.php');
+		$data = array(
+			'app' => $app,
+			'comment' => $this,
+		);
+
+		// Render email template
+		call_user_func(function() use($data) {
+			extract($data);
+			include realpath(__DIR__ . '/../../../templates/') . '/new_external_comment.php';
+		});
 		$message = ob_get_contents();
 		ob_end_clean();
 
-		$email->setContent($message);
-		return $email->send();
+		// Create message
+		$message = \Swift_Message::newInstance()
+			->setSubject('New comment to approve on "'.$this->getArticle()->getTitle().'"')
+			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
+			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
+			->setBody($message);
+
+		// Send message
+		return $app['email']->send($message);
 	}
 
 	/*
@@ -483,17 +495,13 @@ class Comment extends BaseDB
 	/**
 	 * Get a number of comments to approve
 	 */
-	private function getNumCommentsToApprove() {
-		if(!$this->numCommentsToApprove) {
-			$sql = $this->safesql->query(
-				"SELECT 
-					COUNT(id) 
-				FROM comment_ext 
-				WHERE ACTIVE=1 
-				AND pending=1", array());
-			$this->numCommentsToApprove = $this->db->get_var($sql);
-		}
-		return $this->numCommentsToApprove;
+	public function getNumCommentsToApprove()
+	{
+		return (new CommentManager())
+			->filter('pending = 1')
+			->filter('active = 1')
+			->filter('spam = 0')
+			->count();
 	}
 	
 	/*

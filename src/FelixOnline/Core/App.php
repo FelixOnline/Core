@@ -52,6 +52,12 @@ class App implements \ArrayAccess
 			$this->container['akismet'] = new \RzekaE\Akismet\Akismet($connector);
 		}
 
+		if (!isset($this->container['email']) || is_null($this->container['email'])) {
+			// Initialize email
+			$transport = \Swift_MailTransport::newInstance();
+			$this->container['email'] = \Swift_Mailer::newInstance($transport);
+		}
+
 		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
 			throw new InternalException('No db setup');
 		}

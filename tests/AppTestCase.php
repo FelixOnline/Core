@@ -44,6 +44,12 @@ class AppTestCase extends DatabaseTestCase
 		$connector = new \RzekaE\Akismet\Connector\Test();
 		$app['akismet'] = new \RzekaE\Akismet\Akismet($connector);
 
+		if (!isset($app['email']) || is_null($app['email'])) {
+			// Initialize email
+			$transport = \Swift_NullTransport::newInstance();
+			$app['email'] = \Swift_Mailer::newInstance($transport);
+		}
+
 		$session = $this->mock('FelixOnline\\Core\\Session')
 			->getId(1)
 			->start(1)
