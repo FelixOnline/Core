@@ -216,10 +216,111 @@ class Comment extends BaseDB
 		return (boolean) $count;
 	}
 
-	/**
-	 * Public: Check if comment already exists
+	/*
+	 * Public: Like comment
 	 *
 	 * TODO
+	 *
+	 * $user - string username of user liking comment
+	 *
+	 * Returns number of likes
+	 */
+	public function likeComment($user)
+	{
+		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+			$sql = $this->safesql->query(
+				"INSERT INTO `comment_like` 
+				(
+					user,
+					comment,
+					binlike
+				) VALUES (
+					'%s',
+					%i,
+					'1'
+				)",
+				array(
+					$user,
+					$this->getId(),
+				));
+			$this->db->query($sql);
+
+			$likes = $this->getLikes() + 1;
+			if(!$this->external) { // internal comment
+				$sql = "UPDATE `comment` "; 
+			} else {
+				$sql = "UPDATE `comment_ext` ";
+			}
+			$sql .= "SET likes = %i WHERE id = %i";
+			$sql = $this->safesql->query($sql, array(
+				$likes,
+				$this->getId(),
+			));
+			$this->db->query($sql);
+
+			// clear comment
+			//Cache::clear('comment-'.$this->fields['article']);
+
+			return $likes;
+		} else {
+			return false;
+		}
+	}
+
+	/*
+	 * Public: Dislike comment
+	 *
+	 * TODO
+	 *
+	 * $user - string username of user disliking comment
+	 *
+	 * Returns number of dislikes
+	 */
+	public function dislikeComment($user)
+	{
+		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+			$sql = $this->safesql->query(
+				"INSERT INTO `comment_like` 
+				(
+					user,
+					comment,
+					binlike
+				) VALUES (
+					'%s',
+					%i,
+					'0'
+				)",
+				array(
+					$user,
+					$this->getId(),
+				));
+			$this->db->query($sql);
+
+			$dislikes = $this->getDislikes() + 1;
+			if(!$this->external) { // internal comment
+				$sql = "UPDATE `comment` "; 
+			} else {
+				$sql = "UPDATE `comment_ext` ";
+			}
+			$sql .= "SET dislikes = %i WHERE id = %i";
+			$sql = $this->safesql->query($sql, array(
+				$dislikes,
+				$this->getId(),
+			));
+			$this->db->query($sql);
+			
+			// clear comment
+			//Cache::clear('comment-'.$this->fields['article']);
+
+			return $dislikes;
+		} else {
+			return false;
+		}
+	}
+
+
+	/**
+	 * Public: Check if comment already exists
 	 *
 	 * Returns boolean
 	 */
@@ -301,42 +402,58 @@ class Comment extends BaseDB
 				//$this->emailReply();
 			}
 
-			/* email authors of article */
-			//$this->emailAuthors();
+			// email authors of article
+			$this->emailAuthors();
 		}
 		
 		return $this->getId(); // return new comment id
 	}
 
-	/*
+	/**
 	 * Public: Email authors of article
 	 */
 	public function emailAuthors()
 	{
+		$app = App::getInstance();
 		$authors = $this->getArticle()->getAuthors();
+
 		if (in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
 			$key = array_search($this->getUser(), $authors);
 			unset($authors[$key]);
 		}
-		foreach($authors as $author) {
-			$emailAddress = $author->getEmail(true); // get email address of user
-			$email = new Email();
-			$email->setTo($emailAddress);
-			$email->setUniqueID($author->getUser());
 
-			$email->setSubject($this->getName().' has commented on "'.$this->getArticle()->getTitle().'"');
+		// Create message
+		$message = \Swift_Message::newInstance()
+			->setSubject($this->getName().' has commented on "'.$this->getArticle()->getTitle().'"')
+			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'));
 
+		foreach ($authors as $author) {
+			// Get content
 			ob_start();
-			$comment = $this;
-			$user = $author;
-			include(BASE_DIRECTORY.'/templates/emails/comment_notification.php');
-			$message = ob_get_contents();
+			$data = array(
+				'app' => $app,
+				'user' => $author,
+				'comment' => $this,
+			);
+
+			// Render email template
+			call_user_func(function() use($data) {
+				extract($data);
+				include realpath(__DIR__ . '/../../../templates/') . '/comment_notification.php';
+			});
+			$content = ob_get_contents();
 			ob_end_clean();
 
-			$email->setContent($message);
+			$message->setBody($content)
+				->setTo(array(
+					$author->getEmail() => $author->getName(),
+				));
 
-			$email->send();
+			// Send email
+			$app['email']->send($message);
 		}
+
+		return true;
 	}
 
 	/*
@@ -382,7 +499,7 @@ class Comment extends BaseDB
 			extract($data);
 			include realpath(__DIR__ . '/../../../templates/') . '/new_external_comment.php';
 		});
-		$message = ob_get_contents();
+		$content = ob_get_contents();
 		ob_end_clean();
 
 		// Create message
@@ -390,106 +507,10 @@ class Comment extends BaseDB
 			->setSubject('New comment to approve on "'.$this->getArticle()->getTitle().'"')
 			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
 			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
-			->setBody($message);
+			->setBody($content);
 
 		// Send message
 		return $app['email']->send($message);
-	}
-
-	/*
-	 * Public: Like comment
-	 *
-	 * $user - string username of user liking comment
-	 *
-	 * Returns number of likes
-	 */
-	public function likeComment($user) {
-		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
-			$sql = $this->safesql->query(
-				"INSERT INTO `comment_like` 
-				(
-					user,
-					comment,
-					binlike
-				) VALUES (
-					'%s',
-					%i,
-					'1'
-				)",
-				array(
-					$user,
-					$this->getId(),
-				));
-			$this->db->query($sql);
-
-			$likes = $this->getLikes() + 1;
-			if(!$this->external) { // internal comment
-				$sql = "UPDATE `comment` "; 
-			} else {
-				$sql = "UPDATE `comment_ext` ";
-			}
-			$sql .= "SET likes = %i WHERE id = %i";
-			$sql = $this->safesql->query($sql, array(
-				$likes,
-				$this->getId(),
-			));
-			$this->db->query($sql);
-
-			// clear comment
-			//Cache::clear('comment-'.$this->fields['article']);
-
-			return $likes;
-		} else {
-			return false;
-		}
-	}
-
-	/*
-	 * Public: Dislike comment
-	 *
-	 * $user - string username of user disliking comment
-	 *
-	 * Returns number of dislikes
-	 */
-	public function dislikeComment($user) {
-		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
-			$sql = $this->safesql->query(
-				"INSERT INTO `comment_like` 
-				(
-					user,
-					comment,
-					binlike
-				) VALUES (
-					'%s',
-					%i,
-					'0'
-				)",
-				array(
-					$user,
-					$this->getId(),
-				));
-			$this->db->query($sql);
-
-			$dislikes = $this->getDislikes() + 1;
-			if(!$this->external) { // internal comment
-				$sql = "UPDATE `comment` "; 
-			} else {
-				$sql = "UPDATE `comment_ext` ";
-			}
-			$sql .= "SET dislikes = %i WHERE id = %i";
-			$sql = $this->safesql->query($sql, array(
-				$dislikes,
-				$this->getId(),
-			));
-			$this->db->query($sql);
-			
-			// clear comment
-			//Cache::clear('comment-'.$this->fields['article']);
-
-			return $dislikes;
-		} else {
-			return false;
-		}
 	}
 
 	/**
