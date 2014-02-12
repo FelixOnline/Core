@@ -123,6 +123,18 @@ class CommentTest extends AppTestCase
 		$this->assertTrue($external->isRejected());
 	}
 
+	public function testIsPending()
+	{
+		$internal = new \FelixOnline\Core\Comment(1);
+		$this->assertFalse($internal->isPending());
+
+		$external = new \FelixOnline\Core\Comment(80000001);
+		$this->assertFalse($external->isPending());
+
+		$external = new \FelixOnline\Core\Comment(80000004);
+		$this->assertTrue($external->isPending());
+	}
+
 	public function testUserLikedComment()
 	{
 		$comment = new \FelixOnline\Core\Comment(1);
@@ -203,6 +215,46 @@ class CommentTest extends AppTestCase
 		$this->assertEquals((int) $row['active'], 1);
 		$this->assertEquals((int) $row['pending'], 0);
 		$this->assertEquals((int) $row['spam'], 0);
+		$this->assertEquals((int) $row['likes'], 0);
+		$this->assertEquals((int) $row['dislikes'], 0);
+	}
+
+	public function testSpamComment()
+	{
+		$faker = Faker\Factory::create();
+		$name = "viagra-test-123";
+		$email = $faker->email;
+		$content = $faker->text;
+
+		$this->assertEquals(7, $this->getConnection()->getRowCount('comment'));
+
+		$article = new \FelixOnline\Core\Article(1);
+		$comment = new \FelixOnline\Core\Comment();
+
+		$comment->setExternal(1)
+			->setName($name)
+			->setComment($content)
+			->setEmail($email)
+			->setArticle($article)
+			->save();
+
+		$this->assertEquals(8, $this->getConnection()->getRowCount('comment'));
+
+		// Get comment details
+		$pdo = $this->getConnection()->getConnection();
+
+		$stm = $pdo->prepare("SELECT * FROM comment WHERE id = :id");
+		$stm->execute(array(':id' => $comment->getId()));
+		$row = $stm->fetch();
+
+		$this->assertEquals($row['name'], $name);
+		$this->assertEquals($row['email'], $email);
+		$this->assertEquals($row['comment'], $content);
+		$this->assertNull($row['user']);
+		$this->assertEquals((int) $row['external'], 1);
+		$this->assertEquals((int) $row['active'], 0);
+		$this->assertEquals((int) $row['pending'], 0);
+		$this->assertEquals((int) $row['spam'], 1);
 		$this->assertEquals((int) $row['likes'], 0);
 		$this->assertEquals((int) $row['dislikes'], 0);
 	}
