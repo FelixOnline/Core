@@ -374,4 +374,31 @@ class CommentTest extends AppTestCase
 			->setArticle($article)
 			->save();
 	}
+
+	public function testSendAuthorNotificationByAuthor()
+	{
+		$faker = Faker\Factory::create();
+		$content = $faker->text;
+		$article = new \FelixOnline\Core\Article(2);
+		$user = new \FelixOnline\Core\User('jk708');
+		$comment = new \FelixOnline\Core\Comment();
+
+		$test = $this;
+		$emailMock = $this->mock('\Swift_Mailer')
+			->send(function($message) use ($test, $article, $user) {
+				$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $article->getTitle()));
+				$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $user->getName()));
+				$test->assertNotEmpty($message->getBody());
+
+				return true;
+			}, $this->exactly(1))
+			->new();
+
+		$this->app['email'] = $emailMock;
+		$comment->setExternal(0)
+			->setUser($user)
+			->setComment($content)
+			->setArticle($article)
+			->save();
+	}
 }
