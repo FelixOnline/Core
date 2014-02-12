@@ -332,6 +332,7 @@ class CommentTest extends AppTestCase
 			->send(function($message) use ($test, $article) {
 				$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $article->getTitle()));
 				$test->assertArrayHasKey('jkimbo@gmail.com', $message->getTo());
+				$test->assertNotEmpty($message->getBody());
 
 				return true;
 			}, $this->once())
