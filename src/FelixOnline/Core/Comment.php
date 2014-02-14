@@ -351,6 +351,12 @@ class Comment extends BaseDB
 	{
 		$app = App::getInstance();
 
+
+		// If an update
+		if ($this->pk && $this->fields[$this->pk]->getValue()) {
+			return parent::save();
+		}
+
 		$this->setIp($app['env']['REMOTE_ADDR']);
 		$this->setUseragent($app['env']['HTTP_USER_AGENT']);
 		$this->setReferer($app['env']['HTTP_REFERER']);
@@ -399,7 +405,7 @@ class Comment extends BaseDB
 			}
 		} else { // internal emails
 			if ($this->getReply()) { // if comment is replying to an internal comment 
-				//$this->emailReply();
+				$this->emailReply();
 			}
 
 			// email authors of article
@@ -461,23 +467,39 @@ class Comment extends BaseDB
 	 */
 	private function emailReply()
 	{
-		if($this->getReply()->getExternal()) { // check that comment replied to isn't external
+		$app = App::getInstance();
+		$reply = $this->getReply();
+
+		if ($reply->getExternal()) { // check that comment replied to isn't external
 			return false;
 		}
-		$email = new Email();
-		$email->setTo($this->getReply()->getUser()->getEmail(true));
-		$email->setSubject($this->getName().' has replied to your comment on "'.$this->getArticle()->getTitle().'"');
 
+		// Get content
 		ob_start();
-		$comment = $this->getReply();
-		$reply = $this;
-		include(BASE_DIRECTORY.'/templates/emails/comment_reply_notification.php');
-		$message = ob_get_contents();
+		$data = array(
+			'app' => $app,
+			'comment' => $this,
+			'reply' => $reply,
+		);
+		// Render email template
+		call_user_func(function() use($data) {
+			extract($data);
+			include realpath(__DIR__ . '/../../../templates/') . '/comment_reply_notification.php';
+		});
+		$content = ob_get_contents();
 		ob_end_clean();
 
-		$email->setContent($message);
+		// Create message
+		$message = \Swift_Message::newInstance()
+			->setSubject($this->getName() . ' has replied to your comment on "'.$this->getArticle()->getTitle().'"')
+			->setTo(array(
+				$reply->getUser()->getEmail() => $reply->getUser()->getName(),
+			))
+			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
+			->setBody($content);
 
-		return $email->send();
+		// Send message
+		return $app['email']->send($message);
 	}
 
 	/*
@@ -523,41 +545,5 @@ class Comment extends BaseDB
 			->filter('active = 1')
 			->filter('spam = 0')
 			->count();
-	}
-	
-	/*
-	 * Helpers
-	 */
-	public static function getRecentComments($num_to_get) {
-		global $db;
-		global $safesql;
-		
-		$sql = $safesql->query(
-			"SELECT * FROM (
-				SELECT comment.article,
-					comment.id,
-					comment.user,
-					user.name,
-					comment.comment,
-					UNIX_TIMESTAMP(comment.timestamp) AS timestamp 
-				FROM `comment` LEFT JOIN `user` ON (comment.user=user.user) 
-				WHERE active=1 
-				UNION SELECT comment_ext.article,
-					comment_ext.id,
-					comment_ext.name,
-					comment_ext.comment,
-					'ext',
-					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp 
-				FROM `comment_ext` 
-				WHERE active=1 
-				AND pending=0
-			) AS t 
-			ORDER BY timestamp DESC LIMIT %i",
-			array(
-				$num_to_get,
-			));
-
-		$recent_comments = $db->get_results($sql);
-		return $recent_comments;
 	}
 }

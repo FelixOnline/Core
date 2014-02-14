@@ -363,6 +363,8 @@ class CommentTest extends AppTestCase
 				$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $user->getName()));
 				$test->assertNotEmpty($message->getBody());
 
+				$test->assertCount(1, $message->getTo());
+
 				return true;
 			}, $this->exactly(2))
 			->new();
@@ -390,6 +392,9 @@ class CommentTest extends AppTestCase
 				$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $user->getName()));
 				$test->assertNotEmpty($message->getBody());
 
+				$test->assertArrayHasKey('felix@imperial.ac.uk', $message->getTo());
+				$test->assertCount(1, $message->getTo());
+
 				return true;
 			}, $this->exactly(1))
 			->new();
@@ -400,5 +405,54 @@ class CommentTest extends AppTestCase
 			->setComment($content)
 			->setArticle($article)
 			->save();
+	}
+
+	public function testReplyCommentNotification()
+	{
+		$faker = Faker\Factory::create();
+		$content = $faker->text;
+
+		$article = new \FelixOnline\Core\Article(1);
+		$user = new \FelixOnline\Core\User('jk708');
+		$comment = new \FelixOnline\Core\Comment();
+		$replyingto = new \FelixOnline\Core\Comment(1);
+
+		$count = 0;
+		$test = $this;
+		$emailMock = $this->mock('\Swift_Mailer')
+			->send(function($message) use ($test, $article, $user, $replyingto, &$count) {
+				// reply email is sent first
+				if ($count == 0) {
+					$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $article->getTitle()));
+					$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $user->getName()));
+					$test->assertNotEmpty($message->getBody());
+					$test->assertArrayHasKey($replyingto->getUser()->getEmail(), $message->getTo());
+				}
+
+				$count++;
+				return true;
+			}, $this->exactly(2))
+			->new();
+
+		$this->app['email'] = $emailMock;
+
+		$comment->setExternal(0)
+			->setUser($user)
+			->setComment($content)
+			->setArticle($article)
+			->setReply($replyingto)
+			->save();
+	}
+
+	public function testToEmailsAreSentIfUpdate()
+	{
+		$comment = new \FelixOnline\Core\Comment(1);
+
+		$emailMock = $this->mock('\Swift_Mailer')
+			->send($this->never())
+			->new();
+		$this->app['email'] = $emailMock;
+
+		$comment->save();
 	}
 }
