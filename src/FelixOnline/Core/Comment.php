@@ -206,7 +206,7 @@ class Comment extends BaseDB
 	 *
 	 * Returns true or false
 	 */
-	public function userLikedComment($user)
+	public function userLikedComment(User $user)
 	{
 		$count = BaseManager::build(null, 'comment_like')
 			->filter("user = '%s'", array($user->getUser()))
@@ -223,7 +223,7 @@ class Comment extends BaseDB
 	 *
 	 * Returns number of likes
 	 */
-	public function likeComment($user)
+	public function likeComment(User $user)
 	{
 		$app = App::getInstance();
 
@@ -262,7 +262,7 @@ class Comment extends BaseDB
 	 *
 	 * Returns number of dislikes
 	 */
-	public function dislikeComment($user)
+	public function dislikeComment(User $user)
 	{
 		$app = App::getInstance();
 
@@ -371,7 +371,6 @@ class Comment extends BaseDB
 
 		parent::save();
 
-		// TODO
 		// Send emails
 		if ($this->getExternal()) {
 			// If pending comment
