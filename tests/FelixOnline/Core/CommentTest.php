@@ -138,7 +138,59 @@ class CommentTest extends AppTestCase
 	public function testUserLikedComment()
 	{
 		$comment = new \FelixOnline\Core\Comment(1);
-		$this->assertTrue($comment->userLikedComment('felix'));
+		$user = new \FelixOnline\Core\User('felix');
+		$this->assertTrue($comment->userLikedComment($user));
+	}
+
+	public function testUserLikesComment()
+	{
+		$this->assertEquals(3, $this->getConnection()->getRowCount('comment_like'));
+
+		$comment = new \FelixOnline\Core\Comment(1);
+		$user = new \FelixOnline\Core\User('jk708');
+
+		$comment->likeComment($user);
+
+		$this->assertEquals(4, $this->getConnection()->getRowCount('comment_like'));
+
+		// Get details
+		$pdo = $this->getConnection()->getConnection();
+
+		$stm = $pdo->prepare("SELECT * FROM comment_like ORDER BY id DESC LIMIT 1");
+		$stm->execute();
+		$row = $stm->fetch();
+
+		$this->assertEquals($row['user'], $user->getUser());
+		$this->assertEquals($row['comment'], 1);
+		$this->assertEquals($row['binlike'], 1);
+
+		// Try and like again
+		$this->assertFalse($comment->likeComment($user));
+	}
+
+	public function testUserDislikesComment()
+	{
+		$this->assertEquals(3, $this->getConnection()->getRowCount('comment_like'));
+
+		$comment = new \FelixOnline\Core\Comment(1);
+		$user = new \FelixOnline\Core\User('jk708');
+
+		$comment->dislikeComment($user);
+
+		$this->assertEquals(4, $this->getConnection()->getRowCount('comment_like'));
+
+		// Get details
+		$pdo = $this->getConnection()->getConnection();
+
+		$stm = $pdo->prepare("SELECT * FROM comment_like ORDER BY id DESC LIMIT 1");
+		$stm->execute();
+		$row = $stm->fetch();
+
+		$this->assertEquals($row['user'], $user->getUser());
+		$this->assertEquals($row['comment'], 1);
+		$this->assertEquals($row['binlike'], 0);
+
+		$this->assertFalse($comment->dislikeComment($user));
 	}
 
 	public function testNewExternalComment()

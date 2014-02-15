@@ -202,14 +202,14 @@ class Comment extends BaseDB
 	/**
 	 * Public: Check if current user has liked or disliked the comment
 	 *
-	 * $user - username of current user
+	 * $user - user object
 	 *
 	 * Returns true or false
 	 */
 	public function userLikedComment($user)
 	{
 		$count = BaseManager::build(null, 'comment_like')
-			->filter("user = '%s'", array($user))
+			->filter("user = '%s'", array($user->getUser()))
 			->filter("comment = %i", array($this->getId()))
 			->count();
 
@@ -219,16 +219,16 @@ class Comment extends BaseDB
 	/*
 	 * Public: Like comment
 	 *
-	 * TODO
-	 *
-	 * $user - string username of user liking comment
+	 * $user - user object
 	 *
 	 * Returns number of likes
 	 */
 	public function likeComment($user)
 	{
-		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
-			$sql = $this->safesql->query(
+		$app = App::getInstance();
+
+		if (!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
 					user,
@@ -237,29 +237,17 @@ class Comment extends BaseDB
 				) VALUES (
 					'%s',
 					%i,
-					'1'
+					1
 				)",
 				array(
-					$user,
+					$user->getUser(),
 					$this->getId(),
 				));
-			$this->db->query($sql);
+			$app['db']->query($sql);
 
 			$likes = $this->getLikes() + 1;
-			if(!$this->external) { // internal comment
-				$sql = "UPDATE `comment` "; 
-			} else {
-				$sql = "UPDATE `comment_ext` ";
-			}
-			$sql .= "SET likes = %i WHERE id = %i";
-			$sql = $this->safesql->query($sql, array(
-				$likes,
-				$this->getId(),
-			));
-			$this->db->query($sql);
-
-			// clear comment
-			//Cache::clear('comment-'.$this->fields['article']);
+			$this->setLikes($likes)
+				->save();
 
 			return $likes;
 		} else {
@@ -270,16 +258,16 @@ class Comment extends BaseDB
 	/*
 	 * Public: Dislike comment
 	 *
-	 * TODO
-	 *
-	 * $user - string username of user disliking comment
+	 * $user - user object
 	 *
 	 * Returns number of dislikes
 	 */
 	public function dislikeComment($user)
 	{
-		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
-			$sql = $this->safesql->query(
+		$app = App::getInstance();
+
+		if (!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
 					user,
@@ -288,29 +276,17 @@ class Comment extends BaseDB
 				) VALUES (
 					'%s',
 					%i,
-					'0'
+					0
 				)",
 				array(
-					$user,
+					$user->getUser(),
 					$this->getId(),
 				));
-			$this->db->query($sql);
+			$app['db']->query($sql);
 
 			$dislikes = $this->getDislikes() + 1;
-			if(!$this->external) { // internal comment
-				$sql = "UPDATE `comment` "; 
-			} else {
-				$sql = "UPDATE `comment_ext` ";
-			}
-			$sql .= "SET dislikes = %i WHERE id = %i";
-			$sql = $this->safesql->query($sql, array(
-				$dislikes,
-				$this->getId(),
-			));
-			$this->db->query($sql);
-			
-			// clear comment
-			//Cache::clear('comment-'.$this->fields['article']);
+			$this->setDislikes($dislikes)
+				->save();
 
 			return $dislikes;
 		} else {
@@ -350,7 +326,6 @@ class Comment extends BaseDB
 	public function save()
 	{
 		$app = App::getInstance();
-
 
 		// If an update
 		if ($this->pk && $this->fields[$this->pk]->getValue()) {
@@ -469,10 +444,6 @@ class Comment extends BaseDB
 	{
 		$app = App::getInstance();
 		$reply = $this->getReply();
-
-		if ($reply->getExternal()) { // check that comment replied to isn't external
-			return false;
-		}
 
 		// Get content
 		ob_start();
