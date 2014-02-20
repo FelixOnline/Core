@@ -12,7 +12,7 @@ Models are responsible for encapsulating everything to do with a particlar entit
 
 Each database model inherits off `BaseDB` and defines a list of fields which correspond to columns in a database table.
 
-```
+```php
 namespace FelixOnline\Core;
 use FelixOnline\Core\Type;
 
@@ -53,7 +53,7 @@ You can also inherit off `BaseModel` if the model is not backed by a database ta
 
 Model fields can be a relationship to another model through their primary key. If this is the case then when retrieving the value of that field you will get the model it correspondes to. You can also set a value it by passing the relational model as the parameter to the setter.
 
-```
+```php
 namespace FelixOnline\Core;
 use FelixOnline\Core\Type;
 
@@ -119,7 +119,7 @@ $foo->getBar()->getText(); // 'Fizz'
 
 Managers are responsible for selecting lists of models from the database with optional filtering. Some models have specific managers, like `ArticleManger` or `CatgoryManager` because they contain custom methods as well. However a generic manager representing a database table and model can be created on the fly using the builder method. See below.
 
-```
+```php
 $manager = (new FelixOnline\Core\ArticleManager())	->filter('published < NOW()')
 	->order('published', 'DESC');
 
@@ -141,7 +141,7 @@ $manager->values(); // articles by the user 'felix'
 
 You can create managers on the fly by using the static method `build` on the `BaseManager` class.
 
-```
+```php
 $author_manager = BaseManager::build(
 	'FelixOnline\Core\User', // model class
 	'article_author', // database table
