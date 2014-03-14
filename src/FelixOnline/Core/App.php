@@ -48,8 +48,8 @@ class App implements \ArrayAccess
 
 		if (!isset($this->container['akismet']) || is_null($this->container['akismet'])) {
 			// Initialize Akismet
-			$connector = new \RzekaE\Akismet\Connector\Curl();
-			$this->container['akismet'] = new \RzekaE\Akismet\Akismet($connector);
+			$connector = new \Riv\Service\Akismet\Connector\Curl();
+			$this->container['akismet'] = new \Riv\Service\Akismet\Akismet($connector);
 		}
 
 		if (!isset($this->container['email']) || is_null($this->container['email'])) {

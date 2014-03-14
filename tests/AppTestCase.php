@@ -41,8 +41,8 @@ class AppTestCase extends DatabaseTestCase
 		$app['env'] = \FelixOnline\Core\Environment::mock();
 
 		// Initialize Akismet
-		$connector = new \RzekaE\Akismet\Connector\Test();
-		$app['akismet'] = new \RzekaE\Akismet\Akismet($connector);
+		$connector = new \Riv\Service\Akismet\Connector\Test();
+		$app['akismet'] = new \Riv\Service\Akismet\Akismet($connector);
 
 		if (!isset($app['email']) || is_null($app['email'])) {
 			// Initialize email
