@@ -46,6 +46,18 @@ class App implements \ArrayAccess
 			$this->container['env'] = Environment::getInstance();
 		}
 
+		if (!isset($this->container['akismet']) || is_null($this->container['akismet'])) {
+			// Initialize Akismet
+			$connector = new \Riv\Service\Akismet\Connector\Curl();
+			$this->container['akismet'] = new \Riv\Service\Akismet\Akismet($connector);
+		}
+
+		if (!isset($this->container['email']) || is_null($this->container['email'])) {
+			// Initialize email
+			$transport = \Swift_MailTransport::newInstance();
+			$this->container['email'] = \Swift_Mailer::newInstance($transport);
+		}
+
 		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
 			throw new InternalException('No db setup');
 		}

@@ -40,6 +40,16 @@ class AppTestCase extends DatabaseTestCase
 
 		$app['env'] = \FelixOnline\Core\Environment::mock();
 
+		// Initialize Akismet
+		$connector = new \Riv\Service\Akismet\Connector\Test();
+		$app['akismet'] = new \Riv\Service\Akismet\Akismet($connector);
+
+		if (!isset($app['email']) || is_null($app['email'])) {
+			// Initialize email
+			$transport = \Swift_NullTransport::newInstance();
+			$app['email'] = \Swift_Mailer::newInstance($transport);
+		}
+
 		$session = $this->mock('FelixOnline\\Core\\Session')
 			->getId(1)
 			->start(1)

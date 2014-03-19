@@ -106,7 +106,7 @@ class ArticleTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(2);
 		$authors = $article->getAuthorsEnglish();
 
-		$this->assertEquals($authors, '<a href="http://localhost/user/felix/">Joseph Letts - Felix Editor</a>, <a href="http://localhost/user/jk708/">Jonathan Kim</a> and <a href="http://localhost/user/pk1811/">Philip Kent</a>');
+		$this->assertEquals($authors, '<a href="http://localhost/user/felix/">Joseph Letts - Felix Editor</a> and <a href="http://localhost/user/jk708/">Jonathan Kim</a>');
 	}
 
 	public function testGetApprovedBy()
@@ -133,7 +133,7 @@ class ArticleTest extends AppTestCase
 
 	public function testAddAuthors()
 	{
-		$this->assertEquals(5, $this->getConnection()->getRowCount('article_author'));
+		$this->assertEquals(4, $this->getConnection()->getRowCount('article_author'));
 
 		$article = new \FelixOnline\Core\Article(1);
 		$users = array(
@@ -142,7 +142,7 @@ class ArticleTest extends AppTestCase
 		);
 		$article->addAuthors($users);
 
-		$this->assertEquals(7, $this->getConnection()->getRowCount('article_author'));
+		$this->assertEquals(6, $this->getConnection()->getRowCount('article_author'));
 		$this->assertCount(3, $article->getAuthors());
 	}
 
