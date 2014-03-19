@@ -206,7 +206,7 @@ class Comment extends BaseDB
 	 *
 	 * Returns true or false
 	 */
-	public function userLikedComment(User $user)
+	public function userLikedComment($user)
 	{
 		$count = BaseManager::build(null, 'comment_like')
 			->filter("user = '%s'", array($user->getUser()))
@@ -223,7 +223,7 @@ class Comment extends BaseDB
 	 *
 	 * Returns number of likes
 	 */
-	public function likeComment(User $user)
+	public function likeComment($user)
 	{
 		$app = App::getInstance();
 
@@ -262,7 +262,7 @@ class Comment extends BaseDB
 	 *
 	 * Returns number of dislikes
 	 */
-	public function dislikeComment(User $user)
+	public function dislikeComment($user)
 	{
 		$app = App::getInstance();
 
