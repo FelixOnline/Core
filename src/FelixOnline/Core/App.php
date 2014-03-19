@@ -58,6 +58,10 @@ class App implements \ArrayAccess
 			$this->container['email'] = \Swift_Mailer::newInstance($transport);
 		}
 
+		if (!isset($this->container['currentuser']) || is_null($this->container['currentuser'])) {
+			$this->container['currentuser'] = new CurrentUser();
+		}
+
 		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
 			throw new InternalException('No db setup');
 		}
