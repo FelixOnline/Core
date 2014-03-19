@@ -24,7 +24,9 @@ class Session implements \ArrayAccess
 	public function start()
 	{
 		session_name($this->name); // set session name
-		session_start(); // start session
+		if (session_status() == PHP_SESSION_NONE) {
+			session_start(); // start session
+		}
 
 		$this->session = &$_SESSION[$this->name];
 

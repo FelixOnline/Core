@@ -24,5 +24,5 @@
 </p>
 
 <p>Lots of love,
-</br>
+<br/>
 Felix</p>

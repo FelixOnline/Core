@@ -30,7 +30,8 @@ class Category extends BaseDB
 	private $stories; // array of top story objects
 	public $dbtable = 'category';
 
-	function __construct($id = NULL) {
+	function __construct($id = NULL)
+	{
 		$fields = array(
 			'label' => new Type\CharField(),
 			'cat' => new Type\CharField(),
@@ -57,7 +58,8 @@ class Category extends BaseDB
 	/**
 	 * Public: Get category url
 	 */
-	public function getURL($pagenum = NULL) {
+	public function getURL($pagenum = NULL)
+	{
 		$app = App::getInstance();
 		$output = $app->getOption('base_url').$this->getCat().'/';
 		if ($pagenum != NULL) {
@@ -86,7 +88,8 @@ class Category extends BaseDB
 	 *
 	 * Returns array of articles
 	 */
-	public function getTopStories() {
+	public function getTopStories()
+	{
 		if (!$this->stories) {
 			$this->stories = array();
 

@@ -4,6 +4,8 @@ require_once __DIR__ . '/../../DatabaseTestCase.php';
 
 class AppTest extends DatabaseTestCase
 {
+	use \Xpmock\TestCaseTrait;
+
 	public function createApp($config)
 	{
 		$app = new \FelixOnline\Core\App($config);
@@ -21,6 +23,17 @@ class AppTest extends DatabaseTestCase
 
 		$app['safesql'] = new \SafeSQL_MySQLi($db->dbh);
 		$app['env'] = \FelixOnline\Core\Environment::mock();
+
+		$session = $this->mock('FelixOnline\\Core\\Session')
+			->getId(1)
+			->start(1)
+			->reset()
+			->new();
+
+		$this->reflect($session)
+			->__set('session', array());
+
+		$app['env']['session'] = $session;
 
 		$app->run();
 
