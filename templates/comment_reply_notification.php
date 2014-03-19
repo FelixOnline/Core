@@ -27,5 +27,5 @@
 	<a href="<?php echo $comment->getArticle()->getURL().'#comment'.$comment->getId(); ?>">View Comment</a>
 </p>
 
-<p>Lots of love,</br>
+<p>Lots of love,<br/>
 Felix</p>
