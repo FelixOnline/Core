@@ -11,6 +11,8 @@ class CurrentUser extends User
 	 */
 	function __construct()
 	{
+		parent::__construct();
+
 		$app = App::getInstance();
 
 		if (!isset($app['env']['session'])) {
