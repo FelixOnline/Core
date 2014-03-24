@@ -13,7 +13,7 @@ namespace FelixOnline\Core;
  *    request
  *    response
  */
-class Category extends BaseDB
+class AkismetLog extends BaseDB
 {
 	public $dbtable = 'akismet_log';
 
