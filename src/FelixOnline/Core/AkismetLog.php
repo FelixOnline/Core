@@ -4,7 +4,7 @@ namespace FelixOnline\Core;
  * Akismet log entry
  *
  * Fields:
- *	  id			  - 
+ *	  id
  *	  comment_id
  *    timestamp
  *    action

@@ -349,14 +349,14 @@ class Comment extends BaseDB
 				'referrer' => $this->getReferer(),
 			));
 
-			$log_entry = new \FelixOnline\AkismetLog();
-			$log_entry->setCommentId($this);
-			$log_entry->setAction('check');
-			$log_entry->setIsSpam($check);
-			$log_entry->setError($app['akismet']->getError());
-			$log_entry->setRequest($app['akismet']->getRequest());
-			$log_entry->setResponse($app['akismet']->getResponse());
-			$log_entry->save();
+			$log_entry = new \FelixOnline\AkismetLog()
+							->setCommentId($this);
+							->setAction('check');
+							->setIsSpam($check);
+							->setError($app['akismet']->getError());
+							->setRequest($app['akismet']->getRequest());
+							->setResponse($app['akismet']->getResponse());
+							->save();
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
@@ -412,25 +412,23 @@ class Comment extends BaseDB
 				'referrer' => $this->getReferer(),
 			));
 
-			$log_entry = new \FelixOnline\AkismetLog();
-			$log_entry->setCommentId($this);
-			$log_entry->setAction('sendSpam');
-			$log_entry->setIsSpam($check);
-			$log_entry->setError($app['akismet']->getError());
-			$log_entry->setRequest($app['akismet']->getRequest());
-			$log_entry->setResponse($app['akismet']->getResponse());
-			$log_entry->save();
+			$log_entry = new \FelixOnline\Core\AkismetLog()
+							->setCommentId($this);
+							->setAction('check');
+							->setIsSpam($check);
+							->setError($app['akismet']->getError());
+							->setRequest($app['akismet']->getRequest());
+							->setResponse($app['akismet']->getResponse());
+							->save();
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
 				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
 			}
 
-			if ($check == true) { // if comment is spam
-				$this->setActive(0);
-				$this->setPending(0);
-				$this->setSpam(1);
-			}
+			$this->setActive(0);
+			$this->setPending(0);
+			$this->setSpam(1);
 
 			$this->save();
 		} else {
@@ -452,25 +450,23 @@ class Comment extends BaseDB
 				'referrer' => $this->getReferer(),
 			));
 
-			$log_entry = new \FelixOnline\AkismetLog();
-			$log_entry->setCommentId($this);
-			$log_entry->setAction('sendHam');
-			$log_entry->setIsSpam($check);
-			$log_entry->setError($app['akismet']->getError());
-			$log_entry->setRequest($app['akismet']->getRequest());
-			$log_entry->setResponse($app['akismet']->getResponse());
-			$log_entry->save();
+			$log_entry = new \FelixOnline\Core\AkismetLog()
+							->setCommentId($this);
+							->setAction('check');
+							->setIsSpam($check);
+							->setError($app['akismet']->getError());
+							->setRequest($app['akismet']->getRequest());
+							->setResponse($app['akismet']->getResponse());
+							->save();
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
 				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
 			}
 
-			if ($check == true) { // if comment is ham restore to pending
-				$this->setActive(1);
-				$this->setPending(1);
-				$this->setSpam(0);
-			}
+			$this->setActive(1);
+			$this->setPending(1);
+			$this->setSpam(0);
 
 			$this->save();
 		} else {
