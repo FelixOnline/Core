@@ -349,14 +349,14 @@ class Comment extends BaseDB
 				'referrer' => $this->getReferer(),
 			));
 
-			$log_entry = new \FelixOnline\Core\AkismetLog()
-							->setCommentId($this)
-							->setAction('check')
-							->setIsSpam($check)
-							->setError($app['akismet']->getError())
-							->setRequest($app['akismet']->getRequest())
-							->setResponse($app['akismet']->getResponse())
-							->save();
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+						->setAction('check')
+						->setIsSpam($check)
+						->setError($app['akismet']->getError())
+						->setRequest($app['akismet']->getRequest())
+						->setResponse($app['akismet']->getResponse())
+						->save();
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
@@ -412,14 +412,14 @@ class Comment extends BaseDB
 				'referrer' => $this->getReferer(),
 			));
 
-			$log_entry = new \FelixOnline\Core\AkismetLog()
-							->setCommentId($this)
-							->setAction('check')
-							->setIsSpam($check)
-							->setError($app['akismet']->getError())
-							->setRequest($app['akismet']->getRequest())
-							->setResponse($app['akismet']->getResponse())
-							->save();
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+						->setAction('check')
+						->setIsSpam($check)
+						->setError($app['akismet']->getError())
+						->setRequest($app['akismet']->getRequest())
+						->setResponse($app['akismet']->getResponse())
+						->save();
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
@@ -450,14 +450,14 @@ class Comment extends BaseDB
 				'referrer' => $this->getReferer(),
 			));
 
-			$log_entry = new \FelixOnline\Core\AkismetLog()
-							->setCommentId($this)
-							->setAction('check')
-							->setIsSpam($check)
-							->setError($app['akismet']->getError())
-							->setRequest($app['akismet']->getRequest())
-							->setResponse($app['akismet']->getResponse())
-							->save();
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+						->setAction('check')
+						->setIsSpam($check)
+						->setError($app['akismet']->getError())
+						->setRequest($app['akismet']->getRequest())
+						->setResponse($app['akismet']->getResponse())
+						->save();
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
