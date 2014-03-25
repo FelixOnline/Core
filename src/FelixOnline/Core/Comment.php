@@ -349,13 +349,13 @@ class Comment extends BaseDB
 				'referrer' => $this->getReferer(),
 			));
 
-			$log_entry = new \FelixOnline\AkismetLog()
-							->setCommentId($this);
-							->setAction('check');
-							->setIsSpam($check);
-							->setError($app['akismet']->getError());
-							->setRequest($app['akismet']->getRequest());
-							->setResponse($app['akismet']->getResponse());
+			$log_entry = new \FelixOnline\Core\AkismetLog()
+							->setCommentId($this)
+							->setAction('check')
+							->setIsSpam($check)
+							->setError($app['akismet']->getError())
+							->setRequest($app['akismet']->getRequest())
+							->setResponse($app['akismet']->getResponse())
 							->save();
 
 			// check for akismet errors
@@ -413,12 +413,12 @@ class Comment extends BaseDB
 			));
 
 			$log_entry = new \FelixOnline\Core\AkismetLog()
-							->setCommentId($this);
-							->setAction('check');
-							->setIsSpam($check);
-							->setError($app['akismet']->getError());
-							->setRequest($app['akismet']->getRequest());
-							->setResponse($app['akismet']->getResponse());
+							->setCommentId($this)
+							->setAction('check')
+							->setIsSpam($check)
+							->setError($app['akismet']->getError())
+							->setRequest($app['akismet']->getRequest())
+							->setResponse($app['akismet']->getResponse())
 							->save();
 
 			// check for akismet errors
@@ -451,12 +451,12 @@ class Comment extends BaseDB
 			));
 
 			$log_entry = new \FelixOnline\Core\AkismetLog()
-							->setCommentId($this);
-							->setAction('check');
-							->setIsSpam($check);
-							->setError($app['akismet']->getError());
-							->setRequest($app['akismet']->getRequest());
-							->setResponse($app['akismet']->getResponse());
+							->setCommentId($this)
+							->setAction('check')
+							->setIsSpam($check)
+							->setError($app['akismet']->getError())
+							->setRequest($app['akismet']->getRequest())
+							->setResponse($app['akismet']->getResponse())
 							->save();
 
 			// check for akismet errors
