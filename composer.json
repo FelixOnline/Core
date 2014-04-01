@@ -15,12 +15,12 @@
 	"repositories": [
 		{
 			"type": "vcs",
-			"url": "https://github.com/RivCode/Service-Akismet.git"
+			"url": "https://github.com/FelixOnline/Service-Akismet.git"
 		}
 	],
 	"require": {
 		"robmorgan/phinx": "0.3.*",
-		"rzekanet/service-akismet": "1.1.*",
+		"rzekanet/service-akismet": "dev-master#9fe7b38819f26376c78d03fee85de722d9cc1edf",
 		"jv2222/ezsql": "dev-master#4036408076",
 		"d11wtq/boris": "1.0.*",
 		"swiftmailer/swiftmailer": "5.0.*"
