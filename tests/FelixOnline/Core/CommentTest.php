@@ -12,6 +12,7 @@ class CommentTest extends AppTestCase
 		'comments',
 		'comment_likes',
 		'categories',
+		'akismet_logs',
 	);
 
 	public function testInteralComment()
