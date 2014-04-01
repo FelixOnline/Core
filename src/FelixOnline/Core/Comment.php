@@ -373,6 +373,16 @@ class Comment extends BaseDB
 
 		// Send emails
 		if ($this->getExternal()) {
+
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+				->setAction('check')
+				->setIsSpam($check)
+				->setError($app['akismet']->getError())
+				->setRequest($app['akismet']->getConnector()->getLastRequest())
+				->setResponse($app['akismet']->getConnector()->getLastResponse())
+				->save();
+
 			// If pending comment
 			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
 				$this->emailExternalComment();
@@ -387,6 +397,82 @@ class Comment extends BaseDB
 		}
 		
 		return $this->getId(); // return new comment id
+	}
+
+	public function markAsSpam() {
+		if ($this->getExternal()) {
+			// check spam using akismet
+			$check = $app['akismet']->sendSpam(array(
+				'permalink' => $this->getArticle()->getURL(),
+				'comment_type' => 'comment',
+				'comment_author' => $this->fields['name']->getValue(),
+				'comment_content' => $this->getComment(),
+				'comment_author_email' => $this->getEmail(),
+				'user_ip' => $this->getIp(),
+				'user_agent' => $this->getUseragent(),
+				'referrer' => $this->getReferer(),
+			));
+
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+				->setAction('check')
+				->setIsSpam($check)
+				->setError($app['akismet']->getError())
+				->setRequest($app['akismet']->getConnector()->getLastRequest())
+				->setResponse($app['akismet']->getConnector()->getLastResponse())
+				->save();
+
+			// check for akismet errors
+			if (!is_null($app['akismet']->getError())) {
+				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+			}
+
+			$this->setActive(0);
+			$this->setPending(0);
+			$this->setSpam(1);
+
+			$this->save();
+		} else {
+			throw new \FelixOnline\Exceptions\InternalException('Trying to mark internal comment as spam');
+		}
+	}
+
+	public function markAsHam() {
+		if ($this->getExternal()) {
+			// check spam using akismet
+			$check = $app['akismet']->sendHam(array(
+				'permalink' => $this->getArticle()->getURL(),
+				'comment_type' => 'comment',
+				'comment_author' => $this->fields['name']->getValue(),
+				'comment_content' => $this->getComment(),
+				'comment_author_email' => $this->getEmail(),
+				'user_ip' => $this->getIp(),
+				'user_agent' => $this->getUseragent(),
+				'referrer' => $this->getReferer(),
+			));
+
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+				->setAction('check')
+				->setIsSpam($check)
+				->setError($app['akismet']->getError())
+				->setRequest($app['akismet']->getConnector()->getLastRequest())
+				->setResponse($app['akismet']->getConnector()->getLastResponse())
+				->save();
+
+			// check for akismet errors
+			if (!is_null($app['akismet']->getError())) {
+				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+			}
+
+			$this->setActive(1);
+			$this->setPending(1);
+			$this->setSpam(0);
+
+			$this->save();
+		} else {
+			throw new \FelixOnline\Exceptions\InternalException('Trying to mark internal comment as spam');
+		}
 	}
 
 	/**
