@@ -5,19 +5,6 @@ use Phinx\Migration\AbstractMigration;
 class AkismetLog extends AbstractMigration
 {
     /**
-     * Change Method.
-     *
-     * More information on this method is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-change-method
-     *
-     * Uncomment this method if you would like to use it.
-     *
-    public function change()
-    {
-    }
-    */
-    
-    /**
      * Migrate Up.
      */
     public function up()
@@ -29,9 +16,9 @@ class AkismetLog extends AbstractMigration
             `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `action` varchar(10) NOT NULL,
             `is_spam` tinyint(1) NOT NULL,
-            `error` text NOT NULL,
-            `request` text NOT NULL,
-            `response` text NOT NULL,
+            `error` text NULL,
+            `request` text NULL,
+            `response` text NULL,
             PRIMARY KEY (`id`),
             KEY `comment_id` (`comment_id`)
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
