@@ -37,17 +37,18 @@ namespace FelixOnline\Core;
  * Examples
  *	  // Get comment
  *	  $comment = new Comment(300);
- *	  echo $comment->getContent(); 
+ *	  echo $comment->getComment(); 
  *
  *	  // Submit comment
  *	  $comment = new Comment();
  *	  $comment->setExternal(false); // internal comment
  *	  $comment->setArticle(100); // article id
- *	  $comment->setContent('Hello world');
+ *	  $comment->setComment('Hello world');
  *	  $comment->setUser('felix');
  *	  if($id = $comment->save()) echo 'Success!';
  */
-class Comment extends BaseModel {
+class Comment extends BaseDB
+{
 	const EXTERNAL_COMMENT_ID = 80000000; // external comment id start
 
 	private $article; // article class comment is on
@@ -55,11 +56,9 @@ class Comment extends BaseModel {
 	private $reply; // comment class of reply
 	private $external = false; // if comment is external or not. Default false
 	private $commentsToApprove;
-	protected $db;
-	protected $transformers = array(
-		'content' => parent::TRANSFORMER_NO_HTML
-	);
-	
+
+	public $dbtable = 'comment';
+
 	/**
 	 * Constructor for Comment class
 	 * If initialised with an id then store relevant data
@@ -69,119 +68,72 @@ class Comment extends BaseModel {
 	 *
 	 * Returns comment object.
 	 */
-	public function __construct($id=NULL) {
-		$app = App::getInstance();
+	public function __construct($id = NULL)
+	{
+		// common fields
+		$fields = array(
+			'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'external' => new Type\BooleanField(),
+			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
+			'name' => new Type\CharField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
+			'comment' => new Type\CharField(array(
+				'transformers' => array(
+					Type\BaseType::TRANSFORMER_NO_HTML
+				)
+			)),
+			'timestamp' => new Type\DateTimeField(),
+			'ip' => new Type\CharField(),
+			'email' => new Type\CharField(),
+			'useragent' => new Type\CharField(),
+			'referer' => new Type\CharField(),
+			'active' => new Type\BooleanField(),
+			'pending' => new Type\BooleanField(),
+			'spam' => new Type\BooleanField(),
+			'reply' => new Type\ForeignKey('FelixOnline\Core\Comment'),
+			'likes' => new Type\IntegerField(array(
+				'null' => false
+			)),
+			'dislikes' => new Type\IntegerField(array(
+				'null' => false
+			)),
+		);
 
-		if ($id != NULL) {
-			if($id < self::EXTERNAL_COMMENT_ID) { // if comment is internal
-				$this->external = false; // comment is internal
-				$sql = $app['safesql']->query(
-					"SELECT 
-						id, 
-						`article`,
-						`user`,
-						`comment` as content,
-						UNIX_TIMESTAMP(`timestamp`) as timestamp,
-						`active`,
-						`reply`,
-						`likes`,
-						`dislikes` 
-					FROM `comment` 
-					WHERE id=%i",
-					array(
-						$id
-					));
-
-				parent::__construct($app['db']->get_row($sql), $id);
-			} else {
-				$this->external = true; // comment is external
-				$sql = $app['safesql']->query(
-					"SELECT 
-						id, 
-						`article`,
-						`name`,
-						`comment` as content,
-						UNIX_TIMESTAMP(`timestamp`) as timestamp,
-						`active`,
-						`IP` as ip,
-						`pending`,
-						`reply`,
-						`spam`,
-						`likes`,
-						`dislikes` 
-					FROM `comment_ext` 
-					WHERE id=%i",
-					array(
-						$id
-					));
-
-				$this->transfomers['name'] = parent::TRANSFORMER_NO_HTML;
-
-				parent::__construct($app['db']->get_row($sql), $id);
-			}
-		} else {
-			$this->setFieldFilters(array(
-				'content' => 'comment',
-				'ip' => 'IP'
-			));
-		}
-	}
-
-	/**
-	 * Public: Get article class that comment is on
-	 */
-	public function getArticle() { 
-		if (!$this->article) {
-			$this->article = new Article($this->fields['article']);
-		}
-		return $this->article;
+		parent::__construct($fields, $id);
 	}
 
 	/**
 	 * Public: Get user class
 	 */
-	public function getUser() {
-		if (!$this->user) {
-			if ($this->hasUser()) {
-				$this->user = new User($this->fields['user']);
-			} else {
-				throw new \FelixOnline\Exceptions\InternalException('External comment does not have a user');
-			}
+	public function getUser()
+	{
+		if ($this->getExternal()) {
+			throw new \FelixOnline\Exceptions\InternalException('External comment does not have a user');
 		}
-		return $this->user;
-	}
 
-	/*
-	 * Public: Get comment object of the comment this comment is replying to
-	 *
-	 * Returns comment object of reply. Returns false if no reply
-	 */
-	public function getReply() {
-		if ($this->fields['reply']) {
-			if(!$this->reply) {
-				$this->reply = new Comment($this->fields['reply']); // initialise new comment as reply
-			}
-			return $this->reply;
-		} else {
-			return false;
-		}
+		return $this->fields['user']->getValue();
 	}
 
 	/**
 	 * Public: Get comment content
 	 */
-	public function getContent() { 
-		$output = nl2br(trim($this->fields['content'])); 
+	public function getContent()
+	{ 
+		$output = nl2br(trim($this->getComment())); 
 		return $output;
 	}
 
 	/**
 	 * Public: Get commenter's name
 	 */
-	public function getName() {
-		if($this->isExternal()) {
-			if($this->fields['name']) { // if external commenter has a name
-				return $this->fields['name'];
+	public function getName()
+	{
+		if ($this->getExternal()) {
+			if ($this->fields['name']->getValue()) { // if external commenter has a name
+				return $this->fields['name']->getValue();
 			} else {
 				return 'Anonymous'; // else return Anonymous
 			}
@@ -193,7 +145,8 @@ class Comment extends BaseModel {
 	/**
 	 * Public: Get url
 	 */
-	public function getURL() {
+	public function getURL()
+	{
 		return $this->getArticle()->getURL().'#comment'.$this->getId();
 	}
 
@@ -202,11 +155,12 @@ class Comment extends BaseModel {
 	 *
 	 * Returns true if is author. False if not.
 	 */
-	public function byAuthor() {
-		if($this->isExternal()) {
+	public function byAuthor()
+	{
+		if ($this->getExternal()) {
 			return false;
 		} else {
-			if(in_array($this->getUser(), $this->getArticle()->getAuthors())) {
+			if (in_array($this->getUser(), $this->getArticle()->getAuthors())) {
 				return true;
 			} else {
 				return false;
@@ -215,24 +169,12 @@ class Comment extends BaseModel {
 	}
 
 	/*
-	 * Public: Check if comment is from an external author or not
-	 *
-	 * Returns true if external, false if internal
-	 */
-	public function isExternal() {
-		if($this->external) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/*
 	 * Public: Check if comment is rejected
 	 */
-	public function isRejected() {
-		if(!$this->isExternal() && !$this->getActive() 
-		   || $this->isExternal() && !$this->getActive() && !$this->getPending()) { // if comment that is rejected
+	public function isRejected()
+	{
+		if (!$this->getExternal() && !$this->getActive() 
+		   || $this->getExternal() && !$this->getActive() && !$this->getPending()) { // if comment that is rejected
 			return true; 
 		} else {
 			return false;
@@ -242,11 +184,14 @@ class Comment extends BaseModel {
 	/*
 	 * Public: Check if comment is pending approval
 	 */
-	public function isPending() {
-		if($this->isExternal()
+	public function isPending()
+	{
+		$app = App::getInstance();
+
+		if ($this->getExternal()
 			&& $this->getActive()
 			&& $this->getPending()
-			&& $this->getIp() == $_SERVER['REMOTE_ADDR']
+			&& $this->getIp() == $app['env']['REMOTE_ADDR']
 		) { // if comment is pending for this ip address
 			return true;
 		} else {
@@ -254,236 +199,36 @@ class Comment extends BaseModel {
 		} 
 	}
 
-	/*
+	/**
 	 * Public: Check if current user has liked or disliked the comment
 	 *
-	 * $user - username of current user
+	 * $user - user object
 	 *
 	 * Returns true or false
 	 */
-	public function userLikedComment($user) {
-		$app = \FelixOnline\Core\App::getInstance();
+	public function userLikedComment($user)
+	{
+		$count = BaseManager::build(null, 'comment_like')
+			->filter("user = '%s'", array($user->getUser()))
+			->filter("comment = %i", array($this->getId()))
+			->count();
 
-		$sql = $app['safesql']->query(
-			"SELECT 
-				COUNT(*) 
-			FROM `comment_like` 
-			WHERE user='%s' 
-			AND comment=%i",
-			array(
-				$user,
-				$this->getId()
-			));
-		$count = $app['db']->get_var($sql);
 		return (boolean) $count;
-	}
-
-	/*
-	 * Public: Check if comment already exists
-	 *
-	 * Returns the number of rows that the query will return
-	 *  i.e. 0 for none found. >0 if found
-	 */
-	public function commentExists() {
-		if(!$this->external) {
-			$sql = $this->safesql->query(
-				"SELECT 
-					COUNT(*) 
-				FROM `comment` 
-				WHERE article=%i 
-				AND user='%s' 
-				AND comment='%s' 
-				AND `active`=1",
-				array(
-					$this->getArticle()->getId(),
-					$this->getUser()->getUser(),
-					$this->getContent(),
-				));
-		} else {
-			$sql = $this->safesql->query(
-				"SELECT 
-					COUNT(*) 
-				FROM `comment_ext` 
-				WHERE article=%i 
-				AND name='%s' 
-				AND comment='%s'",
-				array(
-					$this->getArticle()->getId(),
-					$this->getName(),
-					$this->getContent(),
-				));
-		}
-		return $this->db->get_var($sql);
-	}
-
-	/*
-	 * Public: Set external
-	 * Set whether comment is external or not
-	 */
-	public function setExternal($external) {
-		$this->external = $external;
-		return $this->external;
-	}
-
-	/* 
-	 * Public: Save new comment into database
-	 *
-	 * Returns id of new comment
-	 */
-	public function save() {
-		global $akismet;
-		if(!$this->external) { // if internal
-			$this->setDbtable('comment');
-		} else {
-			$this->setDbtable('comment_ext');
-			$this->setIp($_SERVER['REMOTE_ADDR']);
-
-			// check spam using akismet
-
-			$check = $akismet->check(array(
-				'permalink' => $this->getArticle()->getURL(),
-				'comment_type' => 'comment',
-				'comment_author' => $this->getName(),
-				'comment_content' => $this->getContent(),
-				'user_ip' => $this->getIp(),
-				'user_agent' => $_SERVER['HTTP_USER_AGENT'],
-				'referrer' => $_SERVER['HTTP_REFERER'],
-			));
-
-			if($check == true) { // if comment is spam
-				$this->setActive(0);
-				$this->setPending(0);
-				$this->setSpam(1);
-
-				$sql = $this->safesql->query(
-					"INSERT IGNORE INTO `comment_spam` 
-					(
-						IP, 
-						date
-					) VALUES (
-						'%s', 
-						DATE_ADD(NOW(), INTERVAL 2 MONTH)
-					)",
-					array(
-						$_SERVER['REMOTE_ADDR'],
-					)); // insert comment ip into comment_spam
-				$this->db->query($sql);
-			} else { // Not spam
-				$this->setActive(1);
-				$this->setPending(1);
-				$this->setSpam(0);
-			}
-		}
-
-		// check for akismet errors
-		if (!is_null($akismet->getError())) {
-			throw new ExternalException($akismet->getError());
-		}
-
-		parent::save();
-		$this->setId($this->db->insert_id); // get id of inserted comment
-
-		// Send emails
-
-		if ($this->isExternal()) {
-			// If pending comment
-			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
-				$this->emailExternalComment();
-			}
-		} else { // internal emails
-			if ($this->getReply()) { // if comment is replying to an internal comment 
-				$this->emailReply();
-			}
-
-			/* email authors of article */
-			$this->emailAuthors();
-		}
-		
-		return $this->getId(); // return new comment id
-	}
-
-	/*
-	 * Public: Email authors of article
-	 */
-	public function emailAuthors() {
-		$authors = $this->getArticle()->getAuthors();
-		if(in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
-			$key = array_search($this->getUser(), $authors);
-			unset($authors[$key]);
-		}
-		foreach($authors as $author) {
-			$emailAddress = $author->getEmail(true); // get email address of user
-			$email = new Email();
-			$email->setTo($emailAddress);
-			$email->setUniqueID($author->getUser());
-
-			$email->setSubject($this->getName().' has commented on "'.$this->getArticle()->getTitle().'"');
-
-			ob_start();
-			$comment = $this;
-			$user = $author;
-			include(BASE_DIRECTORY.'/templates/emails/comment_notification.php');
-			$message = ob_get_contents();
-			ob_end_clean();
-
-			$email->setContent($message);
-
-			$email->send();
-		}
-	}
-
-	/*
-	 * Private: Email comment author with reply
-	 */
-	private function emailReply() {
-		if($this->getReply()->isExternal()) { // check that comment replied to isn't external
-			return false;
-		}
-		$email = new Email();
-		$email->setTo($this->getReply()->getUser()->getEmail(true));
-		$email->setSubject($this->getName().' has replied to your comment on "'.$this->getArticle()->getTitle().'"');
-
-		ob_start();
-		$comment = $this->getReply();
-		$reply = $this;
-		include(BASE_DIRECTORY.'/templates/emails/comment_reply_notification.php');
-		$message = ob_get_contents();
-		ob_end_clean();
-
-		$email->setContent($message);
-
-		return $email->send();
-	}
-
-	/*
-	 * Private: Email felix on new external comment
-	 */
-	private function emailExternalComment() {
-		/* Send email */
-		$email = new Email();
-		$email->setTo(EMAIL_EXTCOMMENT_NOTIFYADDR);
-		$email->setSubject('New comment to approve on "'.$this->getArticle()->getTitle().'"');
-
-		ob_start();
-		$comment = $this;
-		include(BASE_DIRECTORY.'/templates/emails/new_external_comment.php');
-		$message = ob_get_contents();
-		ob_end_clean();
-
-		$email->setContent($message);
-		return $email->send();
 	}
 
 	/*
 	 * Public: Like comment
 	 *
-	 * $user - string username of user liking comment
+	 * $user - user object
 	 *
 	 * Returns number of likes
 	 */
-	public function likeComment($user) {
-		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
-			$sql = $this->safesql->query(
+	public function likeComment($user)
+	{
+		$app = App::getInstance();
+
+		if (!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
 					user,
@@ -492,29 +237,17 @@ class Comment extends BaseModel {
 				) VALUES (
 					'%s',
 					%i,
-					'1'
+					1
 				)",
 				array(
-					$user,
+					$user->getUser(),
 					$this->getId(),
 				));
-			$this->db->query($sql);
+			$app['db']->query($sql);
 
 			$likes = $this->getLikes() + 1;
-			if(!$this->external) { // internal comment
-				$sql = "UPDATE `comment` "; 
-			} else {
-				$sql = "UPDATE `comment_ext` ";
-			}
-			$sql .= "SET likes = %i WHERE id = %i";
-			$sql = $this->safesql->query($sql, array(
-				$likes,
-				$this->getId(),
-			));
-			$this->db->query($sql);
-
-			// clear comment
-			//Cache::clear('comment-'.$this->fields['article']);
+			$this->setLikes($likes)
+				->save();
 
 			return $likes;
 		} else {
@@ -525,13 +258,16 @@ class Comment extends BaseModel {
 	/*
 	 * Public: Dislike comment
 	 *
-	 * $user - string username of user disliking comment
+	 * $user - user object
 	 *
 	 * Returns number of dislikes
 	 */
-	public function dislikeComment($user) {
-		if(!$this->userLikedComment($user)) { // check user hasn't already liked the comment
-			$sql = $this->safesql->query(
+	public function dislikeComment($user)
+	{
+		$app = App::getInstance();
+
+		if (!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
 					user,
@@ -540,29 +276,17 @@ class Comment extends BaseModel {
 				) VALUES (
 					'%s',
 					%i,
-					'0'
+					0
 				)",
 				array(
-					$user,
+					$user->getUser(),
 					$this->getId(),
 				));
-			$this->db->query($sql);
+			$app['db']->query($sql);
 
 			$dislikes = $this->getDislikes() + 1;
-			if(!$this->external) { // internal comment
-				$sql = "UPDATE `comment` "; 
-			} else {
-				$sql = "UPDATE `comment_ext` ";
-			}
-			$sql .= "SET dislikes = %i WHERE id = %i";
-			$sql = $this->safesql->query($sql, array(
-				$dislikes,
-				$this->getId(),
-			));
-			$this->db->query($sql);
-			
-			// clear comment
-			//Cache::clear('comment-'.$this->fields['article']);
+			$this->setDislikes($dislikes)
+				->save();
 
 			return $dislikes;
 		} else {
@@ -570,55 +294,312 @@ class Comment extends BaseModel {
 		}
 	}
 
+
+	/**
+	 * Public: Check if comment already exists
+	 *
+	 * Returns boolean
+	 */
+	public function commentExists()
+	{
+		$comments = (new CommentManager())
+			->filter('article = %i', array($this->getArticle()->getId()))
+			->filter("comment = '%s'", array($this->getComment()));
+
+		if ($this->getExternal()) {
+			$comments->filter("name = '%s'", array($this->fields['name']->getValue()));
+		} else {
+			$comments->filter("user = '%s'", array($this->getUser()->getUser()));
+		}
+
+		$count = $comments->count();
+		return (boolean) $count;
+	}
+
+	/**
+	 * Public: Save new comment into database
+	 *
+	 * TODO
+	 *
+	 * Returns id of new comment
+	 */
+	public function save()
+	{
+		$app = App::getInstance();
+
+		// If an update
+		if ($this->pk && $this->fields[$this->pk]->getValue()) {
+			return parent::save();
+		}
+
+		$this->setIp($app['env']['REMOTE_ADDR']);
+		$this->setUseragent($app['env']['HTTP_USER_AGENT']);
+		$this->setReferer($app['env']['HTTP_REFERER']);
+
+		if ($this->getExternal()) {
+			// check spam using akismet
+			$check = $app['akismet']->check(array(
+				'permalink' => $this->getArticle()->getURL(),
+				'comment_type' => 'comment',
+				'comment_author' => $this->fields['name']->getValue(),
+				'comment_content' => $this->getComment(),
+				'comment_author_email' => $this->getEmail(),
+				'user_ip' => $this->getIp(),
+				'user_agent' => $this->getUseragent(),
+				'referrer' => $this->getReferer(),
+			));
+
+			// check for akismet errors
+			if (!is_null($app['akismet']->getError())) {
+				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+			}
+
+			if ($check == true) { // if comment is spam
+				$this->setActive(0);
+				$this->setPending(0);
+				$this->setSpam(1);
+			} else { // Not spam
+				$this->setActive(1);
+				$this->setPending(1);
+				$this->setSpam(0);
+			}
+		} else {
+			$this->setActive(1);
+			$this->setPending(0);
+			$this->setSpam(0);
+		}
+
+		parent::save();
+
+		// Send emails
+		if ($this->getExternal()) {
+
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+				->setAction('check')
+				->setIsSpam($check)
+				->setError($app['akismet']->getError())
+				->setRequest($app['akismet']->getConnector()->getLastRequest())
+				->setResponse($app['akismet']->getConnector()->getLastResponse())
+				->save();
+
+			// If pending comment
+			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
+				$this->emailExternalComment();
+			}
+		} else { // internal emails
+			if ($this->getReply()) { // if comment is replying to an internal comment 
+				$this->emailReply();
+			}
+
+			// email authors of article
+			$this->emailAuthors();
+		}
+		
+		return $this->getId(); // return new comment id
+	}
+
+	public function markAsSpam() {
+		if ($this->getExternal()) {
+			// check spam using akismet
+			$check = $app['akismet']->sendSpam(array(
+				'permalink' => $this->getArticle()->getURL(),
+				'comment_type' => 'comment',
+				'comment_author' => $this->fields['name']->getValue(),
+				'comment_content' => $this->getComment(),
+				'comment_author_email' => $this->getEmail(),
+				'user_ip' => $this->getIp(),
+				'user_agent' => $this->getUseragent(),
+				'referrer' => $this->getReferer(),
+			));
+
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+				->setAction('check')
+				->setIsSpam($check)
+				->setError($app['akismet']->getError())
+				->setRequest($app['akismet']->getConnector()->getLastRequest())
+				->setResponse($app['akismet']->getConnector()->getLastResponse())
+				->save();
+
+			// check for akismet errors
+			if (!is_null($app['akismet']->getError())) {
+				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+			}
+
+			$this->setActive(0);
+			$this->setPending(0);
+			$this->setSpam(1);
+
+			$this->save();
+		} else {
+			throw new \FelixOnline\Exceptions\InternalException('Trying to mark internal comment as spam');
+		}
+	}
+
+	public function markAsHam() {
+		if ($this->getExternal()) {
+			// check spam using akismet
+			$check = $app['akismet']->sendHam(array(
+				'permalink' => $this->getArticle()->getURL(),
+				'comment_type' => 'comment',
+				'comment_author' => $this->fields['name']->getValue(),
+				'comment_content' => $this->getComment(),
+				'comment_author_email' => $this->getEmail(),
+				'user_ip' => $this->getIp(),
+				'user_agent' => $this->getUseragent(),
+				'referrer' => $this->getReferer(),
+			));
+
+			$log_entry = new \FelixOnline\Core\AkismetLog();
+			$log_entry->setCommentId($this)
+				->setAction('check')
+				->setIsSpam($check)
+				->setError($app['akismet']->getError())
+				->setRequest($app['akismet']->getConnector()->getLastRequest())
+				->setResponse($app['akismet']->getConnector()->getLastResponse())
+				->save();
+
+			// check for akismet errors
+			if (!is_null($app['akismet']->getError())) {
+				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+			}
+
+			$this->setActive(1);
+			$this->setPending(1);
+			$this->setSpam(0);
+
+			$this->save();
+		} else {
+			throw new \FelixOnline\Exceptions\InternalException('Trying to mark internal comment as spam');
+		}
+	}
+
+	/**
+	 * Public: Email authors of article
+	 */
+	public function emailAuthors()
+	{
+		$app = App::getInstance();
+		$authors = $this->getArticle()->getAuthors();
+
+		if (in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
+			$key = array_search($this->getUser(), $authors);
+			unset($authors[$key]);
+		}
+
+		// Create message
+		$message = \Swift_Message::newInstance()
+			->setSubject($this->getName().' has commented on "'.$this->getArticle()->getTitle().'"')
+			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'));
+
+		foreach ($authors as $author) {
+			// Get content
+			ob_start();
+			$data = array(
+				'app' => $app,
+				'user' => $author,
+				'comment' => $this,
+			);
+
+			// Render email template
+			call_user_func(function() use($data) {
+				extract($data);
+				include realpath(__DIR__ . '/../../../templates/') . '/comment_notification.php';
+			});
+			$content = ob_get_contents();
+			ob_end_clean();
+
+			$message->setBody($content, 'text/html')
+				->setTo(array(
+					$author->getEmail() => $author->getName(),
+				));
+
+			// Send email
+			$app['email']->send($message);
+		}
+
+		return true;
+	}
+
+	/*
+	 * Private: Email comment author with reply
+	 */
+	private function emailReply()
+	{
+		$app = App::getInstance();
+		$reply = $this->getReply();
+
+		// Get content
+		ob_start();
+		$data = array(
+			'app' => $app,
+			'comment' => $this,
+			'reply' => $reply,
+		);
+		// Render email template
+		call_user_func(function() use($data) {
+			extract($data);
+			include realpath(__DIR__ . '/../../../templates/') . '/comment_reply_notification.php';
+		});
+		$content = ob_get_contents();
+		ob_end_clean();
+
+		// Create message
+		$message = \Swift_Message::newInstance()
+			->setSubject($this->getName() . ' has replied to your comment on "'.$this->getArticle()->getTitle().'"')
+			->setTo(array(
+				$reply->getUser()->getEmail() => $reply->getUser()->getName(),
+			))
+			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
+			->setBody($content, 'text/html');
+
+		// Send message
+		return $app['email']->send($message);
+	}
+
+	/*
+	 * Private: Email felix on new external comment
+	 */
+	private function emailExternalComment()
+	{
+		$app = App::getInstance();
+
+		// Get content
+		ob_start();
+		$data = array(
+			'app' => $app,
+			'comment' => $this,
+		);
+
+		// Render email template
+		call_user_func(function() use($data) {
+			extract($data);
+			include realpath(__DIR__ . '/../../../templates/') . '/new_external_comment.php';
+		});
+		$content = ob_get_contents();
+		ob_end_clean();
+
+		// Create message
+		$message = \Swift_Message::newInstance()
+			->setSubject('New comment to approve on "'.$this->getArticle()->getTitle().'"')
+			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
+			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
+			->setBody($content, 'text/html');
+
+		// Send message
+		return $app['email']->send($message);
+	}
+
 	/**
 	 * Get a number of comments to approve
 	 */
-	private function getNumCommentsToApprove() {
-		if(!$this->numCommentsToApprove) {
-			$sql = $this->safesql->query(
-				"SELECT 
-					COUNT(id) 
-				FROM comment_ext 
-				WHERE ACTIVE=1 
-				AND pending=1", array());
-			$this->numCommentsToApprove = $this->db->get_var($sql);
-		}
-		return $this->numCommentsToApprove;
-	}
-	
-	/*
-	 * Helpers
-	 */
-	public static function getRecentComments($num_to_get) {
-		global $db;
-		global $safesql;
-		
-		$sql = $safesql->query(
-			"SELECT * FROM (
-				SELECT comment.article,
-					comment.id,
-					comment.user,
-					user.name,
-					comment.comment,
-					UNIX_TIMESTAMP(comment.timestamp) AS timestamp 
-				FROM `comment` LEFT JOIN `user` ON (comment.user=user.user) 
-				WHERE active=1 
-				UNION SELECT comment_ext.article,
-					comment_ext.id,
-					comment_ext.name,
-					comment_ext.comment,
-					'ext',
-					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp 
-				FROM `comment_ext` 
-				WHERE active=1 
-				AND pending=0
-			) AS t 
-			ORDER BY timestamp DESC LIMIT %i",
-			array(
-				$num_to_get,
-			));
-
-		$recent_comments = $db->get_results($sql);
-		return $recent_comments;
+	public function getNumCommentsToApprove()
+	{
+		return (new CommentManager())
+			->filter('pending = 1')
+			->filter('active = 1')
+			->filter('spam = 0')
+			->count();
 	}
 }

@@ -1,6 +1,15 @@
 <?xml version="1.0"?>
 <mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <database name="media_felix">
+	<table_structure name="text_story">
+		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+		<field Field="user" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="content" Type="mediumtext" Null="YES" Key="" Extra="" Comment="" />
+		<field Field="timestamp" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" Comment="" />
+		<key Table="text_story" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="3692" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="text_story" Non_unique="1" Key_name="user" Seq_in_index="1" Column_name="user" Collation="A" Cardinality="246" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="text_story" Engine="InnoDB" Version="10" Row_format="Compact" Rows="3692" Avg_row_length="8107" Data_length="29933568" Max_data_length="0" Index_length="98304" Data_free="0" Auto_increment="4316" Create_time="2014-02-03 21:43:51" Collation="utf8_general_ci" Create_options="" Comment="" />
+	</table_structure>
 	<table_data name="text_story">
 	<row>
 		<field name="id">27</field>

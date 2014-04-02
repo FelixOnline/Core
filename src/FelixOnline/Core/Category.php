@@ -23,51 +23,43 @@ namespace FelixOnline\Core;
  *	  description	 -
  *	  hidden		  -
  */
-class Category extends BaseModel
+class Category extends BaseDB
 {
-	protected $db;
 	private $editors = array();
 	private $count; // number of articles in catgeory
 	private $stories; // array of top story objects
+	public $dbtable = 'category';
 
-	function __construct($id = NULL) {
-		$app = App::getInstance();
+	function __construct($id = NULL)
+	{
+		$fields = array(
+			'label' => new Type\CharField(),
+			'cat' => new Type\CharField(),
+			'uri' => new Type\CharField(),
+			'colourclass' => new Type\CharField(),
+			'active' => new Type\BooleanField(),
+			'top_slider_1' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_slider_2' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_slider_3' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_slider_4' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_1' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_2' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_3' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'top_sidebar_4' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'email' => new Type\CharField(),
+			'twitter' => new Type\CharField(),
+			'description' => new Type\TextField(),
+			'hidden' => new Type\BooleanField(),
+		);
 
-		if ($id !== NULL) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					id,
-					label,
-					cat,
-					uri,
-					colourclass,
-					active,
-					top_slider_1,
-					top_slider_2,
-					top_slider_3,
-					top_slider_4,
-					top_sidebar_1,
-					top_sidebar_2,
-					top_sidebar_3,
-					top_sidebar_4,
-					email,
-					twitter,
-					description,
-					hidden
-				FROM category
-				WHERE id=%i",
-				array($id)
-			);
-			parent::__construct($app['db']->get_row($sql), $id);
-			return $this;
-		} else {
-		}
+		parent::__construct($fields, $id);
 	}
 
 	/**
 	 * Public: Get category url
 	 */
-	public function getURL($pagenum = NULL) {
+	public function getURL($pagenum = NULL)
+	{
 		$app = App::getInstance();
 		$output = $app->getOption('base_url').$this->getCat().'/';
 		if ($pagenum != NULL) {
@@ -81,85 +73,14 @@ class Category extends BaseModel
 	 *
 	 * Returns array of user objects
 	 */
-	public function getEditors() {
-		$app = App::getInstance();
+	public function getEditors()
+	{
+		$editors = BaseManager::build('FelixOnline\Core\User', 'category_author', 'user')
+			->filter("category = %i", array($this->getId()))
+			->filter("admin = 1")
+			->values();
 
-		if (!$this->editors) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					user 
-				FROM `category_author` 
-				WHERE category=%i 
-				AND admin=1",
-				array(
-					$this->getId()
-				));
-			$editors = $app['db']->get_results($sql);
-			if (is_null($editors)) {
-				$this->editors = null;
-			} else {
-				foreach ($editors as $key => $object) {
-					$this->editors[] = new User($object->user);
-				}
-			}
-		}
-		return $this->editors;
-	}
-
-	/**
-	 * TODO Remove? Should be done using managers
-	 */
-
-	/**
-	 * Public: Get category articles
-	 *
-	 * $page - page number to limit article list
-	 *
-	 * Returns dbobject
-	 */
-	public function getArticles($page) {
-		$app = App::getInstance();
-
-		$sql = $app['safesql']->query(
-			"SELECT 
-				id 
-			FROM `article` 
-			WHERE published < NOW() 
-			AND category=%i
-			ORDER BY published DESC 
-			LIMIT %i, %i",
-			array(
-				$this->getId(),
-				($page-1) * ARTICLES_PER_CAT_PAGE,
-				ARTICLES_PER_CAT_PAGE
-			));
-		return $app['db']->get_results($sql);
-	}
-
-	/**
-	 * Public: Get number of pages in a category
-	 *
-	 * TODO
-	 *
-	 * Returns int 
-	 */
-	public function getNumPages() {
-		$app = App::getInstance();
-
-		if (!$this->count) {
-			$sql = $app['safesql']->query(
-				"SELECT 
-					COUNT(id) as count 
-				FROM `article` 
-				WHERE published < NOW() 
-				AND category=%i",
-				array(
-					$this->getId()
-				));
-			$this->count = $app['db']->get_var($sql);
-		}
-		$pages = ceil(($this->count - ARTICLES_PER_CAT_PAGE) / (ARTICLES_PER_SECOND_CAT_PAGE)) + 1;
-		return $pages;
+		return $editors;
 	}
 
 	/**
@@ -167,7 +88,8 @@ class Category extends BaseModel
 	 *
 	 * Returns array of articles
 	 */
-	public function getTopStories() {
+	public function getTopStories()
+	{
 		if (!$this->stories) {
 			$this->stories = array();
 
@@ -179,11 +101,7 @@ class Category extends BaseModel
 			);
 
 			foreach($sliders as $slider) {
-				if (!is_null($this->fields[$slider])) {
-					$this->stories[] = new Article($this->fields[$slider]);
-				} else {
-					$this->stories[] = null;
-				}
+				$this->stories[] = $this->fields[$slider]->getValue();
 			}
 		}
 		return $this->stories;

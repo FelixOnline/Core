@@ -12,7 +12,6 @@ class ArticleTest extends AppTestCase
 		'users',
 		'article_authors',
 		'comments',
-		'comments_ext',
 		'images',
 		'article_visits',
 		'logins',
@@ -107,13 +106,13 @@ class ArticleTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(2);
 		$authors = $article->getAuthorsEnglish();
 
-		$this->assertEquals($authors, '<a href="http://localhost/user/felix/">Joseph Letts - Felix Editor</a>, <a href="http://localhost/user/jk708/">Jonathan Kim</a> and <a href="http://localhost/user/pk1811/">Philip Kent</a>');
+		$this->assertEquals($authors, '<a href="http://localhost/user/felix/">Joseph Letts - Felix Editor</a> and <a href="http://localhost/user/jk708/">Jonathan Kim</a>');
 	}
 
 	public function testGetApprovedBy()
 	{
 		$article = new \FelixOnline\Core\Article(1);
-		$user = $article->getApprovedBy();
+		$user = $article->getApprovedby();
 
 		$this->assertInstanceOf('FelixOnline\Core\User', $user);
 		$this->assertEquals($user->getUser(), 'felix');
@@ -129,12 +128,12 @@ class ArticleTest extends AppTestCase
 
 		$app = \FelixOnline\Core\App::getInstance();
 		$insert_id = $app['db']->dbh->insert_id;
-		$this->assertEquals($insert_id, $article->getText1());
+		$this->assertEquals($insert_id, $article->getText1()->getId());
 	}
 
 	public function testAddAuthors()
 	{
-		$this->assertEquals(5, $this->getConnection()->getRowCount('article_author'));
+		$this->assertEquals(4, $this->getConnection()->getRowCount('article_author'));
 
 		$article = new \FelixOnline\Core\Article(1);
 		$users = array(
@@ -143,7 +142,7 @@ class ArticleTest extends AppTestCase
 		);
 		$article->addAuthors($users);
 
-		$this->assertEquals(7, $this->getConnection()->getRowCount('article_author'));
+		$this->assertEquals(6, $this->getConnection()->getRowCount('article_author'));
 		$this->assertCount(3, $article->getAuthors());
 	}
 
@@ -172,6 +171,14 @@ class ArticleTest extends AppTestCase
 
 		$this->assertCount(5, $comments);
 		$this->assertInstanceOf('FelixOnline\Core\Comment', $comments[0]);
+	}
+
+	public function testGetCommentsNoComments()
+	{
+		$article = new \FelixOnline\Core\Article(3);
+
+		$comments = $article->getComments();
+		$this->assertEmpty($comments);
 	}
 
 	public function testGetImage()

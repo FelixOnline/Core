@@ -1,5 +1,7 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Core\Type;
 /*
  * Article class
  * Deals with both article retrieval and article submission
@@ -24,7 +26,7 @@ namespace FelixOnline\Core;
  *	  hits			- number of views the article has had
  *	  short_desc	  - short description of article for boxes on front page [optional]
  */
-class Article extends BaseModel {
+class Article extends BaseDB {
 	const TEASER_LENGTH = 200;
 
 	private $authors; // array of authors of article
@@ -46,7 +48,7 @@ class Article extends BaseModel {
 		'@</?[^>]*>*@' 		  // html tags
 	);
 
-	protected $dbtable = 'article';
+	public $dbtable = 'article';
 
 	/*
 	 * Constructor for Article class
@@ -56,39 +58,32 @@ class Article extends BaseModel {
 	 *
 	 * Returns article object
 	 */
-	function __construct($id = NULL) {
-		$app = App::getInstance();
+	function __construct($id = NULL)
+	{
+		$fields = array(
+			'title' => new Type\CharField(),
+			'short_title' => new Type\CharField(),
+			'teaser' => new Type\CharField(),
+			//'author' => new ForeignKey('User'),
+			'approvedby' => new Type\ForeignKey('FelixOnline\Core\User'),
+			'category' => new Type\ForeignKey('FelixOnline\Core\Category'),
+			'date' => new Type\DateTimeField(),
+			'published' => new Type\DateTimeField(),
+			'hidden' => new Type\BooleanField(array(
+				'null' => false,
+			)),
+			'searchable' => new Type\BooleanField(array(
+				'null' => false,
+			)),
+			'text1' => new Type\ForeignKey('FelixOnline\Core\Text'),
+			'img1' => new Type\ForeignKey('FelixOnline\Core\Image'),
+			'hits' => new Type\IntegerField(array(
+				'null' => false,
+			)),
+			'short_desc' => new Type\CharField(),
+		);
 
-		if ($id !== NULL) { // if creating an already existing article object
-			$sql = $app['safesql']->query(
-				"SELECT
-					`id`,
-					`title`,
-					`short_title`,
-					`teaser`,
-					`author`,
-					`approvedby`,
-					`category`,
-					UNIX_TIMESTAMP(`date`) as date,
-					UNIX_TIMESTAMP(`published`) as published,
-					`hidden`,
-					`searchable`,
-					`text1`,
-					`text2`,
-					`img1`,
-					`img2`,
-					`img2lr`,
-					`hits`,
-					`short_desc`
-				FROM `article`
-				WHERE id=%i",
-				array($id)
-			);
-			parent::__construct($app['db']->get_row($sql), $id);
-			return $this;
-		} else {
-			// initialise new article
-		}
+		parent::__construct($fields, $id);
 	}
 
 	/*
@@ -96,39 +91,13 @@ class Article extends BaseModel {
 	 *
 	 * Returns array
 	 */
-	public function getAuthors() {
-		$app = App::getInstance();
+	public function getAuthors()
+	{
+		$authors = BaseManager::build('FelixOnline\Core\User', 'article_author', 'author')
+			->filter('article = %i', array($this->getId()))
+			->values();
 
-		if (!$this->authors) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					article_author.author as author
-				FROM `article_author`
-				INNER JOIN `article`
-				ON (article_author.article=article.id)
-				WHERE article.id=%i",
-				array(
-					$this->getId()
-				)
-			);
-			$authors = $app['db']->get_results($sql);
-			foreach($authors as $author) {
-				$this->authors[] = new User($author->author);
-			}
-		}
-		return $this->authors;
-	}
-
-	/*
-	 * Public: Get approved by user
-	 *
-	 * Returns User object
-	 */
-	public function getApprovedBy() {
-		if(!$this->approvedby) {
-			$this->approvedby = new User($this->fields['approvedby']);
-		}
-		return $this->approvedby;
+		return $authors;
 	}
 
 	/**
@@ -154,34 +123,10 @@ class Article extends BaseModel {
 	}
 
 	/**
-	 * Public: Get category class
-	 */
-	public function getCategory() {
-		if(!$this->category) {
-			$this->category = new Category($this->fields['category']);
-		}
-		return $this->category;
-	}
-
-	/**
 	 * Public: Get article content
 	 */
 	public function getContent() {
-		$app = App::getInstance();
-
-		if (!$this->content) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					`content`
-				FROM `text_story`
-				WHERE id = %i",
-				array(
-					$this->getText1()
-				)
-			);
-			$this->content = $app['db']->get_var($sql);
-		}
-		return $this->cleanText($this->content);
+		return $this->getText1()->getContent();
 	}
 
 	/**
@@ -245,8 +190,8 @@ class Article extends BaseModel {
 	 * $limit - character limit for description [defaults to 80]
 	 */
 	public function getShortDesc($limit = 80) {
-		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']) {
-			return substr($this->fields['short_desc'], 0, $limit);
+		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']->getValue()) {
+			return substr($this->fields['short_desc']->getValue(), 0, $limit);
 		} else {
 			return substr(trim(strip_tags($this->getContent())), 0, $limit);
 		}
@@ -257,36 +202,16 @@ class Article extends BaseModel {
 	 *
 	 * Returns int
 	 */
-	public function getNumComments() {
-		$app = App::getInstance();
+	public function getNumComments()
+	{
+		$count = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("active = 1")
+			->filter("pending = 0")
+			->filter("spam = 0 ")
+			->count();
 
-		if (!isset($this->num_comments)) {
-			$sql = $app['safesql']->query(
-				"SELECT
-					SUM(count) AS count
-				FROM (
-					SELECT article,COUNT(*) AS count
-					FROM `comment`
-					WHERE article=%i
-					AND `active`=1
-					GROUP BY article
-					UNION ALL
-					SELECT article,COUNT(*) AS count
-					FROM `comment_ext`
-					WHERE article=%i
-					AND `active`=1
-					AND `pending`=0
-					GROUP BY article
-				) AS t GROUP BY article",
-				array(
-					$this->getId(),
-					$this->getId()
-				)
-			);
-			$this->num_comments = $app['db']->get_var($sql);
-			if(!isset($this->num_comments)) $this->num_comments = 0;
-		}
-		return $this->num_comments;
+		return $count;
 	}
 
 	/*
@@ -294,72 +219,43 @@ class Article extends BaseModel {
 	 *
 	 * $ip - server ip
 	 *
-	 * Returns db object
+	 * Returns array
 	 */
 	public function getComments($ip = NULL) {
 		$app = App::getInstance();
+
+		$comments = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("active = 1")
+			->filter("pending = 0")
+			->filter("spam = 0 ")
+			->values();
+
+		$comments = is_null($comments) ? array() : $comments;
 
 		if (is_null($ip)) {
 			$ip = $app['env']['REMOTE_ADDR'];
 		}
 
-		$sql = $app['safesql']->query(
-			"SELECT
-				id
-			FROM (
-				SELECT
-					comment.id,
-					UNIX_TIMESTAMP(comment.timestamp) AS timestamp
-				FROM `comment`
-				WHERE article=%i
-				AND active=1 # select all internal comments
-				UNION SELECT
-					comment_ext.id,
-					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
-				FROM `comment_ext`
-				WHERE article=%i
-				AND active = 1
-				AND pending  =0
-				AND spam = 0 # select external comments that are not spam
-				UNION SELECT
-					comment_ext.id,
-					UNIX_TIMESTAMP(comment_ext.timestamp) AS timestamp
-					FROM `comment_ext`
-				WHERE article=%i
-				AND IP = '%s'
-				AND active = 1
-				AND pending = 1
-				AND spam = 0 # select external comments that are pending and are from current ip
-			) AS t
-			ORDER BY timestamp ASC
-			LIMIT 500",
-			array(
-				$this->getId(),
-				$this->getId(),
-				$this->getId(),
-				$ip,
-			)
-		);
-		$comments = array();
-		$rsc = $app['db']->get_results($sql);
-		if ($rsc) {
-			foreach($rsc as $key => $obj) {
-				$comments[] = new Comment($obj->id);
-			}
-		}
-		return $comments;
+		// Get pending comments for current ip
+		$pending = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("ip = '%s'", array($ip))
+			->filter("active = 1")
+			->filter("pending = 1")
+			->filter("spam = 0 ")
+			->values();
+
+		$pending = is_null($pending) ? array() : $pending;
+
+		return array_merge($comments, $pending);
 	}
 
 	/*
 	 * Public: Get image class
 	 */
 	public function getImage() {
-		if (!$this->image) {
-			if ($this->getImg1()) {
-				$this->image = new Image($this->getImg1());
-			}
-		}
-		return $this->image;
+		return $this->getImg1();
 	}
 
 	/*
@@ -369,7 +265,7 @@ class Article extends BaseModel {
 	 */
 	public function getURL() {
 		$app = App::getInstance();
-		return $app->getOption('base_url').$this->constructURL();
+		return $app->getOption('base_url') . $this->constructURL();
 	}
 
 	/*
@@ -501,16 +397,11 @@ class Article extends BaseModel {
 	public function setContent($content) {
 		$app = App::getInstance();
 
-		$sql = $app['safesql']->query(
-			"INSERT INTO text_story (`content`) VALUES ('%s')",
-			array($content)
-		);
+		$text = new \FelixOnline\Core\Text();
+		$text->setContent($content);
+		$text->save();
 
-		$app['db']->query($sql);
-
-		$id = $app['db']->insert_id;
-
-		$this->setText1($id);
+		$this->setText1($text);
 
 		return $this;
 	}

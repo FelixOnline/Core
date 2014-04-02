@@ -43,6 +43,19 @@ class BaseManager
 	 */
 	protected $joins = array();
 
+	public static function build($class, $table, $pk = null)
+	{
+		$manager = new self();
+		$manager->class = $class;
+		$manager->table = $table;
+
+		if (!is_null($pk)) {
+			$manager->pk = $pk;
+		}
+
+		return $manager;
+	}
+
 	/**
 	 * Get all objects
 	 */
@@ -101,8 +114,9 @@ class BaseManager
 	{
 		$statement = [];
 
-		$statement[] = "SELECT COUNT(`" . $this->pk . "`) AS count";
+		$statement[] = "SELECT COUNT(`" . $this->table . "`.`" . $this->pk . "`) AS count";
 		$statement[] = $this->getFrom();
+		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
 		$statement[] = $this->getOrder();
 		$statement[] = $this->getLimit();

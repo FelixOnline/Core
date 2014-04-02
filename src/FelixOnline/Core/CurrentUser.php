@@ -3,12 +3,16 @@ namespace FelixOnline\Core;
 /*
  * Current User class
  */
-class CurrentUser extends User {
+class CurrentUser extends User
+{
 	/*
 	 * Create current user object
 	 * Store session into object
 	 */
-	function __construct() {
+	function __construct()
+	{
+		parent::__construct();
+
 		$app = App::getInstance();
 
 		if (!isset($app['env']['session'])) {
@@ -28,7 +32,8 @@ class CurrentUser extends User {
 	/*
 	 * Public: Resets the session cookie, regenerating its ID, and ensures old session data is removed
 	 */
-	public function resetToGuest() {
+	public function resetToGuest()
+	{
 		$app = App::getInstance();
 		$app['env']['session']->reset();
 	}
@@ -38,7 +43,8 @@ class CurrentUser extends User {
 	 *
 	 * Returns boolean
 	 */
-	public function isLoggedIn() {
+	public function isLoggedIn()
+	{
 		$app = App::getInstance();
 
 		if ($app['env']['session']['loggedin'] && $this->isSessionRecent()){
@@ -53,7 +59,8 @@ class CurrentUser extends User {
 	/**
 	 * Public: Set user
 	 */
-	public function setUser($username) {
+	public function setUser($username)
+	{
 		$app = App::getInstance();
 
 		try {
@@ -83,11 +90,11 @@ class CurrentUser extends User {
 								// just be auto logged out after a while
 	}
 
-
 	/**
 	 * Public: Removes the permanent cookie, and removes associated database entries
 	 */
-	protected function removeCookie() {
+	protected function removeCookie()
+	{
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
@@ -116,7 +123,8 @@ class CurrentUser extends User {
 	 * Returns false if failed, username otherwise
 	 * TODO make sure there isn't redundant code
 	 */
-	protected function loginFromCookie() {
+	protected function loginFromCookie()
+	{
 		$app = App::getInstance();
 
 		// is there a cookie?
@@ -194,7 +202,8 @@ class CurrentUser extends User {
 	 * on every visit, if this is greater than two hours then we need to log in
 	 * again, unless the cookie is valid
 	 */
-	protected function isSessionRecent() {
+	protected function isSessionRecent()
+	{
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
@@ -235,7 +244,8 @@ class CurrentUser extends User {
 	/*
 	 * Public: Update user details
 	 */
-	public function updateDetails($username) {
+	public function updateDetails($username)
+	{
 		/* update user details */
 		$name = $this->updateName($username);
 		$info = $this->updateInfo($username);
@@ -272,10 +282,11 @@ class CurrentUser extends User {
 		return $this->db->query($sql);
 	}
 
-	/*
+	/**
 	 * Update user's name from ldap
 	 */
-	private function updateName($uname) {
+	private function updateName($uname)
+	{
 		if(!LOCAL) {
 			$ds = ldap_connect("addressbook.ic.ac.uk");
 			$r = ldap_bind($ds);
@@ -310,7 +321,8 @@ class CurrentUser extends User {
 	 *
 	 * Returns json encoded array
 	 */
-	private function updateInfo($uname) {
+	private function updateInfo($uname)
+	{
 		$info = '';
 		if(!LOCAL) { // if on union server
 			$ds = ldap_connect("addressbook.ic.ac.uk");
@@ -333,7 +345,8 @@ class CurrentUser extends User {
 		return $info;
 	}
 
-	public function getRole() {
+	public function getRole()
+	{
 		if($this->fields['role']) {
 			return $this->fields['role'];
 		} else {

@@ -8,7 +8,9 @@ class ArticleManager extends BaseManager
 	public $table = 'article';
 	public $class = 'FelixOnline\Core\Article';
 
-	public function getMostPopular($number_to_get) {
+	// TODO
+	public function getMostPopular($number_to_get)
+	{
 		$app = App::getInstance();
 
 		$item = $app['cache']->getItem('articles/most_popular');
@@ -44,7 +46,9 @@ class ArticleManager extends BaseManager
 		return $articles;
 	}
 
-	public function getMostCommented($number_to_get) {
+	// TODO
+	public function getMostCommented($number_to_get)
+	{
 		$app = App::getInstance();
 
 		$item = $app['cache']->getItem('articles/most_commented');
@@ -92,6 +96,8 @@ class ArticleManager extends BaseManager
 			} else {
 				$articles = null;
 			}
+
+			$item->set($articles);
 		}
 
 		return $articles;
