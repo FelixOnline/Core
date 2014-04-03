@@ -23,8 +23,6 @@ class App implements \ArrayAccess
 	 * Constructor
 	 *
 	 * @param array $options - options array
-	 * @param \ezSQL_mysqli $db - database object
-	 * @param \SafeSQL_MySQLi $db - safesql object
 	 */
 	public function __construct(
 		$options = array()

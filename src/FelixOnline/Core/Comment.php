@@ -337,6 +337,16 @@ class Comment extends BaseDB
 		$this->setReferer($app['env']['HTTP_REFERER']);
 
 		if ($this->getExternal()) {
+			// check key
+			$key_check = $app['akismet']->keyCheck(
+				$app->getOption('akismet_api_key', ''),
+				$app->getOption('base_url')
+			);
+
+			if ($key_check == false) {
+				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+			}
+
 			// check spam using akismet
 			$check = $app['akismet']->check(array(
 				'permalink' => $this->getArticle()->getURL(),
@@ -401,6 +411,16 @@ class Comment extends BaseDB
 
 	public function markAsSpam() {
 		if ($this->getExternal()) {
+			// check key
+			$key_check = $app['akismet']->keyCheck(
+				$app->getOption('akismet_api_key', ''),
+				$app->getOption('base_url')
+			);
+
+			if ($key_check == false) {
+				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+			}
+
 			// check spam using akismet
 			$check = $app['akismet']->sendSpam(array(
 				'permalink' => $this->getArticle()->getURL(),
@@ -439,6 +459,16 @@ class Comment extends BaseDB
 
 	public function markAsHam() {
 		if ($this->getExternal()) {
+			// check key
+			$key_check = $app['akismet']->keyCheck(
+				$app->getOption('akismet_api_key', ''),
+				$app->getOption('base_url')
+			);
+
+			if ($key_check == false) {
+				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+			}
+
 			// check spam using akismet
 			$check = $app['akismet']->sendHam(array(
 				'permalink' => $this->getArticle()->getURL(),
