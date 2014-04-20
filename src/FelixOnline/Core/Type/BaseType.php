@@ -41,6 +41,14 @@ class BaseType
 		return $this->value;
 	}
 
+	/**
+	 * Return unfiltered value
+	 */
+	public function getRawValue()
+	{
+		return $this->value;
+	}
+
 	public function getSQL()
 	{
 		$app = \FelixOnline\Core\App::getInstance();
