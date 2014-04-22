@@ -409,7 +409,8 @@ class Comment extends BaseDB
 		return $this->getId(); // return new comment id
 	}
 
-	public function markAsSpam() {
+	public function markAsSpam()
+	{
 		$app = App::getInstance();
 
 		if ($this->getExternal()) {
@@ -459,7 +460,8 @@ class Comment extends BaseDB
 		}
 	}
 
-	public function markAsHam() {
+	public function markAsHam()
+	{
 		$app = App::getInstance();
 
 		if ($this->getExternal()) {
