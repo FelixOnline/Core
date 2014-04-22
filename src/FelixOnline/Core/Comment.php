@@ -410,6 +410,8 @@ class Comment extends BaseDB
 	}
 
 	public function markAsSpam() {
+		$app = App::getInstance();
+
 		if ($this->getExternal()) {
 			// check key
 			$key_check = $app['akismet']->keyCheck(
@@ -458,6 +460,8 @@ class Comment extends BaseDB
 	}
 
 	public function markAsHam() {
+		$app = App::getInstance();
+
 		if ($this->getExternal()) {
 			// check key
 			$key_check = $app['akismet']->keyCheck(
