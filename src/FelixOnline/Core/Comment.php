@@ -519,7 +519,7 @@ class Comment extends BaseDB
 		$app = App::getInstance();
 		$authors = $this->getArticle()->getAuthors();
 
-		if (in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
+		if (!$this->getExternal() && in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
 			$key = array_search($this->getUser(), $authors);
 			unset($authors[$key]);
 		}
