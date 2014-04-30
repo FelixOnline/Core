@@ -35,9 +35,7 @@ class BaseDB extends BaseModel
 
 			$fields[$this->pk]->setValue($id);
 
-			$sql = $this->constructSelectSQL($fields);
-
-			$results = $this->getValues($sql);
+			$results = $this->getValues($fields);
 
 			foreach ($results as $column => $value) {
 				$fields[$column]->setValue($value);
@@ -57,19 +55,29 @@ class BaseDB extends BaseModel
 	/**
 	 * Query database and return results
 	 */
-	protected function getValues($sql)
+	protected function getValues($fields)
 	{
 		$app = \FelixOnline\Core\App::getInstance();
 
-		// TODO Cache here
-		$results = $app['db']->get_row($sql);
+		$sql = $this->constructSelectSQL($fields);
 
-		if ($app['db']->last_error) {
-			throw new InternalException($app['db']->last_error);
-		}
+		// get cache
+		$cachePath = $this->dbtable . "/" . $fields[$this->pk]->getValue();
+		$item = $app['cache']->getItem($cachePath);
+		$results = $item->get();
 
-		if (is_null($results)) {
-			throw new ModelNotFoundException('No model in database', $this->class);
+		if ($item->isMiss()) {
+			$results = $app['db']->get_row($sql);
+
+			if ($app['db']->last_error) {
+				throw new InternalException($app['db']->last_error);
+			}
+
+			if (is_null($results)) {
+				throw new ModelNotFoundException('No model in database', $this->class);
+			}
+
+			$item->set($results);
 		}
 
 		return $results;
