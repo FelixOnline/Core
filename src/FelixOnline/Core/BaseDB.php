@@ -62,7 +62,7 @@ class BaseDB extends BaseModel
 		$sql = $this->constructSelectSQL($fields);
 
 		// get cache
-		$item = $app['cache']->getItem($this->dbtable, $fields[$this->pk]->getValue());
+		$item = $this->getCache($fields[$this->pk]);
 		$results = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
 
 		if ($item->isMiss()) {
@@ -83,6 +83,17 @@ class BaseDB extends BaseModel
 	}
 
 	/**
+	 * Get cache item
+	 *
+	 * pk - primary key column
+	 */
+	protected function getCache($pk)
+	{
+		$app = \FelixOnline\Core\App::getInstance();
+		return $app['cache']->getItem($this->dbtable, $pk->getValue());
+	}
+
+	/**
 	 * Public: Save all fields to database
 	 *
 	 * Example:
@@ -97,7 +108,7 @@ class BaseDB extends BaseModel
 		$app = App::getInstance();
 
 		// update model
-		if ($this->pk && $this->fields[$this->pk]->getValue()) {
+		if ($this->pk && $this->getPk()->getValue()) {
 			// Determine what has been modified
 			$changed = array();
 			foreach ($this->initialFields as $column => $field) {
@@ -113,6 +124,10 @@ class BaseDB extends BaseModel
 				if ($app['db']->last_error) {
 					throw new \FelixOnline\Exceptions\InternalException($app['db']->last_error);
 				}
+
+				// clear cache
+				$item = $this->getCache($this->getPk());
+				$item->clear();
 			}
 		} else { // insert model
 			$sql = $this->constructInsertSQL($this->fields);
@@ -129,7 +144,7 @@ class BaseDB extends BaseModel
 			}
 		}
 
-		return $this->fields[$this->pk]->getValue(); // return new id
+		return $this->getPk()->getValue(); // return new id
 	}
 
 	/**
@@ -226,6 +241,14 @@ class BaseDB extends BaseModel
 		}
 
 		return $pk;
+	}
+
+	/**
+	 * Get pk
+	 */
+	public function getPk()
+	{
+		return $this->fields[$this->pk];
 	}
 
 	/**
