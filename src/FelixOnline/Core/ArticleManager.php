@@ -8,13 +8,12 @@ class ArticleManager extends BaseManager
 	public $table = 'article';
 	public $class = 'FelixOnline\Core\Article';
 
-	// TODO
 	public function getMostPopular($number_to_get)
 	{
 		$app = App::getInstance();
 
 		$item = $app['cache']->getItem('articles/most_popular');
-		$articles = $item->get();
+		$articles = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
 
 		if ($item->isMiss()) {
 			$sql = $app['safesql']->query(
@@ -40,7 +39,7 @@ class ArticleManager extends BaseManager
 				$articles = null;
 			}
 
-			$item->set($articles);
+			$item->set($articles, 1800); // expire in 30 mins
 		}
 
 		return $articles;
@@ -52,7 +51,7 @@ class ArticleManager extends BaseManager
 		$app = App::getInstance();
 
 		$item = $app['cache']->getItem('articles/most_commented');
-		$articles = $item->get();
+		$articles = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
 
 		if ($item->isMiss()) {
 			$sql = $app['safesql']->query(
@@ -86,7 +85,7 @@ class ArticleManager extends BaseManager
 				$articles = null;
 			}
 
-			$item->set($articles);
+			$item->set($articles, 1800); // expire in 30 mins
 		}
 
 		return $articles;

@@ -63,7 +63,7 @@ class BaseDB extends BaseModel
 
 		// get cache
 		$item = $app['cache']->getItem($this->dbtable, $fields[$this->pk]->getValue());
-		$results = $item->get();
+		$results = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
 
 		if ($item->isMiss()) {
 			$results = $app['db']->get_row($sql);

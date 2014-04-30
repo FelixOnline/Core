@@ -323,8 +323,6 @@ class BaseManager
 	{
 		$app = \FelixOnline\Core\App::getInstance();
 
-		// TODO cache here
-
 		set_error_handler(function($errno, $errstr) {
 			throw new InternalException($errstr);
 		});
