@@ -19,13 +19,6 @@
 	"<?php echo $comment->getContent(); ?>"
 </p>
 
-<p>
-	Approve it: <a href="<?php echo $app->getOption('base_url')."engine/?page=comment&action=approve&c=".$comment->getId(); ?>"><?php echo $app->getOption('base_url')."engine/?page=comment&action=approve&c=".$comment->getId(); ?></a><br/>
-	Trash it: <a href="<?php echo $app->getOption('base_url')."engine/?page=comment&action=trash&c=".$comment->getId(); ?>"><?php echo $app->getOption('base_url')."engine/?page=comment&action=trash&c=".$comment->getId(); ?></a><br/>
-	Spam it: <a href="<?php echo $app->getOption('base_url')."engine/?page=comment&action=spam&c=".$comment->getId();?>"><?php echo $app->getOption('base_url')."engine/?page=comment&action=spam&c=".$comment->getId();?></a>
-
-</p>
-
-<p>There are <?php echo $comment->getNumCommentsToApprove(); ?> comment(s) waiting to be approved. View them here: <a href="<?php echo $app->getOption('base_url')."engine/?page=comment"; ?>"><?php echo $app->getOption('base_url')."engine/?page=comment"; ?></a></p>
+<p>There are <?php echo $comment->getNumCommentsToApprove(); ?> comment(s) waiting to be approved. View them here: <a href="<?php echo $app->getOption('base_url')."admin/comments/pending"; ?>"><?php echo $app->getOption('base_url')."admin/comments/pending"; ?></a></p>
 
 <p>Felix Online</p>

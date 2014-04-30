@@ -337,6 +337,16 @@ class Comment extends BaseDB
 		$this->setReferer($app['env']['HTTP_REFERER']);
 
 		if ($this->getExternal()) {
+			// check key
+			$key_check = $app['akismet']->keyCheck(
+				$app->getOption('akismet_api_key', ''),
+				$app->getOption('base_url')
+			);
+
+			if ($key_check == false) {
+				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+			}
+
 			// check spam using akismet
 			$check = $app['akismet']->check(array(
 				'permalink' => $this->getArticle()->getURL(),
@@ -399,8 +409,21 @@ class Comment extends BaseDB
 		return $this->getId(); // return new comment id
 	}
 
-	public function markAsSpam() {
+	public function markAsSpam()
+	{
+		$app = App::getInstance();
+
 		if ($this->getExternal()) {
+			// check key
+			$key_check = $app['akismet']->keyCheck(
+				$app->getOption('akismet_api_key', ''),
+				$app->getOption('base_url')
+			);
+
+			if ($key_check == false) {
+				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+			}
+
 			// check spam using akismet
 			$check = $app['akismet']->sendSpam(array(
 				'permalink' => $this->getArticle()->getURL(),
@@ -437,8 +460,21 @@ class Comment extends BaseDB
 		}
 	}
 
-	public function markAsHam() {
+	public function markAsHam()
+	{
+		$app = App::getInstance();
+
 		if ($this->getExternal()) {
+			// check key
+			$key_check = $app['akismet']->keyCheck(
+				$app->getOption('akismet_api_key', ''),
+				$app->getOption('base_url')
+			);
+
+			if ($key_check == false) {
+				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+			}
+
 			// check spam using akismet
 			$check = $app['akismet']->sendHam(array(
 				'permalink' => $this->getArticle()->getURL(),
@@ -483,7 +519,7 @@ class Comment extends BaseDB
 		$app = App::getInstance();
 		$authors = $this->getArticle()->getAuthors();
 
-		if (in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
+		if (!$this->getExternal() && in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
 			$key = array_search($this->getUser(), $authors);
 			unset($authors[$key]);
 		}

@@ -208,4 +208,21 @@ class BaseDB extends BaseModel
 
 		return $pk;
 	}
+
+	/**
+	 * Get data
+	 */
+	public function getData()
+	{
+		$data = array();
+		foreach($this->fields as $key => $field) {
+			if ($field instanceof Type\ForeignKey) { // foreign key exception
+				$data[$key] = $field->getRawValue();
+			} else {
+				$data[$key] = $field->getValue();
+			}
+		}
+
+		return $data;
+	}
 }
