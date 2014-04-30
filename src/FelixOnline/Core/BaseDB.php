@@ -62,8 +62,7 @@ class BaseDB extends BaseModel
 		$sql = $this->constructSelectSQL($fields);
 
 		// get cache
-		$cachePath = $this->dbtable . "/" . $fields[$this->pk]->getValue();
-		$item = $app['cache']->getItem($cachePath);
+		$item = $app['cache']->getItem($this->dbtable, $fields[$this->pk]->getValue());
 		$results = $item->get();
 
 		if ($item->isMiss()) {
