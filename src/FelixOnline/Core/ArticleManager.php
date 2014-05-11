@@ -45,7 +45,6 @@ class ArticleManager extends BaseManager
 		return $articles;
 	}
 
-	// TODO
 	public function getMostCommented($number_to_get)
 	{
 		$app = App::getInstance();
@@ -63,15 +62,17 @@ class ArticleManager extends BaseManager
 					FROM `comment` AS c
 					INNER JOIN `article` AS a ON (c.article=a.id)
 					WHERE c.`active`=1
+					AND c.`spam`=0
 					AND timestamp >= NOW() - INTERVAL 3 WEEK
 					AND a.published IS NOT NULL
 					AND a.published < NOW()
+					AND a.published >= NOW() - INTERVAL 3 WEEK
 					GROUP BY article
-					ORDER BY timestamp DESC
+					ORDER BY count DESC
 					LIMIT 20
 				) AS t
 				GROUP BY article
-				ORDER BY count DESC, article DESC LIMIT %i",
+				ORDER BY count DESC LIMIT %i",
 				array(
 					$number_to_get
 				)
