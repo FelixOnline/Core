@@ -43,6 +43,11 @@ class BaseManager
 	 */
 	protected $joins = array();
 
+	/**
+	 * Cache flag
+	 */
+	protected $cache = false;
+
 	public static function build($class, $table, $pk = null)
 	{
 		$manager = new self();
@@ -204,6 +209,15 @@ class BaseManager
 	}
 
 	/**
+	 * Set cache status
+	 */
+	public function cache($flag)
+	{
+		$this->cache = (boolean) $flag;
+		return $this;
+	}
+
+	/**
 	 * From
 	 */
 	protected function getFrom()
@@ -323,6 +337,16 @@ class BaseManager
 	{
 		$app = \FelixOnline\Core\App::getInstance();
 
+		$item = null;
+		if ($this->cache == true) {
+			$item = $app['cache']->getItem($this->table, md5($sql));
+			$results = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
+		}
+
+		if ($item && !$item->isMiss()) {
+			return $results;
+		}
+
 		set_error_handler(function($errno, $errstr) {
 			throw new InternalException($errstr);
 		});
@@ -331,6 +355,10 @@ class BaseManager
 
 		if ($app['db']->last_error) {
 			throw new InternalException($app['db']->last_error);
+		}
+
+		if ($item) {
+			$item->set($results);
 		}
 
 		return $results;
