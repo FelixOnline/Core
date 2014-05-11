@@ -48,6 +48,11 @@ class BaseManager
 	 */
 	protected $cache = false;
 
+	/**
+	 * Cache expiry
+	 */
+	protected $cacheExpiry = null;
+
 	public static function build($class, $table, $pk = null)
 	{
 		$manager = new self();
@@ -211,9 +216,13 @@ class BaseManager
 	/**
 	 * Set cache status
 	 */
-	public function cache($flag)
+	public function cache($flag, $expiry = null)
 	{
 		$this->cache = (boolean) $flag;
+
+		if (!is_null($expiry)) {
+			$this->cacheExpiry = $expiry;
+		}
 		return $this;
 	}
 
@@ -358,7 +367,11 @@ class BaseManager
 		}
 
 		if ($item) {
-			$item->set($results);
+			if ($this->cacheExpiry) {
+				$item->set($results, $this->cacheExpiry);
+			} else {
+				$item->set($results);
+			}
 		}
 
 		return $results;
