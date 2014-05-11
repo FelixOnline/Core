@@ -28,7 +28,6 @@
                 <directory suffix=".php">migrations/</directory>
                 <directory suffix=".php">lib/</directory>
                 <directory suffix=".php">templates/</directory>
-                <file>config.php</file>
                 <file>constants.php</file>
             </exclude>
         </whitelist>
