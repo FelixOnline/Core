@@ -73,6 +73,9 @@ class AppTestCase extends DatabaseTestCase
 			$app['currentuser'] = new \FelixOnline\Core\CurrentUser();
 		}
 
+		// Set empty cache so data isn't cached in tests
+		$app['cache'] = new \Stash\Pool();
+
 		$app->run();
 
 		$this->app = $app;

@@ -263,4 +263,30 @@ class BaseManagerTest extends AppTestCase
 		$this->assertEquals($manager->table, 'article');
 		$this->assertEquals($manager->pk, 'id');
 	}
+
+	public function testCache()
+	{
+		$app = \FelixOnline\Core\App::getInstance();
+
+		$manager = $this->getManager();
+		$manager->cache(true);
+
+		$selects = $app['db']->get_row("SHOW STATUS LIKE 'Com_select'")->Value;
+		$this->assertEquals(0, (int) $selects);
+
+		$all = $manager->all();
+
+		$selects = $app['db']->get_row("SHOW STATUS LIKE 'Com_select'")->Value;
+		// 4 because of the selects when instantiating the models
+		$this->assertEquals(4, (int) $selects);
+		$this->assertCount(3, $all);
+		$this->assertInstanceOf('FelixOnline\Core\Article', $all[0]);
+
+		$all = $manager->all();
+
+		$selects = $app['db']->get_row("SHOW STATUS LIKE 'Com_select'")->Value;
+		$this->assertEquals(4, (int) $selects);
+		$this->assertCount(3, $all);
+		$this->assertInstanceOf('FelixOnline\Core\Article', $all[0]);
+	}
 }
