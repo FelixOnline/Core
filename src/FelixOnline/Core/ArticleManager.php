@@ -63,6 +63,7 @@ class ArticleManager extends BaseManager
 					INNER JOIN `article` AS a ON (c.article=a.id)
 					WHERE c.`active`=1
 					AND c.`spam`=0
+					AND c.`pending`=0
 					AND timestamp >= NOW() - INTERVAL 3 WEEK
 					AND a.published IS NOT NULL
 					AND a.published < NOW()
