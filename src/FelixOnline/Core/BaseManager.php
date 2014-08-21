@@ -129,7 +129,6 @@ class BaseManager
 		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
 		$statement[] = $this->getOrder();
-		$statement[] = $this->getLimit();
 
 		// Remove null values
 		$statement = array_filter($statement);
