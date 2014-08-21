@@ -144,6 +144,20 @@ class BaseManagerTest extends AppTestCase
 		$this->assertEquals($count, 2);
 	}
 
+	public function testCountWithLimit()
+	{
+		$manager = $this->getManager();
+
+		$query = $manager->filter('published IS NOT NULL')
+			->filter('`id` IN (1, 2)')
+			->order('id', 'ASC')
+			->limit(10, 10);
+
+		$count = $query->count();
+
+		$this->assertEquals($count, 2);
+	}
+
 	public function testQueryExceptionsBadQuery()
 	{
 		$manager = $this->getManager();
