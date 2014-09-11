@@ -56,6 +56,10 @@ class App implements \ArrayAccess
 			$this->container['email'] = \Swift_Mailer::newInstance($transport);
 		}
 
+		if (!isset($this->container['cache']) || is_null($this->container['cache'])) {
+			$this->container['cache'] = new \Stash\Pool(new \Stash\Driver\FileSystem());
+		}
+
 		if (!isset($this->container['currentuser']) || is_null($this->container['currentuser'])) {
 			$this->container['currentuser'] = new CurrentUser();
 		}
@@ -66,10 +70,6 @@ class App implements \ArrayAccess
 
 		if (!isset($this->container['safesql']) || !($this->container['safesql'] instanceof \SafeSQL_MySQLi)) {
 			throw new InternalException('No safesql setup');
-		}
-
-		if (!isset($this->container['cache']) || is_null($this->container['cache'])) {
-			$this->container['cache'] = new \Stash\Pool(new \Stash\Driver\FileSystem());
 		}
 	}
 
