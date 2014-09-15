@@ -20,6 +20,7 @@
 		<field Field="img2lr" Type="tinyint(1)" Null="YES" Key="" Extra="" Comment="0 left, 1 right (default)" />
 		<field Field="hits" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
 		<field Field="short_desc" Type="varchar(100)" Null="YES" Key="" Extra="" Comment="" />
+		<field Field="comment_status" Type="int(11)" Null="YES" DEFAULT="1" Key="" Extra="" Comment="" />
 		<key Table="article" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="3504" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="text1" Seq_in_index="1" Column_name="text1" Collation="A" Cardinality="3504" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="img1" Seq_in_index="1" Column_name="img1" Collation="A" Cardinality="3504" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
@@ -53,6 +54,7 @@
 		<field name="img2lr" xsi:nil="true" />
 		<field name="hits">1</field>
         <field name="short_desc">Simon Singh returning to Imperial!</field>
+        <field name="comment_status">1</field>
 	</row>
 	<row>
 		<field name="id">2</field>
@@ -73,6 +75,7 @@
 		<field name="img2lr" xsi:nil="true" />
 		<field name="hits">1671</field>
 		<field name="short_desc" xsi:nil="true" />
+        <field name="comment_status">1</field>
 	</row>
 	<row>
 		<field name="id">3</field>
@@ -93,6 +96,7 @@
 		<field name="img2lr" xsi:nil="true" />
 		<field name="hits">2282</field>
 		<field name="short_desc" xsi:nil="true" />
+        <field name="comment_status">1</field>
 	</row>
 	</table_data>
 </database>
