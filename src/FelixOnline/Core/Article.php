@@ -29,6 +29,10 @@ use FelixOnline\Core\Type;
 class Article extends BaseDB {
 	const TEASER_LENGTH = 200;
 
+	const COMMENTS_DISABLED = 0;
+	const COMMENTS_ENABLED = 1;
+	const COMMENTS_INTERNAL_ONLY = 2;
+
 	private $authors; // array of authors of article
 	private $approvedby; // user object of user who approved article
 	private $category_cat; // category cat (short version)
@@ -81,6 +85,7 @@ class Article extends BaseDB {
 				'null' => false,
 			)),
 			'short_desc' => new Type\CharField(),
+			'comment_status' => new Type\IntegerField(),
 		);
 
 		parent::__construct($fields, $id);
@@ -420,5 +425,28 @@ class Article extends BaseDB {
 			$app['db']->query($sql);
 		}
 		return $authors;
+	}
+
+	/**
+	 * Public: Are comments enabled
+	 */
+	public function canComment($user = NULL) {
+		if ($this->getCommentStatus() == self::COMMENTS_DISABLED) {
+			return false;
+		}
+
+		if ($this->getCommentStatus() == self::COMMENTS_INTERNAL_ONLY) {
+			if ($user && $user->isLoggedIn()) {
+				return true;
+			} else {
+				return false;	
+			}
+		}
+
+		if ($this->getCommentStatus() == self::COMMENTS_ENABLED) {
+			return true;
+		}
+
+		return false;
 	}
 }
