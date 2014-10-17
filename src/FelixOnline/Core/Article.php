@@ -131,7 +131,16 @@ class Article extends BaseDB {
 	 * Public: Get article content
 	 */
 	public function getContent() {
-		return $this->getText1()->getContent();
+		$string = $this->getText1()->getContent();
+
+		// ugly bodge
+		$string = str_replace('&nbsp;</p>', '</p>', $string);
+
+		$tidy = new \tidy;
+		$tidy->parseString($string, array('drop-empty-paras' => TRUE));
+		$tidy->cleanRepair();
+
+		return $tidy;
 	}
 
 	/**
