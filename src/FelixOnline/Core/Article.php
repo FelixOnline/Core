@@ -241,28 +241,12 @@ class Article extends BaseDB {
 		$comments = (new CommentManager())
 			->filter("article = %i", array($this->getId()))
 			->filter("active = 1")
-			->filter("pending = 0")
 			->filter("spam = 0 ")
 			->values();
 
 		$comments = is_null($comments) ? array() : $comments;
 
-		if (is_null($ip)) {
-			$ip = $app['env']['REMOTE_ADDR'];
-		}
-
-		// Get pending comments for current ip
-		$pending = (new CommentManager())
-			->filter("article = %i", array($this->getId()))
-			->filter("ip = '%s'", array($ip))
-			->filter("active = 1")
-			->filter("pending = 1")
-			->filter("spam = 0 ")
-			->values();
-
-		$pending = is_null($pending) ? array() : $pending;
-
-		return array_merge($comments, $pending);
+		return $comments;
 	}
 
 	/*
