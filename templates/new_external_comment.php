@@ -5,7 +5,7 @@
  * Requires $comment as comment object
  */
 ?>
-<p>A new comment on the post "<?php echo $comment->getArticle()->getTitle(); ?>" is waiting for your approval. <br/>
+<p>A new comment on the post "<?php echo $comment->getArticle()->getTitle(); ?>" is waiting for moderation. <br/>
 <a href="<?php echo $comment->getArticle()->getURL(); ?>"/><?php echo $comment->getArticle()->getURL(); ?></a>
 </p>
 
@@ -19,6 +19,6 @@
 	"<?php echo $comment->getContent(); ?>"
 </p>
 
-<p>There are <?php echo $comment->getNumCommentsToApprove(); ?> comment(s) waiting to be approved. View them here: <a href="<?php echo $app->getOption('base_url')."admin/comments/pending"; ?>"><?php echo $app->getOption('base_url')."admin/comments/pending"; ?></a></p>
+<p>There are <?php echo $comment->getNumCommentsToApprove(); ?> comment(s) waiting to be moderated. View them here: <a href="<?php echo $app->getOption('base_url')."admin/comments/pending"; ?>"><?php echo $app->getOption('base_url')."admin/comments/pending"; ?></a></p>
 
 <p>Felix Online</p>

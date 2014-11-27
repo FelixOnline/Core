@@ -396,6 +396,7 @@ class Comment extends BaseDB
 			// If pending comment
 			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
 				$this->emailExternalComment();
+				$this->emailAuthors();
 			}
 		} else { // internal emails
 			if ($this->getReply()) { // if comment is replying to an internal comment 
@@ -618,7 +619,7 @@ class Comment extends BaseDB
 
 		// Create message
 		$message = \Swift_Message::newInstance()
-			->setSubject('New comment to approve on "'.$this->getArticle()->getTitle().'"')
+			->setSubject('New comment to moderate on "'.$this->getArticle()->getTitle().'"')
 			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
 			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
 			->setBody($content, 'text/html');
