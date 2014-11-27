@@ -221,7 +221,6 @@ class Article extends BaseDB {
 		$count = (new CommentManager())
 			->filter("article = %i", array($this->getId()))
 			->filter("active = 1")
-			->filter("pending = 0")
 			->filter("spam = 0 ")
 			->count();
 
