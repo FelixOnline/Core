@@ -70,4 +70,11 @@ class BaseModel {
 		$func = create_function('$c', 'return "_" . strtolower($c[1]);');
 		return preg_replace_callback('/([A-Z])/', $func, $str);
 	}
+
+	/*
+	 * Public: Get all fields
+	 */
+	public function getFields() {
+		return $this->fields;
+	}
 }
