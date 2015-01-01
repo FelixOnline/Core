@@ -134,7 +134,7 @@ class Article extends BaseDB {
 		$string = $this->getText1()->getContent();
 
 		// ugly bodge
-		$string = str_replace('&nbsp;</p>', '</p>', $string);
+		$string = $this->cleanText($string);
 
 		$tidy = new \tidy;
 		$tidy->parseString($string, array('drop-empty-paras' => TRUE));
@@ -148,8 +148,9 @@ class Article extends BaseDB {
 	 */
 	private function cleanText($text) {
 		$result = strip_tags($text, '<p><a><div><b><i><br><blockquote><object><param><embed><li><ul><ol><strong><img><h1><h2><h3><h4><h5><h6><em><iframe><strike>'); // Gets rid of html tags except <p><a><div>
+		$result = preg_replace('/(<br(| |\/|( \/))>)/i', '', $result); // strip br tag
 		$result = preg_replace('#<div[^>]*(?:/>|>(?:\s|&nbsp;)*</div>)#im', '', $result); // Removes empty html div tags
-		$result = preg_replace('#<span*(?:/>|>(?:\s|&nbsp;)[^>]*</span>)#im', '', $result); // Removes empty html div tags
+		$result = preg_replace('#<span*(?:/>|>(?:\s|&nbsp;)[^>]*</span>)#im', '', $result); // Removes empty html span tags
 		$result = preg_replace('#<p[^>]*(?:/>|>(?:\s|&nbsp;)*</p>)#im', '', $result); // Removes empty html p tags
 		$result = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $result); // Remove style attributes
 		return $result;
