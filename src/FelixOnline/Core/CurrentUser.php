@@ -24,18 +24,9 @@ class CurrentUser extends User
 			$app['env']['cookies'] = new Cookies();
 		}
 
-		if ($user = $this->isLoggedIn()) {
-			$this->setUser($user);
+		if ($this->isLoggedIn()) {
+			$this->setUser($app['env']['session']->session['uname']);
 		}
-	}
-
-	/*
-	 * Public: Resets the session cookie, regenerating its ID, and ensures old session data is removed
-	 */
-	public function resetToGuest()
-	{
-		$app = App::getInstance();
-		$app['env']['session']->reset();
 	}
 
 	/**
@@ -47,7 +38,7 @@ class CurrentUser extends User
 	{
 		$app = App::getInstance();
 
-		if ($app['env']['session']['loggedin'] && $this->isSessionRecent()){
+		if ($app['env']['session']->session['loggedin'] && $this->validateSession()){
 			return true;
 		} else {
 			// n.b. the session is cleared by isSessionRecent if invalid
@@ -61,39 +52,252 @@ class CurrentUser extends User
 	 */
 	public function setUser($username)
 	{
-		$app = App::getInstance();
-
 		try {
 			parent::__construct($username);
 		} catch (\FelixOnline\Exceptions\ModelNotFoundException $e) {
-			// User does not yet exist in our database...
-			// It'll be created later so carry on
+			User::createUser($username);
+			parent::__construct($username);
 		}
 
-		// TODO Remove?
+		$this->setVisits($this->getVisits() + 1);
+		$this->setIp($app['env']['REMOTE_ADDR']);
+		$this->setTimestamp(time());
+
+		$this->save();
+	}
+
+	/************************************
+	 *
+	 * SESSIONS
+	 *
+	 ************************************/
+
+	/**
+	 * Create session for user
+	 */
+	public function createSession()
+	{
+		if(!$this->getUser()) {
+			throw new \Exceptions\InternalException('Will not create session where no user is set');
+		}
+
+		$this->destroySessions(); // Delete old sessions for user
+
+		$app = App::getInstance();
+
 		$sql = $app['safesql']->query(
-			"UPDATE login
-				SET timestamp = NOW()
-			WHERE session_id='%s'
-			AND logged_in=1
-			AND ip='%s'
-			AND browser='%s'
-			AND valid=1
-			AND TIMESTAMPDIFF(SECOND,timestamp,NOW()) <= %i",
+			"INSERT INTO `login` 
+			(
+				session_id,
+				ip,
+				browser,
+				user,
+				logged_in
+			) VALUES (
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				1
+			)",
 			array(
 				$app['env']['session']->getId(),
 				$app['env']['REMOTE_ADDR'],
 				$app['env']['HTTP_USER_AGENT'],
-				SESSION_LENGTH,
+				$this->getUser(),
 			));
-		$app['db']->query($sql); // if this fails, it doesn't matter, we will
-								// just be auto logged out after a while
+		$app['db']->query($sql);
+
+		$_SESSION['felix']['uname'] = $this->getUser();
+		$_SESSION['felix']['loggedin'] = true;
 	}
+
+	/*
+	 * Public: Get Session object for active session.
+	 */
+	public function getSession() {
+		return $this->session;
+	}
+
+	/*
+	 * Protected: Check if the session is recent (the last visited time is updated
+	 * on every visit, if this is greater than two hours then we need to log in
+	 * again, unless the cookie is valid) and valid for this user.
+	 */
+	protected function validateSession()
+	{
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
+			"SELECT
+				TIMESTAMPDIFF(SECOND,timestamp,NOW()) AS timediff,
+				ip,
+				browser
+			FROM `login`
+			WHERE session_id = '%s'
+			AND logged_in = 1
+			AND valid = 1
+			AND user = '%s'
+			ORDER BY timediff ASC
+			LIMIT 1",
+			array(
+				$app['env']['session']->getId(),
+				$app['env']['session']->session['uname'],
+			));
+
+		$user = $app['db']->get_row($sql);
+
+		if (
+			$user
+			&& $user->timediff <= SESSION_LENGTH 
+			&& $user->ip == $app['env']['REMOTE_ADDR']
+			&& $user->browser == $app['env']['HTTP_USER_AGENT']
+		) {
+			return true;
+		} else {
+			$this->resetSession(); // Clear invalid session data
+			// N.B. Do not delete cookies here!! If the session is invalid
+			// it may have expired, but then we may be able to log in again
+			// from the cookie
+			return false;
+		}
+	}
+
+	/*
+	 * Public: Set aside session so we can reactivate it on the main site
+	 */
+	public function stashSession() {
+		$app = App::getInstance();
+
+		$sessionid = $app['env']['session']->getId();
+		
+		if($this->resetSession(false)) {
+			return $sessionid;
+		} else {
+			return false;
+		}
+	}
+
+	/*
+	 * Public: Reactivate stashed session
+	 */
+	public function restoreSession($existing_id) {
+		$app = App::getInstance();
+
+		// Validate our existing ID
+		$sql = $app['safesql']->query("SELECT 
+										user, 
+										TIMESTAMPDIFF(SECOND,timestamp,NOW()) AS timediff, 
+										ip, 
+										browser 
+									FROM `login` 
+									WHERE session_id='%s' 
+									AND valid=1 
+									AND logged_in=0 
+									ORDER BY timediff ASC 
+									LIMIT 1",
+									array($existing_id));
+		$login = $app['db']->get_row($sql);
+
+		if(
+			$login->timediff <= LOGIN_CHECK_LENGTH 
+			&& $login->ip == $app['env']['REMOTE_ADDR'] 
+			&& $login->browser == $app['env']['HTTP_USER_AGENT']
+		) {
+			// Sessions is valid, now reconfigure it for the current session
+			$user = $login->user;
+
+			// Clear old ID
+			$sql = $app['safesql']->query("DELETE FROM `login` 
+										WHERE session_id='%s' 
+										AND valid=1 
+										AND logged_in=0",
+										array($existing_id));
+			$login = $app['db']->query($sql);
+
+			$this->setUser($user);
+			$this->createSession();
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function resetSession($flushdb = true) {
+		$app = App::getInstance();
+
+		$sessionid = $app['env']['session']->getId();
+
+		$app['env']['session']->reset();
+
+		// Do we invalidate this session ID?
+		if($flushdb) {
+			$sql = $app['safesql']->query("UPDATE `login` 
+					SET valid = 0,
+					logged_in = 0
+					WHERE user='%s'
+					AND session_id='%s'",
+					array($this->getUser(), $sessionid));
+					
+			return $app['db']->query($sql);
+		} else {
+			$sql = $app['safesql']->query("UPDATE `login` 
+					SET valid = 1,
+					logged_in = 0
+					WHERE user='%s'
+					AND session_id='%s'",
+					array($this->getUser(), $sessionid));
+					
+			return $app['db']->query($sql);
+		}
+	}
+
+	/*
+	 * Private: Destroy all user sessions
+	 */
+	private function destroySessions() {
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query("UPDATE `login` 
+				SET valid = 0,
+				logged_in = 0
+				WHERE user='%s'",
+				array($this->getUser()));
+
+		return $app['db']->query($sql);
+	}
+
+	/*
+	 * Private: Destroy old sessions
+	 */
+	private function destroyOldSessions() {
+		global $currentuser;
+		$sql = "DELETE FROM cookies 
+				WHERE UNIX_TIMESTAMP() > UNIX_TIMESTAMP(expires)
+		";
+		$this->db->query($sql);
+		$sql = $this->safesql->query("UPDATE `login` 
+				SET valid = 0
+				WHERE user='%s'
+				AND logged_in=0
+				OR TIMESTAMPDIFF(SECOND,timestamp,NOW()) > %i",
+				array($currentuser->getUser(),
+						SESSION_LENGTH));
+
+		return $this->db->query($sql);
+	}
+
+	/************************************
+	 *
+	 * COOKIES
+	 *
+	 ************************************/
 
 	/**
 	 * Public: Removes the permanent cookie, and removes associated database entries
 	 */
-	protected function removeCookie()
+	public function removeCookie()
 	{
 		$app = App::getInstance();
 
@@ -115,6 +319,33 @@ class CurrentUser extends User
 		$app['db']->query($sql);
 
 		$app['env']['cookies']->delete('felixonline');
+	}
+
+	/*
+	 * Public: Create cookie
+	 */
+	public function setCookie()
+	{
+		$app = App::getInstance();
+
+		$hash = hash('sha256', mt_rand());
+
+		$expiry_time = time() + COOKIE_LENGTH;
+
+		$app['env']['cookies']->set('felixonline', $hash, $expiry_time, '/');
+		$sql = $app['safesql']->query("INSERT INTO `cookies` 
+									(
+										hash,
+										user,
+										expires
+									) VALUES (
+										'%s',
+										'%s',
+										FROM_UNIXTIME(%i)
+									)",
+									array($hash, $this->getUser(), $expiry_time));
+
+		return $app['db']->query($sql);
 	}
 
 	/**
@@ -152,205 +383,14 @@ class CurrentUser extends User
 		$username = $cookie->user;
 
 		// Reset session ID
-		$this->resetToGuest();
+		$this->resetSession();
 
 		// Populate user class
-		parent::__construct($username);
+		$this->setUser($username);
 
 		// Create session
 		$this->createSession();
 
 		return true;
-	}
-
-	/**
-	 * Create session for user
-	 */
-	protected function createSession()
-	{
-		$app = App::getInstance();
-
-		$sql = $app['safesql']->query(
-			"INSERT INTO `login` 
-			(
-				session_id,
-				ip,
-				browser,
-				user,
-				logged_in
-			) VALUES (
-				'%s',
-				'%s',
-				'%s',
-				'%s',
-				1
-			)",
-			array(
-				$app['env']['session']->getId(),
-				$app['env']['REMOTE_ADDR'],
-				$app['env']['HTTP_USER_AGENT'],
-				$this->getUser(),
-			));
-		$app['db']->query($sql);
-
-		$app['env']['session']['uname'] = $this->getUser();
-		$app['env']['session']['loggedin'] = true;
-	}
-
-	/*
-	 * Protected: Check if the session is recent (the last visited time is updated
-	 * on every visit, if this is greater than two hours then we need to log in
-	 * again, unless the cookie is valid
-	 */
-	protected function isSessionRecent()
-	{
-		$app = App::getInstance();
-
-		$sql = $app['safesql']->query(
-			"SELECT
-				TIMESTAMPDIFF(SECOND,timestamp,NOW()) AS timediff,
-				ip,
-				browser
-			FROM `login`
-			WHERE session_id = '%s'
-			AND logged_in = 1
-			AND valid = 1
-			AND user = '%s'
-			ORDER BY timediff ASC
-			LIMIT 1",
-			array(
-				$app['env']['session']->getId(),
-				$app['env']['session']['uname'],
-			));
-
-		$user = $app['db']->get_row($sql);
-
-		if (
-			$user
-			&& $user->timediff <= SESSION_LENGTH 
-			&& $user->ip == $app['env']['REMOTE_ADDR']
-			&& $user->browser == $app['env']['HTTP_USER_AGENT']
-		) {
-			return true;
-		} else {
-			$this->resetToGuest(); // Clear invalid session data
-			// N.B. Do not delete cookies here!! If the session is invalid
-			// it may have expired, but then we may be able to log in again
-			// from the cookie
-			return false;
-		}
-	}
-
-	/*
-	 * Public: Update user details
-	 */
-	public function updateDetails($username)
-	{
-		/* update user details */
-		$name = $this->updateName($username);
-		$info = $this->updateInfo($username);
-
-		$sql = $this->safesql->query(
-			"INSERT INTO `user` 
-				(user,name,visits,ip,info) 
-			VALUES (
-				'%s',
-				'%s',
-				1,
-				'%s',
-				'%s'
-			) 
-			ON DUPLICATE KEY 
-			UPDATE 
-				name='%s',
-				visits=visits+1,
-				ip='%s',
-				timestamp=NOW(),
-				info='%s'",
-			array(
-				$username,
-				$name,
-				$_SERVER['REMOTE_ADDR'],
-				$info,
-				$name,
-				$_SERVER['REMOTE_ADDR'],
-				$info,
-			));
-			// note that this updated the last access time and the ip
-			// of the last access for this user, this is separate from the
-			// session
-		return $this->db->query($sql);
-	}
-
-	/**
-	 * Update user's name from ldap
-	 */
-	private function updateName($uname)
-	{
-		if(!LOCAL) {
-			$ds = ldap_connect("addressbook.ic.ac.uk");
-			$r = ldap_bind($ds);
-			$justthese = array("gecos");
-			$sr = ldap_search(
-				$ds,
-				"ou=People, ou=everyone, dc=ic, dc=ac, dc=uk",
-				"uid=$uname",
-				$justthese
-			);
-			$info = ldap_get_entries($ds, $sr);
-			if ($info["count"] > 0) {
-				$this->setName($info[0]['gecos'][0]);
-				return ($info[0]['gecos'][0]);
-			} else {
-				return false;
-			}
-		} else {
-			$name = $uname;
-			try {
-				$name = $this->getName();
-			} catch (InternalException $e) {
-				// User does not yet exist in our database...
-				// It'll be created later so carry on
-			}
-			return $name;
-		}
-	}
-
-	/*
-	 * Update user's info from ldap
-	 *
-	 * Returns json encoded array
-	 */
-	private function updateInfo($uname)
-	{
-		$info = '';
-		if(!LOCAL) { // if on union server
-			$ds = ldap_connect("addressbook.ic.ac.uk");
-			$r = ldap_bind($ds);
-			$justthese = array("o");
-			$sr = ldap_search(
-				$ds,
-				"ou=People, ou=shibboleth, dc=ic, dc=ac, dc=uk",
-				"uid=$uname",
-				$justthese
-			);
-			$info = ldap_get_entries($ds, $sr);
-			if ($info["count"] > 0) {
-				$info = json_encode(explode('|', $info[0]['o'][0]));
-				$this->setInfo($info);
-			} else {
-				return false;
-			}
-		}
-		return $info;
-	}
-
-	public function getRole()
-	{
-		if($this->fields['role']) {
-			return $this->fields['role'];
-		} else {
-			return 0;
-		}
 	}
 }

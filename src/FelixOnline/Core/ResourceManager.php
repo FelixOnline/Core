@@ -3,6 +3,8 @@
  * Resources class
  * Handles all css and javascript resources
  */
+namespace FelixOnline\Core;
+
 class ResourceManager {
 	private $css = array(); // array of css files
 	private $js = array(); // array of js files

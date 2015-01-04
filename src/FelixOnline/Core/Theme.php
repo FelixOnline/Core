@@ -1,4 +1,6 @@
 <?php
+namespace FelixOnline\Core;
+
 /*
  * Theme class
  * Handles rendering views etc

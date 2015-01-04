@@ -5,7 +5,7 @@ namespace FelixOnline\Core;
  */
 class Session implements \ArrayAccess
 {
-	protected $session = array();
+	public $session = array();
 	private $name;
 	private $id;
 

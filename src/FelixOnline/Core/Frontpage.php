@@ -1,4 +1,7 @@
 <?php
+
+namespace FelixOnline\Core;
+
 /*
  * Frontpage class
  * Represents the frontpage

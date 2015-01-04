@@ -257,4 +257,121 @@ class User extends BaseDB
 		$result = $app['db']->get_var($sql);
 		return ($result > 0 ? true: false);
 	}
+
+	/*
+	 * Create new user
+	 */
+	public static function createUser($username) {
+		$user = new User();
+		$user->setUser($username);
+		$user->setName($username);
+		$user->setEmail($username."@imperial.ac.uk");
+		$user->setInfo(json_encode(array()));
+		$user->setVisits(0);
+		$user->setIp(0);
+		$user->setRole(0);
+		$user->setImage(676); // FIXME - Move to const
+
+		$user->updateName();
+		$user->updateEmail();
+		$user->updateInfo();
+		$user->save();
+
+		return $user;
+	}
+
+	/**
+	 * Sync details from LDAP
+	 */
+	public function syncLdap() {
+		$this->updateName();
+		$this->updateEmail();
+		$this->updateInfo();
+		$this->save();
+	}
+
+	/**
+	 * Update user's name from ldap
+	 */
+	private function updateName()
+	{
+		if(!LOCAL) {
+			$ds = ldap_connect("addressbook.ic.ac.uk");
+			$r = ldap_bind($ds);
+			$justthese = array("sn");
+			$sr = ldap_search(
+				$ds,
+				"ou=People,ou=shibboleth,dc=ic,dc=ac,dc=uk",
+				"uid=".$this->getUser(),
+				$justthese
+			);
+			$info = ldap_get_entries($ds, $sr);
+			if ($info["count"] > 0) {
+				$this->setName($info[0]['sn'][0]);
+				return ($info[0]['sn'][0]);
+			} else {
+				return false;
+			}
+		} else {
+			$name = $this->getName();
+			return $name;
+		}
+	}
+
+	/**
+	 * Update user's email address from ldap
+	 */
+	private function updateEmail($uname)
+	{
+		if(!LOCAL) {
+			$ds = ldap_connect("addressbook.ic.ac.uk");
+			$r = ldap_bind($ds);
+			$justthese = array("mail");
+			$sr = ldap_search(
+				$ds,
+				"ou=People,ou=shibboleth,dc=ic,dc=ac,dc=uk",
+				"uid=$uname",
+				$justthese
+			);
+			$info = ldap_get_entries($ds, $sr);
+			if ($info["count"] > 0) {
+				$this->setName($info[0]['mail'][0]);
+				return ($info[0]['mail'][0]);
+			} else {
+				return false;
+			}
+		} else {
+			$email = $this->getEmail();
+			return $email;
+		}
+	}
+
+	/*
+	 * Update user's info from ldap
+	 *
+	 * Returns json encoded array
+	 */
+	private function updateInfo($uname)
+	{
+		$info = '';
+		if(!LOCAL) { // if on union server
+			$ds = ldap_connect("addressbook.ic.ac.uk");
+			$r = ldap_bind($ds);
+			$justthese = array("o");
+			$sr = ldap_search(
+				$ds,
+				"ou=People,ou=shibboleth,dc=ic,dc=ac,dc=uk",
+				"uid=$uname",
+				$justthese
+			);
+			$info = ldap_get_entries($ds, $sr);
+			if ($info["count"] > 0) {
+				$info = json_encode(explode('|', $info[0]['o'][0]));
+				$this->setInfo($info);
+			} else {
+				return false;
+			}
+		}
+		return $info;
+	}
 }
