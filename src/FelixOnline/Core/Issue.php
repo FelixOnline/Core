@@ -39,6 +39,10 @@ class Issue {
 
 			$row = $this->dba->get_row($sql);
 
+			if(!$row) {
+				throw new \FelixOnline\Exceptions\ModelNotFoundException('No issue', $this, $id);
+			}
+
 			$this->id = $id;
 			$this->issueno = $row->IssueNo;
 			$this->pubno = $row->PubNo;
@@ -48,7 +52,7 @@ class Issue {
 
 			return $this;
 		} else {
-			// initialise new issue
+			throw new \FelixOnline\Exceptions\InternalException('Issue must be specified');
 		}
 	}
 
