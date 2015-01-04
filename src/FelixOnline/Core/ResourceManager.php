@@ -204,7 +204,7 @@ class ResourceManager {
 		} else {
 			$cache = $this->getFilename($lessfile, 'css', 'dir');
 		}
-		$newcache = lessc::cexecute($cache);
+		$newcache = \lessc::cexecute($cache);
 		if (!is_array($cache) || $newcache['updated'] > $cache['updated']) {
 			file_put_contents($cachefile, serialize($newcache));
 			file_put_contents($cssfile, $newcache['compiled']);
@@ -233,7 +233,7 @@ class ResourceManager {
 				) {
 					require_once(BASE_DIRECTORY.'/inc/minify_css.php');
 					$cssfile = $this->getFilename($file, 'css', 'dir'); // get file location
-					$min = Minify_CSS_Compressor::process(file_get_contents($cssfile));
+					$min = \Minify_CSS_Compressor::process(file_get_contents($cssfile));
 					file_put_contents($this->getFilename($minfilename, 'css', 'dir'), $min);
 				}
 				return $minfilename;
