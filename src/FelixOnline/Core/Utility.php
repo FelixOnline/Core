@@ -17,7 +17,7 @@ class Utility {
 	 */
 	public static function currentPageURL() {
 		$pageURL = 'http';
-		if ($_SERVER["HTTPS"] == "on") {
+		if (array_key_exists('HTTPS', $_SERVER) && $_SERVER["HTTPS"] == "on") {
 			$pageURL .= "s";
 		}
 		$pageURL .= "://";
