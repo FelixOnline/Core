@@ -11,32 +11,73 @@ namespace FelixOnline\Core;
  *      Description - Text description of publication
  *      Year        - Temporary
  */
-class Issue extends BaseModel {
-	protected $filters = array();
+class Issue {
+	private $id;
+	private $issueno;
+	private $pubno;
+	private $description;
+	private $year;
+	private $pubdate;
+	private $relevance;
+
+	private $fields = array();
 
 	function __construct($id = NULL) {
 		global $dba;
 		$this->dba = $dba;
-		$this->safesql = new SafeSQL_MySQLi($dba->dbh);
+		$this->safesql = new \SafeSQL_MySQLi($dba->dbh);
 		if($id !== NULL) {
 			$sql = $this->safesql->query("SELECT
 						`id`,
-						UNIX_TIMESTAMP(`PubDate`) as pub_date,
+						`PubDate`,
 						`IssueNo`,
 						`PubNo`,
 						`Description`,
 						`Year`
 					FROM `Issues`
 					WHERE id=%i", array($id));
-			$this->filters = array(
-				'IssueNo' => 'issue_no',
-				'PubNo' => 'pub_no'
-			);
-			parent::__construct($this->dba->get_row($sql), $id);
+
+			$row = $this->dba->get_row($sql);
+
+			$this->id = $id;
+			$this->issueno = $row->IssueNo;
+			$this->pubno = $row->PubNo;
+			$this->description = $row->Description;
+			$this->year = $row->Year;
+			$this->pubdate = $row->PubDate;
+
 			return $this;
 		} else {
 			// initialise new issue
 		}
+	}
+
+	public function getId() {
+		return $this->id;
+	}
+
+	public function getIssueNo() {
+		return $this->issueno;
+	}
+
+	public function getPubNo() {
+		return $this->pubno;
+	}
+
+	public function getPubDate() {
+		return $this->pubdate;
+	}
+
+	public function hasRelevance() {
+		return $this->relevance;
+	}
+
+	public function getRelevance() {
+		return $this->hasRelevance();
+	}
+
+	public function setRelevance($r) {
+		$this->relevance = $r;
 	}
 
 	/*

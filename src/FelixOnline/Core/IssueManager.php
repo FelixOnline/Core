@@ -3,13 +3,12 @@ namespace FelixOnline\Core;
 /**
  * Issue manager
  */
-class IssueManager extends BaseManager
+class IssueManager
 {
 	function __construct() {
-		parent::__construct();
 		global $dba;
 		$this->dba = $dba;
-		$this->safesql = new SafeSQL_MySQLi($dba->dbh);
+		$this->safesql = new \SafeSQL_MySQLi($dba->dbh);
 	}
 
 	/**
@@ -33,21 +32,16 @@ class IssueManager extends BaseManager
 			array(
 				$query, $query	
 			));
-
 		$results = $this->dba->get_results($sql);
-
 		$issues = array();
-
 		// no results
 		if (is_null($results)) {
 			return $issues;
 		}
-
 		$maxr = 0; // max relevance
 		foreach($results as $obj) {
 			$issue = new Issue($obj->id);
 			$issues[] = $issue;
-
 			if ($maxr == 0) {
 				$maxr = $obj->Relevance;
 			}
@@ -56,7 +50,6 @@ class IssueManager extends BaseManager
 		}
 		return $issues;
 	}
-
 	/*
 	 * Public static: Get issues
 	 *
@@ -73,12 +66,29 @@ class IssueManager extends BaseManager
 				AND i.PubNo = %i
 				ORDER BY i.id ASC", array($year, $pub));
 		$result = $this->dba->get_results($sql);
-
 		$issues = array();
-		foreach($result as $obj) {
-			$issue = new Issue($obj->id);
-			$issues[] = $issue;
+		if ($result) {
+			foreach($result as $obj) {
+				$issue = new Issue($obj->id);
+				$issues[] = $issue;
+			}
 		}
 		return $issues;
+	}
+	/*
+	 * Public static: Get publications
+	 *
+	 * Return array of ID => Publication Name
+	 */
+	public function getPublications() {
+		$sql = $this->safesql->query("SELECT PubNo, PubName FROM Publications", array());
+		$result = $this->dba->get_results($sql);
+		$pubs = array();
+		if ($result) {
+			foreach($result as $obj) {
+				$pubs[$obj->PubNo] = $obj->PubName;
+			}
+		}
+		return $pubs;
 	}
 }
