@@ -1,6 +1,5 @@
 <?php
 namespace FelixOnline\Core;
-
 /*
  * Action hooks
  *

@@ -24,11 +24,11 @@ class BaseDB extends BaseModel
 		}
 
 		if (!is_array($fields) || empty($fields)) {
-			throw new \FelixOnline\Exceptions\InternalException('No fields defined');
+			throw new InternalException('No fields defined');
 		}
 
 		if (!$this->dbtable) {
-			throw new \FelixOnline\Exceptions\InternalException('No table specified');
+			throw new InternalException('No table specified');
 		}
 
 		if (!is_null($id)) {
@@ -125,7 +125,7 @@ class BaseDB extends BaseModel
 
 				$app['db']->query($sql);
 				if ($app['db']->last_error) {
-					throw new \FelixOnline\Exceptions\InternalException($app['db']->last_error);
+					throw new InternalException($app['db']->last_error);
 				}
 
 				// clear cache
@@ -137,7 +137,7 @@ class BaseDB extends BaseModel
 
 			$app['db']->query($sql);
 			if ($app['db']->last_error) {
-				throw new \FelixOnline\Exceptions\InternalException($app['db']->last_error);
+				throw new InternalException($app['db']->last_error);
 			}
 
 			$this->pk = $this->findPk($this->fields);

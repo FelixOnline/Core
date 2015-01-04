@@ -1,4 +1,5 @@
 <?php
+namespace FelixOnline\Core;
 /**
  * Issue manager
  */

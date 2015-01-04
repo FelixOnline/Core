@@ -1,7 +1,10 @@
 <?php
+namespace FelixOnline\Core;
 /**
  * Search query
  */
+
+// FIXME Move this into separate models
 class Search
 {
 	protected $query;
