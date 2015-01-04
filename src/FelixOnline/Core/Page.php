@@ -9,31 +9,30 @@ namespace FelixOnline\Core;
  *	  title:	  - title of page
  *	  content:	- content of page
  */
-class Page extends BaseModel {
-	protected $db;
-	protected $safesql;
 
-	function __construct($slug=NULL) {
-		global $db, $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
-		if($slug !== NULL) {
-			$sql = $this->safesql->query(
-				"SELECT
-					`id`,
-					`slug`,
-					`title`,
-					`content`
-				FROM `pages`
-				WHERE slug='%s'",
-				array(
-					$slug,	
-				));
-			parent::__construct($this->db->get_row($sql), $slug);
-			return $this;
-		} else {
-			// initialise new page
-		}
+class Page extends BaseDb {
+	public $dbtable = 'pages';
+
+	private $csrf_token;
+
+	/*
+	 * Constructor for Page class
+	 * If initialised with id then store relevant data in object
+	 *
+	 * $id - ID of page (optional)
+	 *
+	 * Returns page object
+	 */
+	function __construct($id = NULL)
+	{
+		$fields = array(
+			'slug' => new Type\CharField(),
+			'title' => new Type\CharField(),
+			'content' => new Type\TextField(),
+		);
+
+		parent::__construct($fields, $id);
+		$this->csrf_token = Utility::generateCSRFToken('generic_page');
 	}
 
 	/*
@@ -52,15 +51,13 @@ class Page extends BaseModel {
 	 * Public: Get page content
 	 */
 	public function getContent() {
-		return $this->evalPHP($this->fields['content']);
+		return $this->evalPHP($this->fields['content']->getValue());
 	}
 
-	/**
-	 * Public: Get page slug
-	 *
-	 * @return string page slug
+	/*
+	 * Public: Get page content
 	 */
-	public function getSlug() {
-		return $this->fields['slug'];				
+	public function getToken() {
+		return $this->csrf_token;
 	}
 }
