@@ -17,7 +17,7 @@ class ModelNotFoundException extends NotFoundException {
 		$this->class = $class;
 		$this->item = $item;
 		
-		parent::__construct($message, $code, $previous);
+		parent::__construct($message, $code, $item, $class, $previous);
 	}
 	
 	public function getClass() {
