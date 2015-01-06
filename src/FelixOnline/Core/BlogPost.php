@@ -13,45 +13,20 @@ namespace FelixOnline\Core;
  *	  meta:	   - JSON encoded array of post meta [optional]
  *	  visible:	-
  */
-class BlogPost extends BaseModel {
-	protected $db;
-	protected $safesql;
-	protected $author; // post author
+class BlogPost extends BaseDb {
+	public $dbtable = 'blog_post';
 
-	function __construct($id=NULL) {
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
+	function __construct($id = NULL) {
+		$fields = array(
+			'blog' => new Type\ForeignKey('FelixOnline/Core/Blog'),
+			'content' => new Type\TextField(),
+			'timestamp' => new Type\DateTimeField(),
+			'author' => new Type\ForeignKey('FelixOnline/Core/User'),
+			'type' => new Type\CharField(array('null' => true)),
+			'meta' => new Type\TextField(array('null' => true)),
+			'visible' => new Type\BooleanField(),
+		);
 
-		if($id !== NULL) {
-			$sql = $sql = $this->safesql->query("SELECT
-													`id`,
-													`blog`,
-													`content`,
-													UNIX_TIMESTAMP(timestamp) as timestamp,
-													`author`,
-													`type`,
-													`meta`,
-													`visible`
-												FROM `blog_post`
-												WHERE id=%i", array($this->getId()));
-			parent::__construct($this->db->get_row($sql), $slug);
-			return $this;
-		} else {
-			// initialise new blog post
-		}
-	}
-
-	/*
-	 * Get author
-	 *
-	 * Returns user object of post author
-	 */
-	public function getAuthor() {
-		if(!$this->author) {
-			$this->author = new User($this->fields['author']);
-		}
-		return $this->author;
+		parent::__construct($fields, $id);
 	}
 }
