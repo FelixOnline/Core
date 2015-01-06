@@ -4,7 +4,7 @@ class NotFoundExceptionTest extends PHPUnit_Framework_TestCase
 	public function testException()
 	{
 		$this->setExpectedException('FelixOnline\Exceptions\NotFoundException');
-		throw new \FelixOnline\Exceptions\NotFoundException('foo');
+		throw new \FelixOnline\Exceptions\NotFoundException('foo', null, 'abc', 'def');
 	}
 
 	public function testExceptionMessage()
@@ -12,7 +12,7 @@ class NotFoundExceptionTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException(
 			'FelixOnline\Exceptions\NotFoundException', 'foo'
 		);
-		throw new \FelixOnline\Exceptions\NotFoundException('foo');
+		throw new \FelixOnline\Exceptions\NotFoundException('foo', null, 'abc', 'def');
 	}
 
 	public function testExceptionCode()
@@ -22,6 +22,6 @@ class NotFoundExceptionTest extends PHPUnit_Framework_TestCase
 			'foo',
 			102
 		);
-		throw new \FelixOnline\Exceptions\NotFoundException('foo');
+		throw new \FelixOnline\Exceptions\NotFoundException('foo', null, 'abc', 'def');
 	}
 }

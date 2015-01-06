@@ -38,7 +38,7 @@ class CurrentUser extends User
 	{
 		$app = App::getInstance();
 
-		if ($app['env']['session']->session['loggedin'] && $this->validateSession()){
+		if (array_key_exists('loggedin', $app['env']['session']->session) && $app['env']['session']->session['loggedin'] && $this->validateSession()){
 			return true;
 		} else {
 			// n.b. the session is cleared by isSessionRecent if invalid
@@ -52,6 +52,8 @@ class CurrentUser extends User
 	 */
 	public function setUser($username)
 	{
+		$app = App::getInstance();
+		
 		try {
 			parent::__construct($username);
 		} catch (\FelixOnline\Exceptions\ModelNotFoundException $e) {
