@@ -38,7 +38,7 @@ class CurrentUser extends User
 	{
 		$app = App::getInstance();
 
-		if (array_key_exists('loggedin', $app['env']['session']->session) && $app['env']['session']->session['loggedin'] && $this->validateSession()){
+		if (is_array($app['env']['session']->session) && array_key_exists('loggedin', $app['env']['session']->session) && $app['env']['session']->session['loggedin'] && $this->validateSession()){
 			return true;
 		} else {
 			// n.b. the session is cleared by isSessionRecent if invalid

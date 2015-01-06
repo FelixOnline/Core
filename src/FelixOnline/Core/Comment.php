@@ -344,7 +344,7 @@ class Comment extends BaseDB
 			);
 
 			if ($key_check == false) {
-				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+				throw new \FelixOnline\Exceptions\InternalException('Akismet key is invalid');
 			}
 
 			// check spam using akismet
@@ -361,7 +361,7 @@ class Comment extends BaseDB
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
-				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+				throw new \FelixOnline\Exceptions\InternalException($app['akismet']->getError());
 			}
 
 			if ($check == true) { // if comment is spam
@@ -422,7 +422,7 @@ class Comment extends BaseDB
 			);
 
 			if ($key_check == false) {
-				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+				throw new \FelixOnline\Exceptions\InternalException('Akismet key is invalid');
 			}
 
 			// check spam using akismet
@@ -448,7 +448,7 @@ class Comment extends BaseDB
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
-				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+				throw new \FelixOnline\Exceptions\InternalException($app['akismet']->getError());
 			}
 
 			$this->setActive(0);
@@ -473,7 +473,7 @@ class Comment extends BaseDB
 			);
 
 			if ($key_check == false) {
-				throw new \FelixOnline\Exceptions\ExternalException('Akismet key is invalid');
+				throw new \FelixOnline\Exceptions\InternalException('Akismet key is invalid');
 			}
 
 			// check spam using akismet
@@ -499,7 +499,7 @@ class Comment extends BaseDB
 
 			// check for akismet errors
 			if (!is_null($app['akismet']->getError())) {
-				throw new \FelixOnline\Exceptions\ExternalException($app['akismet']->getError());
+				throw new \FelixOnline\Exceptions\InternalException($app['akismet']->getError());
 			}
 
 			$this->setActive(1);

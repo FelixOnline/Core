@@ -3,7 +3,7 @@ namespace FelixOnline\Exceptions;
 /**
  * If there is an error in the model (i.e. wrong verb)
  */
-class ModelConfigurationException extends InternalException {
+class ModelConfigurationException extends UniversalException {
 	protected $verb;
 	protected $property;
 	protected $class;

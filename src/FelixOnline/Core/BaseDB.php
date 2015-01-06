@@ -32,13 +32,13 @@ class BaseDB extends BaseModel
 		}
 
 		if (!is_null($id)) {
+			$this->constructorId = $id;
+
 			$this->pk = $this->findPk($fields);
 
 			$fields[$this->pk]->setValue($id);
 
 			$results = $this->getValues($fields);
-
-			$this->constructorId = $id;
 
 			foreach ($results as $column => $value) {
 				$fields[$column]->setValue($value);
@@ -76,7 +76,7 @@ class BaseDB extends BaseModel
 			}
 
 			if (is_null($results)) {
-				throw new ModelNotFoundException('No model in database', $this->class, $this->constructorId);
+				throw new ModelNotFoundException('No model in database', $this->dbtable, $this->constructorId);
 			}
 
 			$item->set($results);

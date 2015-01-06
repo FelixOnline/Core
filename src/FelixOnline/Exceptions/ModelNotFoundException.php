@@ -3,7 +3,7 @@ namespace FelixOnline\Exceptions;
 /**
  * For if a model does not exist in the database
  */
-class ModelNotFoundException extends NotFoundException {
+class ModelNotFoundException extends UniversalException {
 	protected $class;
 	protected $item;
 	
@@ -17,7 +17,7 @@ class ModelNotFoundException extends NotFoundException {
 		$this->class = $class;
 		$this->item = $item;
 		
-		parent::__construct($message, $code, $item, $class, $previous);
+		parent::__construct($message, $code, $previous);
 	}
 	
 	public function getClass() {
