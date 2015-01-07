@@ -16,6 +16,10 @@
 		{
 			"type": "vcs",
 			"url": "https://github.com/FelixOnline/Service-Akismet.git"
+		},
+		{
+			"type": "vcs",
+			"url": "https://github.com/mrclay/minify.git"
 		}
 	],
 	"require": {
@@ -24,7 +28,9 @@
 		"jv2222/ezsql": "dev-master#4036408076",
 		"d11wtq/boris": "1.0.*",
 		"tedivm/stash": "0.11.*",
-		"swiftmailer/swiftmailer": "5.*"
+		"swiftmailer/swiftmailer": "5.*",
+		"leafo/lessphp": "0.4.*",
+		"mrclay/minify": "2.2.*"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "4.4.*",

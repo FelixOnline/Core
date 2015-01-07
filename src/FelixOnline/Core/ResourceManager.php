@@ -194,7 +194,6 @@ class ResourceManager {
 	 * Returns compiled css filename
 	 */
 	private function processLess($lessfile) {
-		require_once(BASE_DIRECTORY.'/inc/lessc.inc.php');
 		$filename = strstr('generated/'.$lessfile, '.', true);
 		$cssfile = $this->getFilename($filename.'.css', 'css', 'dir');
 		// load the cache
@@ -231,7 +230,6 @@ class ResourceManager {
 					< 
 					filemtime($this->getFilename($file, 'css', 'dir'))
 				) {
-					require_once(BASE_DIRECTORY.'/inc/minify_css.php');
 					$cssfile = $this->getFilename($file, 'css', 'dir'); // get file location
 					$min = \Minify_CSS_Compressor::process(file_get_contents($cssfile));
 					file_put_contents($this->getFilename($minfilename, 'css', 'dir'), $min);
