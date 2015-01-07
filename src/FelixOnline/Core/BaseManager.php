@@ -2,6 +2,7 @@
 namespace FelixOnline\Core;
 
 use \FelixOnline\Exceptions\InternalException;
+use \FelixOnline\Exceptions\SQLException;
 
 /**
  * Base manager
@@ -362,7 +363,7 @@ class BaseManager
 		restore_error_handler(); // restore old error handler
 
 		if ($app['db']->last_error) {
-			throw new InternalException($app['db']->last_error);
+			throw new SQLException($app['db']->last_error, $sql);
 		}
 
 		if ($item) {
