@@ -3,6 +3,7 @@ namespace FelixOnline\Core;
 
 use FelixOnline\Exceptions\InternalException;
 use FelixOnline\Exceptions\ModelNotFoundException;
+use FelixOnline\Exceptions\SQLException;
 
 /**
  * Base DB class
@@ -72,7 +73,7 @@ class BaseDB extends BaseModel
 			$results = $app['db']->get_row($sql);
 
 			if ($app['db']->last_error) {
-				throw new InternalException($app['db']->last_error);
+				throw new SQLException($app['db']->last_error, $sql);
 			}
 
 			if (is_null($results)) {
@@ -125,7 +126,7 @@ class BaseDB extends BaseModel
 
 				$app['db']->query($sql);
 				if ($app['db']->last_error) {
-					throw new InternalException($app['db']->last_error);
+					throw new SQLException($app['db']->last_error, $sql);
 				}
 
 				// clear cache
@@ -137,7 +138,7 @@ class BaseDB extends BaseModel
 
 			$app['db']->query($sql);
 			if ($app['db']->last_error) {
-				throw new InternalException($app['db']->last_error);
+				throw new SQLException($app['db']->last_error, $sql);
 			}
 
 			$this->pk = $this->findPk($this->fields);
