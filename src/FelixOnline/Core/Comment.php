@@ -80,7 +80,7 @@ class Comment extends BaseDB
 					Type\BaseType::TRANSFORMER_NO_HTML
 				)
 			)),
-			'comment' => new Type\CharField(array(
+			'comment' => new Type\TextField(array(
 				'transformers' => array(
 					Type\BaseType::TRANSFORMER_NO_HTML
 				)
