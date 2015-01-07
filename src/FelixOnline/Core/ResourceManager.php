@@ -194,7 +194,7 @@ class ResourceManager {
 	 * Returns compiled css filename
 	 */
 	private function processLess($lessfile) {
-		$filename = strstr('generated/'.$lessfile, '.', true);
+		$filename = strstr($lessfile, '.', true);
 		$cssfile = $this->getFilename($filename.'.css', 'css', 'dir');
 		// load the cache
 		$cachefile = $this->getFilename($filename.".cache", 'css', 'dir');
