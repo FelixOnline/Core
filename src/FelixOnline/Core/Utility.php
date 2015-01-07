@@ -83,6 +83,30 @@ class Utility {
 	}
 
 	/*
+	 * Public Static: Get user twitter links
+	 *
+	 * $array - array of user objects to output
+	 *
+	 * Returns html string of twitter buttons
+	 */
+	public static function outputUserTwitterList($array) {
+		// sanity check
+		if (!$array || !count ($array))
+			return '';
+		// change array into linked usernames
+		foreach ($array as $key => $user) {
+			if(!is_object($user)) {
+				throw new InternalException($user.' user is not an object');
+			}
+			if($user->getTwitter()) {
+				$full_array[$key] = '<a href="https://twitter.com/'.$user->getTwitter().'" class="twitter-follow-button" data-show-count="false" data-dnt="true">Follow @'.$user->getTwitter().'</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?\'http\':\'https\';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+\'://platform.twitter.com/widgets.js\';fjs.parentNode.insertBefore(js,fjs);}}(document, \'script\', \'twitter-wjs\');</script>';
+			}
+		}
+		$output = implode (' ', $full_array);
+		return $output;
+	}
+
+	/*
 	 * Public Static: Hide email behind javascript to prevent robot crawls
 	 *
 	 * $email - email address to hide
