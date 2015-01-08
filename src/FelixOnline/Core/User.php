@@ -374,4 +374,19 @@ class User extends BaseDB
 		}
 		return $info;
 	}
+
+	/**
+	 * Public: Get categories this user edits
+	 *
+	 * Returns array of category objects
+	 */
+	public function getCategories()
+	{
+		$editors = BaseManager::build('FelixOnline\Core\Category', 'category_author', 'category')
+			->filter("user = '%s'", array($this->getUser()))
+			->filter("admin = 1")
+			->values();
+
+		return $editors;
+	}
 }
