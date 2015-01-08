@@ -93,6 +93,9 @@ class Utility {
 		// sanity check
 		if (!$array || !count ($array))
 			return '';
+
+		$full_array = array();
+
 		// change array into linked usernames
 		foreach ($array as $key => $user) {
 			if(!is_object($user)) {
