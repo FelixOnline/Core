@@ -131,14 +131,10 @@ class Comment extends BaseDB
 	 */
 	public function getName()
 	{
-		if ($this->getExternal()) {
-			if ($this->fields['name']->getValue()) { // if external commenter has a name
-				return $this->fields['name']->getValue();
-			} else {
-				return 'Anonymous'; // else return Anonymous
-			}
+		if ($this->fields['name']->getValue()) { // if external commenter has a name
+			return $this->fields['name']->getValue();
 		} else {
-			return $this->getUser()->getName();
+			return 'Anonymous'; // else return Anonymous
 		}
 	}
 
@@ -326,6 +322,7 @@ class Comment extends BaseDB
 	public function save()
 	{
 		$app = App::getInstance();
+		global $currentuser;
 
 		// If an update
 		if ($this->pk && $this->fields[$this->pk]->getValue()) {
@@ -336,7 +333,7 @@ class Comment extends BaseDB
 		$this->setUseragent($app['env']['HTTP_USER_AGENT']);
 		$this->setReferer($app['env']['HTTP_REFERER']);
 
-		if ($this->getExternal()) {
+		if (!$currentuser->isLoggedIn()) {
 			// check key
 			$key_check = $app['akismet']->keyCheck(
 				$app->getOption('akismet_api_key', ''),
@@ -382,7 +379,7 @@ class Comment extends BaseDB
 		parent::save();
 
 		// Send emails
-		if ($this->getExternal()) {
+		if (!$currentuser->isLoggedIn()) {
 
 			$log_entry = new \FelixOnline\Core\AkismetLog();
 			$log_entry->setCommentId($this)
@@ -395,7 +392,7 @@ class Comment extends BaseDB
 
 			// If pending comment
 			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
-				$this->emailExternalComment();
+				$this->emailComment();
 				$this->emailAuthors();
 			}
 		} else { // internal emails
@@ -596,9 +593,9 @@ class Comment extends BaseDB
 	}
 
 	/*
-	 * Private: Email felix on new external comment
+	 * Private: Email felix on new non-logged-in comment
 	 */
-	private function emailExternalComment()
+	private function emailComment()
 	{
 		$app = App::getInstance();
 
