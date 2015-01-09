@@ -32,11 +32,11 @@
 		<field name="article">1</field>
 		<field name="external">0</field>
 		<field name="user">felix</field>
-		<field name="name" xsi:nil="true"/>
+		<field name="name">Joseph Letts - Felix Editor</field>
 		<field name="comment">Test comment number one</field>
 		<field name="timestamp">2009-12-27 02:46:51</field>
 		<field name="ip" xsi:nil="true"/>
-		<field name="email" xsi:nil="true"/>
+		<field name="email">felix@imperial.ac.uk</email>
 		<field name="useragent" xsi:nil="true"/>
 		<field name="referer" xsi:nil="true"/>
 		<field name="active">1</field>
@@ -51,11 +51,11 @@
 		<field name="article">1</field>
 		<field name="external">0</field>
 		<field name="user">jk708</field>
-		<field name="name" xsi:nil="true"/>
+		<field name="name">Jonathan Kim</field>
 		<field name="comment">Test comment number two</field>
 		<field name="timestamp">2009-12-27 02:47:51</field>
 		<field name="ip" xsi:nil="true"/>
-		<field name="email" xsi:nil="true"/>
+		<field name="email">felix@imperial.ac.uk</email>
 		<field name="useragent" xsi:nil="true"/>
 		<field name="referer" xsi:nil="true"/>
 		<field name="active">1</field>
