@@ -8,11 +8,7 @@
 ?>
 <p>Hi <?php echo $user->getFirstName(); ?></p>
 <p>
-<?php if(!$comment->getExternal()) { // if internal comment ?>
-	<a href="<?php echo $comment->getUser()->getURL();?>/"><?php echo $comment->getName(); ?></a>
-<?php } else { ?>
-	<?php echo $comment->getName(); ?>
-<?php } ?>
+<?php echo $comment->getName(); ?>
  has posted a comment on your article, "<a href="<?php echo $comment->getArticle()->getURL().'#'.$comment->getId(); ?>"><?php echo $comment->getArticle()->getTitle();?></a>" with:
 </p>
 <p>

@@ -10,12 +10,8 @@
 </p>
 
 <p>
-<?php 
-	if ($comment->getExternal()) {
-		echo $comment->getName();
-	} else { ?>
-		<a href="<?php echo $comment->getUser()->getURL(); ?>"><?php echo $comment->getName(); ?></a>
-<?php } ?>
+<?php echo $comment->getName();?>
+
  has replied to your comment on "<a href="<?php echo $reply->getArticle()->getURL().'#comment'.$reply->getId(); ?>"><?php echo $reply->getArticle()->getTitle(); ?></a>" with: 
 </p>
 

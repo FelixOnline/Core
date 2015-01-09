@@ -20,14 +20,10 @@ namespace FelixOnline\Core;
  *	  spam
  *
  * Comment flags:
- *	  Internal:
- *		  active - comment is active or not
- *
- *	  External:
  *		  active | pending | spam  
  *			 0   |	0	|   0	  rejected comment
  *			 1   |	0	|   0	  approved comment
- *			 1   |	1	|   0	  pending comment
+ *			 1   |	1	|   0	  pending moderation comment
  *			 0   |	0	|   1	  spam comment
  *			 0   |	1	|   0	  INVALID
  *			 1   |	0	|   1	  INVALID
@@ -41,10 +37,11 @@ namespace FelixOnline\Core;
  *
  *	  // Submit comment
  *	  $comment = new Comment();
- *	  $comment->setExternal(false); // internal comment
  *	  $comment->setArticle(100); // article id
  *	  $comment->setComment('Hello world');
- *	  $comment->setUser('felix');
+ *	  $comment->setUser('felix'); // if we know the user
+ *    $comment->setName('Felix');
+ *    $comment->setEmail('felix@imperial.ac.uk');
  *	  if($id = $comment->save()) echo 'Success!';
  */
 class Comment extends BaseDB
@@ -54,7 +51,6 @@ class Comment extends BaseDB
 	private $article; // article class comment is on
 	private $user; // user class
 	private $reply; // comment class of reply
-	private $external = false; // if comment is external or not. Default false
 	private $commentsToApprove;
 
 	public $dbtable = 'comment';
@@ -73,7 +69,6 @@ class Comment extends BaseDB
 		// common fields
 		$fields = array(
 			'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'external' => new Type\BooleanField(),
 			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'name' => new Type\CharField(array(
 				'transformers' => array(
@@ -103,18 +98,6 @@ class Comment extends BaseDB
 		);
 
 		parent::__construct($fields, $id);
-	}
-
-	/**
-	 * Public: Get user class
-	 */
-	public function getUser()
-	{
-		if ($this->getExternal()) {
-			throw new \FelixOnline\Exceptions\InternalException('External comment does not have a user');
-		}
-
-		return $this->fields['user']->getValue();
 	}
 
 	/**
@@ -153,14 +136,10 @@ class Comment extends BaseDB
 	 */
 	public function byAuthor()
 	{
-		if ($this->getExternal()) {
-			return false;
+		if (in_array($this->getUser(), $this->getArticle()->getAuthors())) {
+			return true;
 		} else {
-			if (in_array($this->getUser(), $this->getArticle()->getAuthors())) {
-				return true;
-			} else {
-				return false;
-			}
+			return false;
 		}
 	}
 
@@ -169,8 +148,8 @@ class Comment extends BaseDB
 	 */
 	public function isRejected()
 	{
-		if (!$this->getExternal() && !$this->getActive() 
-		   || $this->getExternal() && !$this->getActive() && !$this->getPending()) { // if comment that is rejected
+		if (!$this->getActive() 
+		   || !$this->getActive() && !$this->getPending()) { // if comment that is rejected
 			return true; 
 		} else {
 			return false;
@@ -184,8 +163,7 @@ class Comment extends BaseDB
 	{
 		$app = App::getInstance();
 
-		if ($this->getExternal()
-			&& $this->getActive()
+		if ($this->getActive()
 			&& $this->getPending()
 			&& $this->getIp() == $app['env']['REMOTE_ADDR']
 		) { // if comment is pending for this ip address
@@ -300,13 +278,8 @@ class Comment extends BaseDB
 	{
 		$comments = (new CommentManager())
 			->filter('article = %i', array($this->getArticle()->getId()))
-			->filter("comment = '%s'", array($this->getComment()));
-
-		if ($this->getExternal()) {
-			$comments->filter("name = '%s'", array($this->fields['name']->getValue()));
-		} else {
-			$comments->filter("user = '%s'", array($this->getUser()->getUser()));
-		}
+			->filter("comment = '%s'", array($this->getComment()))
+			->filter("name = '%s'", array($this->fields['name']->getValue()));
 
 		$count = $comments->count();
 		return (boolean) $count;
@@ -322,7 +295,6 @@ class Comment extends BaseDB
 	public function save()
 	{
 		$app = App::getInstance();
-		global $currentuser;
 
 		// If an update
 		if ($this->pk && $this->fields[$this->pk]->getValue()) {
@@ -333,7 +305,7 @@ class Comment extends BaseDB
 		$this->setUseragent($app['env']['HTTP_USER_AGENT']);
 		$this->setReferer($app['env']['HTTP_REFERER']);
 
-		if (!$currentuser->isLoggedIn()) {
+		if (!$this->getUser()) {
 			// check key
 			$key_check = $app['akismet']->keyCheck(
 				$app->getOption('akismet_api_key', ''),
@@ -379,7 +351,7 @@ class Comment extends BaseDB
 		parent::save();
 
 		// Send emails
-		if (!$currentuser->isLoggedIn()) {
+		if (!$this->getUser()) {
 
 			$log_entry = new \FelixOnline\Core\AkismetLog();
 			$log_entry->setCommentId($this)
@@ -411,102 +383,94 @@ class Comment extends BaseDB
 	{
 		$app = App::getInstance();
 
-		if ($this->getExternal()) {
-			// check key
-			$key_check = $app['akismet']->keyCheck(
-				$app->getOption('akismet_api_key', ''),
-				$app->getOption('base_url')
-			);
+		// check key
+		$key_check = $app['akismet']->keyCheck(
+			$app->getOption('akismet_api_key', ''),
+			$app->getOption('base_url')
+		);
 
-			if ($key_check == false) {
-				throw new \FelixOnline\Exceptions\InternalException('Akismet key is invalid');
-			}
-
-			// check spam using akismet
-			$check = $app['akismet']->sendSpam(array(
-				'permalink' => $this->getArticle()->getURL(),
-				'comment_type' => 'comment',
-				'comment_author' => $this->fields['name']->getValue(),
-				'comment_content' => $this->getComment(),
-				'comment_author_email' => $this->getEmail(),
-				'user_ip' => $this->getIp(),
-				'user_agent' => $this->getUseragent(),
-				'referrer' => $this->getReferer(),
-			));
-
-			$log_entry = new \FelixOnline\Core\AkismetLog();
-			$log_entry->setCommentId($this)
-				->setAction('check')
-				->setIsSpam($check)
-				->setError($app['akismet']->getError())
-				->setRequest($app['akismet']->getConnector()->getLastRequest())
-				->setResponse($app['akismet']->getConnector()->getLastResponse())
-				->save();
-
-			// check for akismet errors
-			if (!is_null($app['akismet']->getError())) {
-				throw new \FelixOnline\Exceptions\InternalException($app['akismet']->getError());
-			}
-
-			$this->setActive(0);
-			$this->setPending(0);
-			$this->setSpam(1);
-
-			$this->save();
-		} else {
-			throw new \FelixOnline\Exceptions\InternalException('Trying to mark internal comment as spam');
+		if ($key_check == false) {
+			throw new \FelixOnline\Exceptions\InternalException('Akismet key is invalid');
 		}
+
+		// check spam using akismet
+		$check = $app['akismet']->sendSpam(array(
+			'permalink' => $this->getArticle()->getURL(),
+			'comment_type' => 'comment',
+			'comment_author' => $this->fields['name']->getValue(),
+			'comment_content' => $this->getComment(),
+			'comment_author_email' => $this->getEmail(),
+			'user_ip' => $this->getIp(),
+			'user_agent' => $this->getUseragent(),
+			'referrer' => $this->getReferer(),
+		));
+
+		$log_entry = new \FelixOnline\Core\AkismetLog();
+		$log_entry->setCommentId($this)
+			->setAction('check')
+			->setIsSpam($check)
+			->setError($app['akismet']->getError())
+			->setRequest($app['akismet']->getConnector()->getLastRequest())
+			->setResponse($app['akismet']->getConnector()->getLastResponse())
+			->save();
+
+		// check for akismet errors
+		if (!is_null($app['akismet']->getError())) {
+			throw new \FelixOnline\Exceptions\InternalException($app['akismet']->getError());
+		}
+
+		$this->setActive(0);
+		$this->setPending(0);
+		$this->setSpam(1);
+
+		$this->save();
 	}
 
 	public function markAsHam()
 	{
 		$app = App::getInstance();
 
-		if ($this->getExternal()) {
-			// check key
-			$key_check = $app['akismet']->keyCheck(
-				$app->getOption('akismet_api_key', ''),
-				$app->getOption('base_url')
-			);
+		// check key
+		$key_check = $app['akismet']->keyCheck(
+			$app->getOption('akismet_api_key', ''),
+			$app->getOption('base_url')
+		);
 
-			if ($key_check == false) {
-				throw new \FelixOnline\Exceptions\InternalException('Akismet key is invalid');
-			}
-
-			// check spam using akismet
-			$check = $app['akismet']->sendHam(array(
-				'permalink' => $this->getArticle()->getURL(),
-				'comment_type' => 'comment',
-				'comment_author' => $this->fields['name']->getValue(),
-				'comment_content' => $this->getComment(),
-				'comment_author_email' => $this->getEmail(),
-				'user_ip' => $this->getIp(),
-				'user_agent' => $this->getUseragent(),
-				'referrer' => $this->getReferer(),
-			));
-
-			$log_entry = new \FelixOnline\Core\AkismetLog();
-			$log_entry->setCommentId($this)
-				->setAction('check')
-				->setIsSpam($check)
-				->setError($app['akismet']->getError())
-				->setRequest($app['akismet']->getConnector()->getLastRequest())
-				->setResponse($app['akismet']->getConnector()->getLastResponse())
-				->save();
-
-			// check for akismet errors
-			if (!is_null($app['akismet']->getError())) {
-				throw new \FelixOnline\Exceptions\InternalException($app['akismet']->getError());
-			}
-
-			$this->setActive(1);
-			$this->setPending(1);
-			$this->setSpam(0);
-
-			$this->save();
-		} else {
-			throw new \FelixOnline\Exceptions\InternalException('Trying to mark internal comment as spam');
+		if ($key_check == false) {
+			throw new \FelixOnline\Exceptions\InternalException('Akismet key is invalid');
 		}
+
+		// check spam using akismet
+		$check = $app['akismet']->sendHam(array(
+			'permalink' => $this->getArticle()->getURL(),
+			'comment_type' => 'comment',
+			'comment_author' => $this->fields['name']->getValue(),
+			'comment_content' => $this->getComment(),
+			'comment_author_email' => $this->getEmail(),
+			'user_ip' => $this->getIp(),
+			'user_agent' => $this->getUseragent(),
+			'referrer' => $this->getReferer(),
+		));
+
+		$log_entry = new \FelixOnline\Core\AkismetLog();
+		$log_entry->setCommentId($this)
+			->setAction('check')
+			->setIsSpam($check)
+			->setError($app['akismet']->getError())
+			->setRequest($app['akismet']->getConnector()->getLastRequest())
+			->setResponse($app['akismet']->getConnector()->getLastResponse())
+			->save();
+
+		// check for akismet errors
+		if (!is_null($app['akismet']->getError())) {
+			throw new \FelixOnline\Exceptions\InternalException($app['akismet']->getError());
+		}
+
+		$this->setActive(1);
+		$this->setPending(1);
+		$this->setSpam(0);
+
+		$this->save();
 	}
 
 	/**
@@ -517,7 +481,7 @@ class Comment extends BaseDB
 		$app = App::getInstance();
 		$authors = $this->getArticle()->getAuthors();
 
-		if (!$this->getExternal() && in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
+		if (in_array($this->getUser(), $authors)) { // if author of comment is one of the authors
 			$key = array_search($this->getUser(), $authors);
 			unset($authors[$key]);
 		}
