@@ -29,7 +29,9 @@ class CommentConsolidation2 extends AbstractMigration
         foreach ($items as $item) {
             $user = $this->query('SELECT * FROM user WHERE user = "'.$item['user'].'";');
 
-            if($user->rowCount() != 1) {
+            if($user->rowCount() == 0) {
+                $this->execute("INSERT INTO `user` (`user`, `name`, `visits`, `ip`, `timestamp`, `role`, `info`, `description`, `email`, `facebook`, `twitter`, `websitename`, `websiteurl`, `image`) VALUES ('".$item['user']."', '".$item['user']."', '0', '0.0.0.0', CURRENT_TIMESTAMP, '0', '', NULL, '".$item['user']."@imperial.ac.uk', NULL, NULL, NULL, NULL, '676');");
+            } elseif($user->rowCount() != 1) {
                 die('Too many users found '.$item['user']);
             }
 
