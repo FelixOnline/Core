@@ -471,6 +471,17 @@ class Comment extends BaseDB
 		$this->save();
 	}
 
+	public function reportAbuse()
+	{
+		$this->setActive(1);
+		$this->setPending(1);
+		$this->setSpam(0);
+
+		$this->save();
+
+		$this->emailAbuseComment();
+	}
+
 	/**
 	 * Public: Email authors of article
 	 */
@@ -579,6 +590,39 @@ class Comment extends BaseDB
 		// Create message
 		$message = \Swift_Message::newInstance()
 			->setSubject('New comment to moderate on "'.$this->getArticle()->getTitle().'"')
+			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
+			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
+			->setBody($content, 'text/html');
+
+		// Send message
+		return $app['email']->send($message);
+	}
+
+	/*
+	 * Private: Email felix on abuse report
+	 */
+	private function emailAbuseComment()
+	{
+		$app = App::getInstance();
+
+		// Get content
+		ob_start();
+		$data = array(
+			'app' => $app,
+			'comment' => $this,
+		);
+
+		// Render email template
+		call_user_func(function() use($data) {
+			extract($data);
+			include realpath(__DIR__ . '/../../../templates/') . '/new_abuse_comment.php';
+		});
+		$content = ob_get_contents();
+		ob_end_clean();
+
+		// Create message
+		$message = \Swift_Message::newInstance()
+			->setSubject('Abuse reported for comment on "'.$this->getArticle()->getTitle().'"')
 			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
 			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
 			->setBody($content, 'text/html');
