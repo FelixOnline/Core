@@ -352,7 +352,6 @@ class Comment extends BaseDB
 
 		// Send emails
 		if (!$this->getUser()) {
-
 			$log_entry = new \FelixOnline\Core\AkismetLog();
 			$log_entry->setCommentId($this)
 				->setAction('check')
@@ -365,16 +364,15 @@ class Comment extends BaseDB
 			// If pending comment
 			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
 				$this->emailComment();
-				$this->emailAuthors();
 			}
-		} else { // internal emails
-			if ($this->getReply()) { // if comment is replying to an internal comment 
-				$this->emailReply();
-			}
-
-			// email authors of article
-			$this->emailAuthors();
 		}
+		
+		if ($this->getReply()) { // if comment is replying to an internal comment 
+			$this->emailReply();
+		}
+
+		// email authors of article
+		$this->emailAuthors();
 		
 		return $this->getId(); // return new comment id
 	}
@@ -547,7 +545,7 @@ class Comment extends BaseDB
 		$message = \Swift_Message::newInstance()
 			->setSubject($this->getName() . ' has replied to your comment on "'.$this->getArticle()->getTitle().'"')
 			->setTo(array(
-				$reply->getUser()->getEmail() => $reply->getUser()->getName(),
+				$reply->getEmail() => $reply->getName(),
 			))
 			->setFrom(array('no-reply@imperial.ac.uk' => 'Felix Online'))
 			->setBody($content, 'text/html');
