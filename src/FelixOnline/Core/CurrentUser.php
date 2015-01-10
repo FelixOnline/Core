@@ -24,7 +24,7 @@ class CurrentUser extends User
 			$app['env']['cookies'] = new Cookies();
 		}
 
-		if ($this->isLoggedIn()) {
+		if ($this->isLoggedIn() && $app['env']['session']->session['uname'] != NULL) {
 			$this->setUser($app['env']['session']->session['uname']);
 		}
 	}
