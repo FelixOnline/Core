@@ -166,7 +166,7 @@ class Article extends BaseDB {
 		if ($this->getTeaser()) {
 			return str_replace('<br/>', '', strip_tags($this->getTeaser()));
 		} else {
-			$text = strip_tags($this->getContent());
+			$text = trim(preg_replace( "/\r|\n/", " ", strip_tags($this->getContent())));
 			return trim(
 				substr(
 					$text,
@@ -191,7 +191,7 @@ class Article extends BaseDB {
 	 * $limit - word limit [defaults to 50]
 	 */
 	public function getPreview($limit = 50) {
-		$string = strip_tags($this->getContent());
+		$string = trim(preg_replace( "/\r|\n/", " ", strip_tags($this->getContent())));
 		$words = explode(" ", $string);
 		$append = ' ... <br/><a href="'.$this->getURL().'" title="Read more" id="readmorelink">Read more</a>'; // TODO move into template
 		return implode(" ", array_splice($words, 0, $limit)) . $append;
@@ -206,9 +206,9 @@ class Article extends BaseDB {
 	 */
 	public function getShortDesc($limit = 80) {
 		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']->getValue()) {
-			return substr(trim(strip_tags($this->fields['short_desc']->getValue())), 0, $limit);
+			return substr(trim(preg_replace( "/\r|\n/", " ", strip_tags($this->fields['short_desc']->getValue()))), 0, $limit);
 		} else {
-			return substr(trim(strip_tags($this->getContent())), 0, $limit);
+			return substr(trim(preg_replace( "/\r|\n/", " ", strip_tags($this->getContent()))), 0, $limit);
 		}
 	}
 

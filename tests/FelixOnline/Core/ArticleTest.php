@@ -34,7 +34,18 @@ class ArticleTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(1);
 		$this->assertEquals(
 			$article->getContent()->value,
-			"<p>As Imperial alumnus Simon Singh prepares to return to College to give a guest lecture on the libel laws in science of which he has fallen foul of, the Government have announced the commencement of a working group on libel reform.</p>"
+			'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title></title>
+</head>
+<body>
+<p>As Imperial alumnus Simon Singh prepares to return to College to
+give a guest lecture on the libel laws in science of which he has
+fallen foul of, the Government have announced the commencement of a
+working group on libel reform.</p>
+</body>
+</html>'
 		);
 	}
 
