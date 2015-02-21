@@ -206,7 +206,7 @@ class Article extends BaseDB {
 	 */
 	public function getShortDesc($limit = 80) {
 		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']->getValue()) {
-			return substr($this->fields['short_desc']->getValue(), 0, $limit);
+			return substr(trim(strip_tags($this->fields['short_desc']->getValue())), 0, $limit);
 		} else {
 			return substr(trim(strip_tags($this->getContent())), 0, $limit);
 		}
