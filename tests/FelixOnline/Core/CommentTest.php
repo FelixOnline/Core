@@ -206,8 +206,7 @@ class CommentTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(1);
 		$comment = new \FelixOnline\Core\Comment();
 
-		$comment->setExternal(1)
-			->setName($name)
+		$comment->setName($name)
 			->setComment($content)
 			->setEmail($email)
 			->setArticle($article)
