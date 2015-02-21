@@ -112,6 +112,9 @@ class CurrentUser extends User
 
 		$_SESSION['felix']['uname'] = $this->getUser();
 		$_SESSION['felix']['loggedin'] = true;
+
+		$app['env']['session']['uname'] = $this->getUser();
+		$app['env']['session']['loggedin'] = true;
 	}
 
 	/*
