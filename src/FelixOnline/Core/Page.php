@@ -51,7 +51,7 @@ class Page extends BaseDb {
 	 * Public: Get page content
 	 */
 	public function getContent() {
-		return $this->evalPHP($this->fields['content']->getValue());
+		return str_replace('__CSRF_TOKEN__', $this->csrf_token, $this->evalPHP($this->fields['content']->getValue()));
 	}
 
 	/*
