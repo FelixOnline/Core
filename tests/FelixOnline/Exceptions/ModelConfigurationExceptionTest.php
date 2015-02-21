@@ -32,7 +32,7 @@ class ModelConfigurationExceptionTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException(
 			'FelixOnline\Exceptions\ModelConfigurationException',
 			'foo',
-			107
+			103
 		);
 		throw new \FelixOnline\Exceptions\ModelConfigurationException(
 			'foo',

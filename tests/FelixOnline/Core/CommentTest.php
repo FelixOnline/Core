@@ -47,18 +47,6 @@ class CommentTest extends AppTestCase
 		$this->assertEquals($user->getUser(), 'felix');
 	}
 
-	public function testGetUserException()
-	{
-		$comment = new \FelixOnline\Core\Comment(80000001);
-
-		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException',
-			'External comment does not have a user'
-		);
-
-		$user = $comment->getUser();
-	}
-
 	public function testGetReply()
 	{
 		$comment = new \FelixOnline\Core\Comment(1);
@@ -334,32 +322,6 @@ class CommentTest extends AppTestCase
 		$this->assertTrue($duplicate->commentExists());
 	}
 
-	public function testInteralCommentExists()
-	{
-		$article = new \FelixOnline\Core\Article(1);
-		$user = new \FelixOnline\Core\User('felix');
-		$comment = new \FelixOnline\Core\Comment();
-
-		$faker = Faker\Factory::create();
-		$content = $faker->text;
-
-		$comment->setUser($user)
-			->setComment($content)
-			->setArticle($article);
-
-		$this->assertFalse($comment->commentExists());
-
-		$comment->save();
-
-		$duplicate = new \FelixOnline\Core\Comment();
-
-		$duplicate->setUser($user)
-			->setComment($content)
-			->setArticle($article);
-
-		$this->assertTrue($duplicate->commentExists());
-	}
-
 	public function testSendExtEmail()
 	{
 		$faker = Faker\Factory::create();
@@ -374,11 +336,13 @@ class CommentTest extends AppTestCase
 		$emailMock = $this->mock('\Swift_Mailer')
 			->send(function($message) use ($test, $article) {
 				$test->assertGreaterThanOrEqual(0, strpos($message->getSubject(), $article->getTitle()));
-				$test->assertArrayHasKey('jkimbo@gmail.com', $message->getTo());
+				if($message->getTo() != 'jkimbo@gmail.com') {
+					$test->assertArrayHasKey('felix@imperial.ac.uk', $message->getTo());
+				}
 				$test->assertNotEmpty($message->getBody());
 
 				return true;
-			}, $this->once())
+			}, $this->exactly(2))
 			->new();
 
 		$this->app['email'] = $emailMock;

@@ -33,7 +33,7 @@ class ArticleTest extends AppTestCase
 	{
 		$article = new \FelixOnline\Core\Article(1);
 		$this->assertEquals(
-			$article->getContent(),
+			$article->getContent()->value,
 			"<p>As Imperial alumnus Simon Singh prepares to return to College to give a guest lecture on the libel laws in science of which he has fallen foul of, the Government have announced the commencement of a working group on libel reform.</p>"
 		);
 	}
@@ -150,7 +150,7 @@ class ArticleTest extends AppTestCase
 	{
 		$article = new \FelixOnline\Core\Article(1);
 
-		$this->assertEquals(4, $article->getNumComments());
+		$this->assertEquals(5, $article->getNumComments());
 	}
 
 	public function testGetComments()
