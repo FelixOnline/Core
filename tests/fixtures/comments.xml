@@ -4,7 +4,6 @@
 	<table_structure name="comment">
 		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
 		<field Field="article" Type="int(11)" Null="NO" Key="MUL" Extra="" Comment="" />
-		<field Field="external" Type="tinyint(1)" Null="NO" Key="" Default="0" Extra="" Comment="" />
 		<field Field="user" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
 		<field Field="name" Type="varchar(32)" Null="YES" Key="MUL" Extra="" Comment="" />
 		<field Field="comment" Type="varchar(1024)" Null="NO" Key="" Extra="" Comment="" />
@@ -30,13 +29,12 @@
 	<row>
 		<field name="id">1</field>
 		<field name="article">1</field>
-		<field name="external">0</field>
 		<field name="user">felix</field>
 		<field name="name">Joseph Letts - Felix Editor</field>
 		<field name="comment">Test comment number one</field>
 		<field name="timestamp">2009-12-27 02:46:51</field>
 		<field name="ip" xsi:nil="true"/>
-		<field name="email">felix@imperial.ac.uk</email>
+		<field name="email">felix@imperial.ac.uk</field>
 		<field name="useragent" xsi:nil="true"/>
 		<field name="referer" xsi:nil="true"/>
 		<field name="active">1</field>
@@ -49,13 +47,12 @@
 	<row>
 		<field name="id">2</field>
 		<field name="article">1</field>
-		<field name="external">0</field>
 		<field name="user">jk708</field>
 		<field name="name">Jonathan Kim</field>
 		<field name="comment">Test comment number two</field>
 		<field name="timestamp">2009-12-27 02:47:51</field>
 		<field name="ip" xsi:nil="true"/>
-		<field name="email">felix@imperial.ac.uk</email>
+		<field name="email">felix@imperial.ac.uk</field>
 		<field name="useragent" xsi:nil="true"/>
 		<field name="referer" xsi:nil="true"/>
 		<field name="active">1</field>
@@ -68,7 +65,6 @@
 	<row>
 		<field name="id">80000001</field>
 		<field name="article">1</field>
-		<field name="external">1</field>
 		<field name="user" xsi:nil="true"/>
 		<field name="name">Test</field>
 		<field name="comment">Test ext comment</field>
@@ -87,7 +83,6 @@
 	<row>
 		<field name="id">80000002</field>
 		<field name="article">1</field>
-		<field name="external">1</field>
 		<field name="user" xsi:nil="true"/>
 		<field name="name">viagra-test-123</field>
 		<field name="comment">Test spam comment</field>
@@ -106,7 +101,6 @@
 	<row>
 		<field name="id">80000003</field>
 		<field name="article">1</field>
-		<field name="external">1</field>
 		<field name="user" xsi:nil="true"/>
 		<field name="name">Test</field>
 		<field name="comment">Test rejected comment</field>
@@ -125,7 +119,6 @@
 	<row>
 		<field name="id">80000004</field>
 		<field name="article">1</field>
-		<field name="external">1</field>
 		<field name="user" xsi:nil="true"/>
 		<field name="name">Test</field>
 		<field name="comment">Test pending comment</field>
@@ -144,7 +137,6 @@
 	<row>
 		<field name="id">80000005</field>
 		<field name="article">1</field>
-		<field name="external">1</field>
 		<field name="user" xsi:nil="true"/>
 		<field name="name"></field>
 		<field name="comment">Test anonymous comment</field>

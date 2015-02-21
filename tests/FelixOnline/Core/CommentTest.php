@@ -226,7 +226,6 @@ class CommentTest extends AppTestCase
 		$this->assertEquals($row['email'], $email);
 		$this->assertEquals($row['comment'], $content);
 		$this->assertNull($row['user']);
-		$this->assertEquals((int) $row['external'], 1);
 		$this->assertEquals((int) $row['active'], 1);
 		$this->assertEquals((int) $row['pending'], 1);
 		$this->assertEquals((int) $row['spam'], 0);
@@ -245,8 +244,7 @@ class CommentTest extends AppTestCase
 		$user = new \FelixOnline\Core\User('felix');
 		$comment = new \FelixOnline\Core\Comment();
 
-		$comment->setExternal(0)
-			->setUser($user)
+		$comment->setUser($user)
 			->setComment($content)
 			->setArticle($article)
 			->save();
@@ -264,7 +262,6 @@ class CommentTest extends AppTestCase
 		$this->assertEquals($row['comment'], $content);
 		$this->assertNull($row['name']);
 		$this->assertNull($row['email']);
-		$this->assertEquals((int) $row['external'], 0);
 		$this->assertEquals((int) $row['active'], 1);
 		$this->assertEquals((int) $row['pending'], 0);
 		$this->assertEquals((int) $row['spam'], 0);
@@ -284,8 +281,7 @@ class CommentTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(1);
 		$comment = new \FelixOnline\Core\Comment();
 
-		$comment->setExternal(1)
-			->setName($name)
+		$comment->setName($name)
 			->setComment($content)
 			->setEmail($email)
 			->setArticle($article)
@@ -304,7 +300,6 @@ class CommentTest extends AppTestCase
 		$this->assertEquals($row['email'], $email);
 		$this->assertEquals($row['comment'], $content);
 		$this->assertNull($row['user']);
-		$this->assertEquals((int) $row['external'], 1);
 		$this->assertEquals((int) $row['active'], 0);
 		$this->assertEquals((int) $row['pending'], 0);
 		$this->assertEquals((int) $row['spam'], 1);
@@ -322,8 +317,7 @@ class CommentTest extends AppTestCase
 		$email = $faker->email;
 		$content = $faker->text;
 
-		$comment->setExternal(1)
-			->setName($name)
+		$comment->setName($name)
 			->setComment($content)
 			->setEmail($email)
 			->setArticle($article);
@@ -334,8 +328,7 @@ class CommentTest extends AppTestCase
 
 		$duplicate = new \FelixOnline\Core\Comment();
 
-		$duplicate->setExternal(1)
-			->setName($name)
+		$duplicate->setName($name)
 			->setComment($content)
 			->setArticle($article);
 
@@ -351,8 +344,7 @@ class CommentTest extends AppTestCase
 		$faker = Faker\Factory::create();
 		$content = $faker->text;
 
-		$comment->setExternal(0)
-			->setUser($user)
+		$comment->setUser($user)
 			->setComment($content)
 			->setArticle($article);
 
@@ -362,8 +354,7 @@ class CommentTest extends AppTestCase
 
 		$duplicate = new \FelixOnline\Core\Comment();
 
-		$duplicate->setExternal(0)
-			->setUser($user)
+		$duplicate->setUser($user)
 			->setComment($content)
 			->setArticle($article);
 
@@ -393,8 +384,7 @@ class CommentTest extends AppTestCase
 
 		$this->app['email'] = $emailMock;
 
-		$comment->setExternal(1)
-			->setName($name)
+		$comment->setName($name)
 			->setComment($content)
 			->setEmail($email)
 			->setArticle($article)
@@ -423,8 +413,7 @@ class CommentTest extends AppTestCase
 			->new();
 
 		$this->app['email'] = $emailMock;
-		$comment->setExternal(0)
-			->setUser($user)
+		$comment->setUser($user)
 			->setComment($content)
 			->setArticle($article)
 			->save();
@@ -453,8 +442,7 @@ class CommentTest extends AppTestCase
 			->new();
 
 		$this->app['email'] = $emailMock;
-		$comment->setExternal(0)
-			->setUser($user)
+		$comment->setUser($user)
 			->setComment($content)
 			->setArticle($article)
 			->save();
@@ -489,8 +477,7 @@ class CommentTest extends AppTestCase
 
 		$this->app['email'] = $emailMock;
 
-		$comment->setExternal(0)
-			->setUser($user)
+		$comment->setUser($user)
 			->setComment($content)
 			->setArticle($article)
 			->setReply($replyingto)
