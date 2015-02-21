@@ -7,6 +7,7 @@ class IssueManager
 {
 	function __construct() {
 		global $dba;
+
 		$this->dba = $dba;
 		$this->safesql = new \SafeSQL_MySQLi($dba->dbh);
 	}
@@ -73,6 +74,31 @@ class IssueManager
 				$issues[] = $issue;
 			}
 		}
+
+		return $issues;
+	}
+	/*
+	 * Public static: Get issues for publication all years
+	 *
+	 * $pub     - id of publication type [default = 1 (Felix)]
+	 *
+	 * Return array of issue objects
+	 */
+	public function getAllPublicationIssues($pub = 1) {
+		$sql = $this->safesql->query("SELECT
+					i.id AS id
+				FROM Issues as i
+				WHERE i.PubNo = %i
+				ORDER BY i.id ASC", array($pub));
+		$result = $this->dba->get_results($sql);
+		$issues = array();
+		if ($result) {
+			foreach($result as $obj) {
+				$issue = new Issue($obj->id);
+				$issues[] = $issue;
+			}
+		}
+
 		return $issues;
 	}
 	/*
