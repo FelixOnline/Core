@@ -98,6 +98,37 @@ class BaseDB extends BaseModel
 	}
 
 	/**
+	 * Public: Delete the model. Restores instance of model back to if it was created with no ID
+	 */
+	public function delete()
+	{
+		$app = App::getInstance();
+
+		// update model
+		if ($this->pk && $this->getPk()->getValue()) {
+			$sql = $this->constructDeleteSQL($this->fields);
+
+			$app['db']->query($sql);
+			if ($app['db']->last_error) {
+				throw new SQLException($app['db']->last_error, $sql);
+			}
+
+			// clear cache
+			$item = $this->getCache($this->getPk());
+			$item->clear();
+
+			// clear model
+			$this->constructorId = NULL;
+			$this->pk = NULL;
+			$this->initialFields = NULL;
+		} else { 
+			throw new InternalException('Trying to delete a model that does not yet exist');
+		}
+
+		return true;
+	}
+
+	/**
 	 * Public: Save all fields to database
 	 *
 	 * Example:
@@ -149,6 +180,20 @@ class BaseDB extends BaseModel
 		}
 
 		return $this->getPk()->getValue(); // return new id
+	}
+
+	/**
+	 * Construct the delete sql to remove model from db
+	 */
+	public function constructDeleteSQL($fields)
+	{
+		$sql = array();
+
+		$sql[] = "DELETE";
+		$sql[] = "FROM `" . $this->dbtable . "`";
+		$sql[] = "WHERE `" . $this->pk . "` = " . $fields[$this->pk]->getSQL();
+
+		return implode(" ", $sql);
 	}
 
 	/**
