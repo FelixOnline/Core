@@ -225,7 +225,7 @@ class CurrentUser extends User
 
 			return true;
 		} else {
-			return false;
+			return array($login->timediff, LOGIN_CHECK_LENGTH, $login->ip, $app['env']['REMOTE_ADDR'], $login->browser, $app['env']['HTTP_USER_AGENT']);
 		}
 	}
 
