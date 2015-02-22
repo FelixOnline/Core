@@ -88,7 +88,6 @@ class ResourceManager {
 	 * Returns array of css files paths
 	 */
 	public function getCSS() {
-		global $timing;
 		$data = array();
 		$min = array();
 		foreach($this->css as $key => $value) {
@@ -105,7 +104,7 @@ class ResourceManager {
 				}
 			}
 		}
-		$timing->log('before production');
+
 		if(PRODUCTION_FLAG == true) { // if in production
 			// concatenate minified files
 			$content = '';
@@ -113,16 +112,16 @@ class ResourceManager {
 			foreach($min as $key => $value) {
 				$filename = strstr($value, '.', true);
 				$content .= file_get_contents($this->getFilename($value, 'css'));
-				$timing->log('after get file contents');
+
 				if($key == 0) {
 					$name .= $filename;
 				} else {
 					$name .= '-'.$filename;
 				}
 			}
-			$timing->log('after min loop');
+
 			file_put_contents($this->getFilename($name.'.min.css', 'css', 'dir'), $content);
-			$timing->log('after put file');
+
 			$data['min'] = $this->getFilename($name.'.min.css', 'css');
 		}
 		return $data;
