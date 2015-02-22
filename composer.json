@@ -45,6 +45,9 @@
 		},
 		"classmap": [
 			"lib/SafeSQL.php"
+		],
+		"files": [
+			"constants.php"
 		]
 	}
 }
