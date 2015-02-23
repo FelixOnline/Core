@@ -273,6 +273,8 @@ class User extends BaseDB
 		$user->setIp(0);
 		$user->setRole(0);
 		$user->setImage(676); // FIXME - Move to const
+		$user->setShowEmail(TRUE);
+		$user->setShowLdap(TRUE);
 
 		$user->updateName();
 		$user->updateEmail();
