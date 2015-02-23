@@ -17,6 +17,7 @@
 		<field name="websitename">My website</field>
 		<field name="websiteurl">http://felixonline.co.uk</field>
 		<field name="image">23</field>
+		<field name="show_email">0</field>
 	</row>
 	<row>
 		<field name="user">jk708</field>
@@ -33,6 +34,7 @@
 		<field name="websitename">jkimbo.co.uk</field>
         <field name="websiteurl">http://jkimbo.co.uk</field>
 		<field name="image">24</field>
+		<field name="show_email">0</field>
 	</row>
 	<row>
 		<field name="user">pk1811</field>
@@ -53,6 +55,7 @@
 		<field name="websitename"></field>
         <field name="websiteurl"></field>
 		<field name="image">23</field>
+		<field name="show_email">1</field>
 	</row>
 	</table_data>
 </database>
