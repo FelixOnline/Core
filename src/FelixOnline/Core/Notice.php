@@ -5,7 +5,7 @@ namespace FelixOnline\Core;
  */
 class Notice extends BaseDB
 {
-	public $dbtable = 'notice';
+	public $dbtable = 'notices';
 
 	function __construct($id = NULL) {
 		$fields = array(
