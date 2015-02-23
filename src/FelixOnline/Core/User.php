@@ -298,7 +298,7 @@ class User extends BaseDB
 		if(!LOCAL) {
 			$ds = ldap_connect("addressbook.ic.ac.uk");
 			$r = ldap_bind($ds);
-			$justthese = array("sn");
+			$justthese = array("displayname");
 			$sr = ldap_search(
 				$ds,
 				"ou=People,ou=shibboleth,dc=ic,dc=ac,dc=uk",
@@ -307,8 +307,8 @@ class User extends BaseDB
 			);
 			$info = ldap_get_entries($ds, $sr);
 			if ($info["count"] > 0) {
-				$this->setName($info[0]['sn'][0]);
-				return ($info[0]['sn'][0]);
+				$this->setName($info[0]['displayname'][0]);
+				return ($info[0]['displayname'][0]);
 			} else {
 				return false;
 			}
@@ -335,7 +335,7 @@ class User extends BaseDB
 			);
 			$info = ldap_get_entries($ds, $sr);
 			if ($info["count"] > 0) {
-				$this->setName($info[0]['mail'][0]);
+				$this->setEmail($info[0]['mail'][0]);
 				return ($info[0]['mail'][0]);
 			} else {
 				return false;
