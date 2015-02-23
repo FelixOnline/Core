@@ -69,6 +69,7 @@ class User extends BaseDB
 				)
 			)),
 			'image' => new Type\ForeignKey('FelixOnline\Core\Image'),
+			'show_email' => new Type\BooleanField(),
 		);
 
 		parent::__construct($fields, $uname);
