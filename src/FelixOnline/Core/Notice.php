@@ -9,10 +9,10 @@ class Notice extends BaseDB
 
 	function __construct($id = NULL) {
 		$fields = array(
-			'author' => new Type\ForeignKey('User'),
+			'author' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'text' => new Type\ForeignKey('FelixOnline\Core\Text'),
-			'start_date' => new Type\DateTimeField(),
-			'end_date' => new Type\DateTimeField(),
+			'start_time' => new Type\DateTimeField(),
+			'end_time' => new Type\DateTimeField(),
 			'hidden' => new Type\BooleanField(array(
 				'null' => false,
 			)),
