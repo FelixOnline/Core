@@ -19,8 +19,8 @@ class NoticesTable extends AbstractMigration
               ->addColumn('text', 'integer')
               ->addColumn('start_time', 'datetime')
               ->addColumn('end_time', 'datetime')
-              ->addColumn('hidden', 'boolean')
-              ->addColumn('frontpage', 'boolean')
+              ->addColumn('hidden', 'boolean', array('null' => false, 'default' => 0))
+              ->addColumn('frontpage', 'boolean', array('null' => false, 'default' => 1))
               ->addColumn('sort_order', 'integer')
               ->create();
 
