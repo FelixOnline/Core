@@ -321,7 +321,7 @@ class User extends BaseDB
 	/**
 	 * Update user's email address from ldap
 	 */
-	private function updateEmail($uname)
+	private function updateEmail()
 	{
 		if(!LOCAL) {
 			$ds = ldap_connect("addressbook.ic.ac.uk");
@@ -330,7 +330,7 @@ class User extends BaseDB
 			$sr = ldap_search(
 				$ds,
 				"ou=People,ou=shibboleth,dc=ic,dc=ac,dc=uk",
-				"uid=$uname",
+				"uid=".$this->getUser(),
 				$justthese
 			);
 			$info = ldap_get_entries($ds, $sr);
@@ -351,7 +351,7 @@ class User extends BaseDB
 	 *
 	 * Returns json encoded array
 	 */
-	private function updateInfo($uname)
+	private function updateInfo()
 	{
 		$info = '';
 		if(!LOCAL) { // if on union server
@@ -361,7 +361,7 @@ class User extends BaseDB
 			$sr = ldap_search(
 				$ds,
 				"ou=People,ou=shibboleth,dc=ic,dc=ac,dc=uk",
-				"uid=$uname",
+				"uid=".$this->getUser(),
 				$justthese
 			);
 			$info = ldap_get_entries($ds, $sr);
