@@ -164,5 +164,15 @@ class Issue {
 		}
 		return $this->fields['file_name'];
 	}
+
+	public function getOutput() {
+		return array(
+			'id' => $this->id,
+			'pub_date' => $this->pubdate,
+			'issue_no' => $this->issueno,
+			'pub_no' => $this->pubno,
+			'description' => $this->description,
+			'year' => $this->year);
+	}
 }
 
