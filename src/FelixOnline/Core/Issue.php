@@ -177,7 +177,9 @@ class Issue {
 			'issue_no' => $this->issueno,
 			'pub_no' => $this->pubno,
 			'description' => $this->description,
-			'year' => $this->year);
+			'year' => $this->year,
+			'url' => $this->getURL(),
+			'download_url' => $this->getDownloadURL());
 	}
 }
 
