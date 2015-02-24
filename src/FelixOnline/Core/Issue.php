@@ -145,6 +145,11 @@ class Issue {
 						$this->getIssueNo()
 					));
 			$result = $this->dba->get_row($sql);
+
+			if(!$result) {
+				throw new \FelixOnline\Exceptions\InternalException('No corresponding issue record could be found for publication '.$this->getPubNo().' issue '.$this->getIssueNo().'.');
+			}
+
 			$this->fields['file'] = $result->FileName;
 		}
 		return $this->fields['file'];
