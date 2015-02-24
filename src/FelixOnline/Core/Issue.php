@@ -160,7 +160,7 @@ class Issue {
 			$file = $this->getFile();
 			preg_match('/\/(\w+)_[A-Z]/', $file, $matches);
 			$filename = $matches[1] . '.pdf';
-			$this->fields['file_name'] = $file_name;
+			$this->fields['file_name'] = $filename;
 		}
 		return $this->fields['file_name'];
 	}
