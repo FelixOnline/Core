@@ -40,7 +40,7 @@ class Issue {
 			$row = $this->dba->get_row($sql);
 
 			if(!$row) {
-				throw new \FelixOnline\Exceptions\ModelNotFoundException('No issue', $this, $id);
+				throw new \FelixOnline\Exceptions\ModelNotFoundException('This issue ID does not exist', $this, $id);
 			}
 
 			$this->id = $id;
