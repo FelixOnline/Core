@@ -102,6 +102,31 @@ class IssueManager
 		return $issues;
 	}
 	/*
+	 * Public static: Get latest issue for publication
+	 *
+	 * $pub     - id of publication type [default = 1 (Felix)]
+	 *
+	 * Return array of issue objects
+	 */
+	public function getLatestPublicationIssue($pub = 1) {
+		$sql = $this->safesql->query("SELECT
+					i.id AS id
+				FROM Issues as i
+				WHERE i.PubNo = %i
+				ORDER BY i.id DESC
+				LIMIT 1", array($pub));
+		$result = $this->dba->get_results($sql);
+		$issues = array();
+		if ($result) {
+			foreach($result as $obj) {
+				$issue = new Issue($obj->id);
+				$issues[] = $issue;
+			}
+		}
+
+		return $issues;
+	}
+	/*
 	 * Public static: Get publications
 	 *
 	 * Return array of ID => Publication Name
