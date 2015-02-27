@@ -350,29 +350,31 @@ class Comment extends BaseDB
 
 		parent::save();
 
-		// Send emails
-		if (!$this->getUser()) {
-			$log_entry = new \FelixOnline\Core\AkismetLog();
-			$log_entry->setCommentId($this)
-				->setAction('check')
-				->setIsSpam($check)
-				->setError($app['akismet']->getError())
-				->setRequest($app['akismet']->getConnector()->getLastRequest())
-				->setResponse($app['akismet']->getConnector()->getLastResponse())
-				->save();
+		if(!$this->getSpam()) {
+			// Send emails
+			if (!$this->getUser()) {
+				$log_entry = new \FelixOnline\Core\AkismetLog();
+				$log_entry->setCommentId($this)
+					->setAction('check')
+					->setIsSpam($check)
+					->setError($app['akismet']->getError())
+					->setRequest($app['akismet']->getConnector()->getLastRequest())
+					->setResponse($app['akismet']->getConnector()->getLastResponse())
+					->save();
 
-			// If pending comment
-			if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
-				$this->emailComment();
+				// If pending comment
+				if (!$this->getSpam() && $this->getPending() && $this->getActive()) {
+					$this->emailComment();
+				}
 			}
-		}
-		
-		if ($this->getReply()) { // if comment is replying to an internal comment 
-			$this->emailReply();
-		}
+			
+			if ($this->getReply()) { // if comment is replying to an internal comment 
+				$this->emailReply();
+			}
 
-		// email authors of article
-		$this->emailAuthors();
+			// email authors of article
+			$this->emailAuthors();
+		}		
 		
 		return $this->getId(); // return new comment id
 	}
