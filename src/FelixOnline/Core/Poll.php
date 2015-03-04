@@ -14,7 +14,7 @@ class Poll extends BaseDB
 			'ended' => new Type\BooleanField(array(
 				'null' => false,
 			)),
-			'bottom' => new Type\BooleanField(array(
+			'location' => new Type\IntegerField(array(
 				'null' => false,
 			)),
 			'hide_results' => new Type\BooleanField(array(
