@@ -105,7 +105,24 @@ class BaseManager
 	 */
 	public function order($columns, $order)
 	{
-		$this->order = array($columns, $order);
+		$colArray = array();
+
+		if(is_array($columns)) {
+			foreach($columns as $column) {
+				$colArray = array($column, $order);
+			}
+		}
+
+		$this->multiOrder($colArray);
+		return $this;
+	}
+
+	/**
+	 * Order objects - multiple columns with different sort orders
+	 */
+	public function multiOrder($columns)
+	{
+		$this->order = $columns;
 		return $this;
 	}
 
@@ -296,19 +313,21 @@ class BaseManager
 		if ($this->order) {
 			$order = "ORDER BY ";
 
-			if (is_array($this->order[0])) {
-				$columns = array();
-				foreach ($this->order[0] as $column) {
-					$columns[] = $this->getColumnReference($column);
+			$first = true;
+
+			foreach($this->order as $orderItem) {
+				if(!$first) {
+					$order .= ", ";
 				}
-				$order .= implode(",", $columns);
-			} else {
-				$order .= $this->getColumnReference($this->order[0]);
+
+				$order .= $this->getColumnReference($orderItem[0]);
+				$order .= " ";
+				$order .= $orderItem[1];
+
+				$first = false;
 			}
 
 			$order .= " ";
-
-			$order .= $this->order[1];
 
 			return $order;
 		}
