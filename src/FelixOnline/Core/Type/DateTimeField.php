@@ -9,10 +9,13 @@ class DateTimeField extends BaseType
 	{
 		if (is_string($value) && strtotime($value) !== false) {
 			$this->value = strtotime($value);
+			$this->raw_value = $value;
 		} else if (is_int($value)) {
 			$this->value = $value;
+			$this->raw_value = $value;
 		} else if (is_null($value)) {
 			$this->value = $value;
+			$this->raw_value = $value;
 		} else {
 			throw new \FelixOnline\Exceptions\InternalException('Invalid date');
 		}
@@ -23,6 +26,11 @@ class DateTimeField extends BaseType
 	public function getValue()
 	{
 		return $this->value;
+	}
+
+	public function getRawValue()
+	{
+		return $this->raw_value;
 	}
 
 	public function getSQL()
