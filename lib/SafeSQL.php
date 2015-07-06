@@ -42,6 +42,8 @@ class SafeSQL
 \*======================================================================*/
 	function query($query_string, $query_vars)
 	{		
+		global $app;
+		$link_id = $app['db']->dbh;
 
 		if(is_array($query_vars)) {
 			
@@ -69,7 +71,7 @@ class SafeSQL
                     continue;
                 }
 				// escape string
-				$query_vars[$_x] = $this->_sql_escape($query_vars[$_x]);
+				$query_vars[$_x] = $this->_sql_escape($link_id, $query_vars[$_x]);
 				if(in_array($_match[0][$_x], array('%S','%I','%F','%C','%L','%Q','%N'))) {
 					// get positions of [ and ]
                     if(isset($_last_var_pos))
@@ -204,7 +206,7 @@ class SafeSQL
     Function: _sql_escape
     Purpose:  method overridden by subclass
 \*======================================================================*/
-	function _sql_escape($var) { }
+	function _sql_escape($link_id, $var) { }
 	
 }
 		
@@ -215,29 +217,26 @@ class SafeSQL
 
 class SafeSQL_MySQLi extends SafeSQL {
 	
-	var $_link_id;	
-	
 /*======================================================================*\
     Function: SafeSQL_MySQL
     Purpose:  constructor
 \*======================================================================*/
-	function SafeSQL_MySQLi($link_id) {
-		$this->_link_id = $link_id;
+	function SafeSQL_MySQLi() {
 	}
 
 /*======================================================================*\
     Function: _sql_escape
     Purpose:  recursively escape variables/arrays for SQL use
 \*======================================================================*/
-	function _sql_escape($var) {
+	function _sql_escape($link_id, $var) {
 		if(is_array($var)) {
 			foreach($var as $_element) {
-				$_newvar[] = $this->_sql_escape($_element);
+				$_newvar[] = $this->_sql_escape($link_id, $_element);
 			}
 			return $_newvar;
 		}
 		if(function_exists('mysqli_real_escape_string')) {
-			return mysqli_real_escape_string($this->_link_id, $var);
+			return $link_id->real_escape_string($var);
 		} else {
 			return addslashes($var);
 		}	
