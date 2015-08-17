@@ -77,7 +77,6 @@ class Category extends BaseDB
 	{
 		$editors = BaseManager::build('FelixOnline\Core\User', 'category_author', 'user')
 			->filter("category = %i", array($this->getId()))
-			->filter("admin = 1")
 			->values();
 
 		return $editors;

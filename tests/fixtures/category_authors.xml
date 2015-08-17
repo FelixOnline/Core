@@ -3,14 +3,14 @@
 <database name="media_felix">
 	<table_data name="category_author">
 	<row>
+		<field name="id">1</field>
 		<field name="category">1</field>
 		<field name="user">felix</field>
-		<field name="admin">1</field>
 	</row>
 	<row>
+		<field name="id">2</field>
 		<field name="category">1</field>
 		<field name="user">jk708</field>
-		<field name="admin">1</field>
 	</row>
 	</table_data>
 </database>
