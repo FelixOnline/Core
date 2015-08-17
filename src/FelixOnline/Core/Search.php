@@ -53,7 +53,8 @@ class Search
 			WHERE title LIKE '%s'
 			AND hidden = 0
 			AND published < NOW()
-			ORDER BY date DESC";
+			ORDER BY article.date DESC,
+			article.id DESC";
 
 		// get count
 		$sql = $this->safesql->query(
@@ -107,7 +108,8 @@ class Search
 			WHERE text_story.content LIKE '%s'
 			AND article.hidden = 0
 			AND article.published < NOW()
-			ORDER BY article.date DESC";
+			ORDER BY article.date DESC,
+			article.id DESC";
 
 		// get count
 
@@ -119,6 +121,8 @@ class Search
 				'%'.$this->query.'%',
 			)
 		);
+
+		die($sql);
 
 		$count = (int)$this->db->get_var($sql);
 
