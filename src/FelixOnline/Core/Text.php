@@ -18,6 +18,7 @@ class Text extends BaseDB
 			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'content' => new Type\TextField(),
 			'timestamp' => new Type\DateTimeField(),
+			'converted' => new Type\BooleanField(),
 		);
 
 		parent::__construct($fields, $id);
