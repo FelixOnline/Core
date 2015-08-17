@@ -14,7 +14,7 @@ class TextConversion extends AbstractMigration
      */
     public function change()
     {
-        $table = $this->table('article_text');
+        $table = $this->table('text_story');
         $table->addColumn('converted', 'boolean', array('null' => false, 'default' => 0));
         $table->save();
     }
