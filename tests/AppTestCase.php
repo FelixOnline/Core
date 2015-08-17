@@ -25,10 +25,13 @@ class AppTestCase extends DatabaseTestCase
 
 		$app = new \FelixOnline\Core\App($config);
 
+		$dbuser = getenv('DB_USER') ? getenv('DB_USER') : 'root';
+		$dbpass = getenv('DB_PASS') ? getenv('DB_PASS') : '';
+
 		$db = new \ezSQL_mysqli();
 		$db->quick_connect(
-			'root',
-			'',
+			$dbuser,
+			$dbpass,
 			'test_media_felix',
 			'localhost',
 			3306,

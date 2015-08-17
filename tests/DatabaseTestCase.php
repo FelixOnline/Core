@@ -56,7 +56,7 @@ class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
 			try {
 				$dbname = "test_media_felix";
 				$dbuser = getenv('DB_USER') ? getenv('DB_USER') : 'root';
-				$dbpass = '';
+				$dbpass = getenv('DB_PASS') ? getenv('DB_PASS') : '';
 				$pdo = new PDO('mysql:host=localhost;dbname='.$dbname, $dbuser, $dbpass);
 				$this->conn = $this->createDefaultDBConnection($pdo, 'test');
 			} catch (PDOException $e) {
