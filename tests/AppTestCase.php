@@ -23,6 +23,7 @@ class AppTestCase extends DatabaseTestCase
 			'base_url' => 'http://localhost/'
 		);
 
+		global $app;
 		$app = new \FelixOnline\Core\App($config);
 
 		$db = new \ezSQL_mysqli();

@@ -102,7 +102,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` ORDER BY `article`.`id`,`article`.`title` DESC");
+		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` ORDER BY `article`.`id` DESC, `article`.`title` DESC");
 	}
 
 	public function testOrderWithTable()

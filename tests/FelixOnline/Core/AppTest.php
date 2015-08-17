@@ -8,6 +8,7 @@ class AppTest extends DatabaseTestCase
 
 	public function createApp($config)
 	{
+		global $app;
 		$app = new \FelixOnline\Core\App($config);
 
 		$db = new \ezSQL_mysqli();

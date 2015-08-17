@@ -109,8 +109,10 @@ class BaseManager
 
 		if(is_array($columns)) {
 			foreach($columns as $column) {
-				$colArray = array($column, $order);
+				$colArray[] = array($column, $order);
 			}
+		} else {
+			$colArray[] = array($columns, $order);
 		}
 
 		$this->multiOrder($colArray);
@@ -326,8 +328,6 @@ class BaseManager
 
 				$first = false;
 			}
-
-			$order .= " ";
 
 			return $order;
 		}

@@ -16,6 +16,8 @@ class BaseDB extends BaseModel
 	protected $initialFields;
 	protected $constructorId;
 
+	private $new;
+
 	function __construct($fields, $id = null, $dbtable = null)
 	{
 		$app = \FelixOnline\Core\App::getInstance();
@@ -34,6 +36,8 @@ class BaseDB extends BaseModel
 
 		$this->pk = $this->findPk($fields);
 
+		$this->new = true;
+
 		if (!is_null($id)) {
 			$this->constructorId = $id;
 
@@ -44,6 +48,8 @@ class BaseDB extends BaseModel
 			foreach ($results as $column => $value) {
 				$fields[$column]->setValue($value);
 			}
+
+			$this->new = false;
 		}
 
 		// PHP passes all objects by refernce so we need to clone the fields 
@@ -143,7 +149,7 @@ class BaseDB extends BaseModel
 		$app = App::getInstance();
 
 		// update model
-		if ($this->pk && $this->getPk()->getValue()) {
+		if ($this->getPk()->getValue() && !$this->new) {
 			// Determine what has been modified
 			$changed = array();
 			foreach ($this->initialFields as $column => $field) {
@@ -177,6 +183,8 @@ class BaseDB extends BaseModel
 			if ($app['db']->insert_id) {
 				$this->fields[$this->pk]->setValue($app['db']->insert_id);
 			}
+
+			$this->new = false;
 		}
 
 		return $this->getPk()->getValue(); // return new id
