@@ -32,10 +32,10 @@ class BaseDB extends BaseModel
 			throw new InternalException('No table specified');
 		}
 
+		$this->pk = $this->findPk($fields);
+
 		if (!is_null($id)) {
 			$this->constructorId = $id;
-
-			$this->pk = $this->findPk($fields);
 
 			$fields[$this->pk]->setValue($id);
 
