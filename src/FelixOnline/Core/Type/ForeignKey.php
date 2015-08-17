@@ -4,7 +4,7 @@ namespace FelixOnline\Core\Type;
 class ForeignKey extends BaseType
 {
 	protected $placeholder = "'%s'";
-	protected $class;
+	public $class;
 
 	public function __construct($class, $config = array())
 	{
