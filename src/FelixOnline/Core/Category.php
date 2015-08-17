@@ -7,17 +7,7 @@ namespace FelixOnline\Core;
  *	  id			  - 
  *	  label		   -
  *	  cat			 -
- *	  uri			 - [depreciated]
- *	  colourclass	 - [depreciated]
  *	  active		  -
- *	  top_slider_1	-
- *	  top_slider_2	-
- *	  top_slider_3	-
- *	  top_slider_4	-
- *	  top_sidebar_1   -
- *	  top_sidebar_2   -
- *	  top_sidebar_3   -
- *	  top_sidebar_4   -
  *	  email		   -
  *	  twitter		 -
  *	  description	 -
@@ -35,17 +25,8 @@ class Category extends BaseDB
 		$fields = array(
 			'label' => new Type\CharField(),
 			'cat' => new Type\CharField(),
-			'uri' => new Type\CharField(),
-			'colourclass' => new Type\CharField(),
 			'active' => new Type\BooleanField(),
-			'top_slider_1' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'top_slider_2' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'top_slider_3' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'top_slider_4' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'top_sidebar_1' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'top_sidebar_2' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'top_sidebar_3' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'top_sidebar_4' => new Type\ForeignKey('FelixOnline\Core\Article'),
+			'parent' => new Type\ForeignKey('FelixOnline\Core\Category'),
 			'email' => new Type\CharField(),
 			'twitter' => new Type\CharField(),
 			'description' => new Type\TextField(),
@@ -83,27 +64,17 @@ class Category extends BaseDB
 	}
 
 	/**
-	 * Get category top stories
+	 * Public: Get category children
 	 *
-	 * Returns array of articles
+	 * Returns array of category objects
 	 */
-	public function getTopStories()
+	public function getChildren()
 	{
-		if (!$this->stories) {
-			$this->stories = array();
+		$editors = BaseManager::build('FelixOnline\Core\Category', 'category', 'id')
+			->filter("parent = %i", array($this->getId()))
+			->values();
 
-			$sliders = array(
-				'top_slider_1',
-				'top_slider_2',
-				'top_slider_3',
-				'top_slider_4',
-			);
-
-			foreach($sliders as $slider) {
-				$this->stories[] = $this->fields[$slider]->getValue();
-			}
-		}
-		return $this->stories;
+		return $editors;
 	}
 
 	/**
@@ -119,6 +90,33 @@ class Category extends BaseDB
 			FROM `category`
 			WHERE hidden = 0
 			AND id > 0
+			ORDER BY `order` ASC",
+			array());
+		$results = $app['db']->get_results($sql);
+		$cats = array();
+
+		if (!is_null($results)) {
+			foreach($results as $cat) {
+				$cats[] = new Category($cat->id);
+			}
+		}
+		return $cats;
+	}
+
+	/**
+	 * Static: Get all root categories
+	 */
+	public static function getRootCategories()
+	{
+		$app = App::getInstance();
+
+		$sql = $app['safesql']->query(
+			"SELECT
+				`id`
+			FROM `category`
+			WHERE hidden = 0
+			AND id > 0
+			AND parent IS NULL
 			ORDER BY `order` ASC",
 			array());
 		$results = $app['db']->get_results($sql);

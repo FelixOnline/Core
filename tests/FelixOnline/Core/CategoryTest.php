@@ -44,15 +44,23 @@ class CategoryTest extends AppTestCase
 		$this->assertNull($editors);
 	}
 
-	public function testGetTopStories()
+	public function testGetChildren()
 	{
 		$category = new \FelixOnline\Core\Category(1);
 
-		$topStories = $category->getTopStories();
-		$this->assertCount(4, $topStories);
-		$this->assertInstanceOf('FelixOnline\Core\Article', $topStories[0]);
-		$this->assertEquals($topStories[0]->getTitle(), 'Fighting for Libel Reform');
-		$this->assertNull($topStories[3]);
+		$children = $category->getChildren();
+
+		$this->assertCount(1, $children);
+		$this->assertInstanceOf('FelixOnline\Core\Category', $children[0]);
+		$this->assertEquals($children[0]->getLabel(), 'Comment');
+	}
+
+	public function testGetChildrenNull()
+	{
+		$category = new \FelixOnline\Core\Category(2);
+
+		$children = $category->getChildren();
+		$this->assertNull($children);
 	}
 
 	public function testGetCategories()
@@ -60,6 +68,15 @@ class CategoryTest extends AppTestCase
 		$categories = \FelixOnline\Core\Category::getCategories();
 
 		$this->assertCount(2, $categories);
+		$this->assertInstanceOf('FelixOnline\Core\Category', $categories[0]);
+		$this->assertEquals($categories[0]->getLabel(), 'News');
+	}
+
+	public function testGetRootCategories()
+	{
+		$categories = \FelixOnline\Core\Category::getRootCategories();
+
+		$this->assertCount(1, $categories);
 		$this->assertInstanceOf('FelixOnline\Core\Category', $categories[0]);
 		$this->assertEquals($categories[0]->getLabel(), 'News');
 	}
