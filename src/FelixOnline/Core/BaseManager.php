@@ -283,6 +283,7 @@ class BaseManager
 				$st[] = "`" . $manager->table . "`.`" . $manager->pk . "`";
 				$st[] = ")";
 				$joins[] = implode(' ', $st);
+				$joins[] = $manager->getJoin();
 			}
 			return implode(" ", $joins);
 		}
@@ -294,6 +295,19 @@ class BaseManager
 	 */
 	protected function getWhere()
 	{
+		$filters = $this->getWhereAsArray();
+
+		if (!empty($filters)) {
+			return "WHERE " . implode(" AND ", $filters);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Where as array for recursive joins
+	 */
+	protected function getWhereAsArray() {
 		$filters = [];
 
 		if (!empty($this->filters)) {
@@ -303,15 +317,11 @@ class BaseManager
 		if (!empty($this->joins)) {
 			foreach ($this->joins as $join) {
 				$manager = $join['manager'];
-				$filters = array_merge($filters, $manager->filters);
+				$filters = array_merge($filters, $manager->getWhereAsArray());
 			}
 		}
 
-		if (!empty($filters)) {
-			return "WHERE " . implode(" AND ", $filters);
-		}
-
-		return null;
+		return $filters;
 	}
 
 	/**

@@ -229,7 +229,36 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` ) WHERE `article`.published < NOW() AND `article_author`.author = "felix" ORDER BY `article`.`id` ASC');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.published < NOW() AND `article_author`.author = "felix" ORDER BY `article`.`id` ASC');
+	}
+
+	public function testNestedJoin()
+	{
+		$m1 = $this->getManager();
+		$m1->filter('published < NOW()');
+
+		$m2 = $this->getManager();
+
+		$m2->table = 'category';
+		$m2->pk = 'id';
+
+		$m2->filter('id = "%s"', array('1'));
+
+		$m3 = $this->getManager();
+
+		$m3->table = 'category_author';
+		$m3->pk = 'category';
+
+		$m3->filter('user = "%s"', array('pk1811'));
+
+		$m2->join($m3);
+
+		$m1->join($m2, null, "category");
+		$m1->order('id', 'ASC');
+
+		$sql = $m1->getSQL();
+
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `category` ON ( `article`.`category` = `category`.`id` ) JOIN `category_author` ON ( `category`.`id` = `category_author`.`category` )  WHERE `article`.published < NOW() AND `category`.id = "1" AND `category_author`.user = "pk1811" ORDER BY `article`.`id` ASC');
 	}
 
 	public function testLeftJoin()
@@ -246,7 +275,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` ) WHERE `article_author`.author = "felix"');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article_author`.author = "felix"');
 	}
 
 	public function testLeftJoinSpecificColumn()
@@ -263,7 +292,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`TEST` = `article_author`.`article` ) WHERE `article_author`.author = "felix"');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`TEST` = `article_author`.`article` )  WHERE `article_author`.author = "felix"');
 	}
 
 	public function testJoinCount()
