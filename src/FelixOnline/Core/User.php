@@ -9,7 +9,6 @@ namespace FelixOnline\Core;
  *	  visits	  -
  *	  ip		  -
  *	  timestamp   -
- *	  role		-
  *	  description -
  *	  email	   -
  *	  facebook	-
@@ -36,7 +35,6 @@ class User extends BaseDB
 			'visits' => new Type\IntegerField(),
 			'ip' => new Type\CharField(),
 			'timestamp' => new Type\DateTimeField(),
-			'role' => new Type\IntegerField(),
 			'info' => new Type\TextField(),
 			'description' => new Type\TextField(array(
 				'transformers' => array(
