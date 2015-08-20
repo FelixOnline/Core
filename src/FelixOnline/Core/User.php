@@ -172,6 +172,54 @@ class User extends BaseDB
 	}
 
 	/*
+	 * Public: Get implicit roles
+	 */
+	public function getImplicitRoles() {
+		$manager = \FelixOnline\Core\BaseManager::build('FelixOnline\Core\UserRole', 'user_roles', 'id');
+		$manager->filter('user = "%s"', array($this->getUser()));
+
+		$values = $manager->values();
+		if(!$values) {
+			return null;
+		}
+
+		$roles = array();
+		foreach($values as $value) {
+			$roles[] = $value->getRole();
+		}
+
+		return $roles;
+	}
+
+	/*
+	 * Public: Get all including inherited roles
+	 */
+	public function getRoles() {
+		$roles = $this->getImplicitRoles();
+
+		if(!$roles) {
+			return null;
+		}
+
+		$finalRoles = array();
+		foreach($roles as $role) {
+			$childRoles = $role->getChildRoles();
+
+			foreach($childRoles as $childRole) {
+				if(!in_array($childRole, $finalRoles)) {
+					$finalRoles[] = $childRole;
+				}
+			}
+
+			if(!in_array($role, $finalRoles)) {
+				$finalRoles[] = $role;
+			}
+		}
+
+		return $finalRoles;
+	}
+
+	/*
 	 * Public: Get user info
 	 * Decode json array of info
 	 *
