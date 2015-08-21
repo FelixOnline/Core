@@ -10,7 +10,7 @@ class Notice extends BaseDB
 	function __construct($id = NULL) {
 		$fields = array(
 			'author' => new Type\ForeignKey('FelixOnline\Core\User'),
-			'text' => new Type\ForeignKey('FelixOnline\Core\Text'),
+			'content' => new Type\TextField(),
 			'start_time' => new Type\DateTimeField(),
 			'end_time' => new Type\DateTimeField(),
 			'hidden' => new Type\BooleanField(array(
@@ -40,16 +40,5 @@ class Notice extends BaseDB
 		$result = strip_tags($text, '<b><i><u><img><a><strong><em>'); // Gets rid of html tags except for a few
 		$result = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $result); // Remove style attributes
 		return $result;
-	}
-
-	/**
-	 * Public: Get article content
-	 */
-	public function getContent() {
-		$string = $this->getText()->getContent();
-
-		$string = $this->cleanText($string);
-
-		return $string;
 	}
 }
