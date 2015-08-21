@@ -35,9 +35,9 @@ class CurrentUserTest extends AppTestCase
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
 		$pdo->exec("INSERT INTO `login` 
-			(`session_id`, `ip`, `browser`, `user`, `timestamp`, `valid`, `logged_in`)
+			(`session_id`, `session_name`, `ip`, `browser`, `user`, `timestamp`, `valid`, `logged_in`)
 			VALUES 
-			('1', '".$env['REMOTE_ADDR']."', '".$env['HTTP_USER_AGENT']."', 'felix', NOW(), 1, 1)");
+			('1', 'felix', '".$env['REMOTE_ADDR']."', '".$env['HTTP_USER_AGENT']."', 'felix', NOW(), 1, 1)");
 
 		$this->assertTrue($currentUser->isLoggedIn());
 	}
@@ -54,9 +54,9 @@ class CurrentUserTest extends AppTestCase
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
 		$pdo->exec("INSERT INTO `login` 
-			(`session_id`, `ip`, `browser`, `user`, `timestamp`, `valid`, `logged_in`)
+			(`session_id`, `session_name`, `ip`, `browser`, `user`, `timestamp`, `valid`, `logged_in`)
 			VALUES 
-			('1', '".$env['REMOTE_ADDR']."', '".$env['HTTP_USER_AGENT']."', 'felix', NOW(), 1, 0)");
+			('1', 'felix', '".$env['REMOTE_ADDR']."', '".$env['HTTP_USER_AGENT']."', 'felix', NOW(), 1, 0)");
 
 		$this->assertFalse($currentUser->isLoggedIn());
 	}

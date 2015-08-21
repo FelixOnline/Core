@@ -5,6 +5,7 @@
 	<row>
 		<field name="id">1</field>
 		<field name="session_id">adc022e7c4d4b1f031faefc21443121a</field>
+		<field name="session_name">felix</field>
 		<field name="ip">0.0.0.0</field>
 		<field name="browser"></field>
 		<field name="user">felix</field>

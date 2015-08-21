@@ -91,6 +91,7 @@ class CurrentUser extends User
 			"INSERT INTO `login` 
 			(
 				session_id,
+				session_name,
 				ip,
 				browser,
 				user,
@@ -100,10 +101,12 @@ class CurrentUser extends User
 				'%s',
 				'%s',
 				'%s',
+				'%s',
 				1
 			)",
 			array(
 				$app['env']['session']->getId(),
+				SESSION_NAME,
 				$app['env']['REMOTE_ADDR'],
 				$app['env']['HTTP_USER_AGENT'],
 				$this->getUser(),
@@ -140,6 +143,7 @@ class CurrentUser extends User
 				browser
 			FROM `login`
 			WHERE session_id = '%s'
+			AND session_name = '%s'
 			AND logged_in = 1
 			AND valid = 1
 			AND user = '%s'
@@ -147,6 +151,7 @@ class CurrentUser extends User
 			LIMIT 1",
 			array(
 				$app['env']['session']->getId(),
+				SESSION_NAME,
 				$app['env']['session']->session['uname'],
 			));
 
@@ -196,12 +201,13 @@ class CurrentUser extends User
 										ip, 
 										browser 
 									FROM `login` 
-									WHERE session_id='%s' 
+									WHERE session_id='%s'
+									AND session_name='%s'
 									AND valid=1 
 									AND logged_in=0 
 									ORDER BY timediff ASC 
 									LIMIT 1",
-									array($existing_id));
+									array($existing_id, SESSION_NAME));
 		$login = $app['db']->get_row($sql);
 
 		if(
@@ -215,9 +221,10 @@ class CurrentUser extends User
 			// Clear old ID
 			$sql = $app['safesql']->query("DELETE FROM `login` 
 										WHERE session_id='%s' 
+										AND session_name='%s'
 										AND valid=1 
 										AND logged_in=0",
-										array($existing_id));
+										array($existing_id, SESSION_NAME));
 			$login = $app['db']->query($sql);
 
 			$this->setUser($user);
@@ -242,8 +249,9 @@ class CurrentUser extends User
 					SET valid = 0,
 					logged_in = 0
 					WHERE user='%s'
-					AND session_id='%s'",
-					array($this->getUser(), $sessionid));
+					AND session_id='%s'
+					AND session_name='%s'",
+					array($this->getUser(), $sessionid, SESSION_NAME));
 					
 			return $app['db']->query($sql);
 		} else {
@@ -251,8 +259,9 @@ class CurrentUser extends User
 					SET valid = 1,
 					logged_in = 0
 					WHERE user='%s'
-					AND session_id='%s'",
-					array($this->getUser(), $sessionid));
+					AND session_id='%s'
+					AND session_name='%s'",
+					array($this->getUser(), $sessionid, SESSION_NAME));
 					
 			return $app['db']->query($sql);
 		}
@@ -267,8 +276,9 @@ class CurrentUser extends User
 		$sql = $app['safesql']->query("UPDATE `login` 
 				SET valid = 0,
 				logged_in = 0
-				WHERE user='%s'",
-				array($this->getUser()));
+				WHERE user='%s'
+				AND session_name='%s'",
+				array($this->getUser(), SESSION_NAME));
 
 		return $app['db']->query($sql);
 	}
@@ -285,9 +295,11 @@ class CurrentUser extends User
 		$sql = $this->safesql->query("UPDATE `login` 
 				SET valid = 0
 				WHERE user='%s'
+				AND session_name='%s'
 				AND logged_in=0
 				OR TIMESTAMPDIFF(SECOND,timestamp,NOW()) > %i",
 				array($currentuser->getUser(),
+						SESSION_NAME,
 						SESSION_LENGTH));
 
 		return $this->db->query($sql);
