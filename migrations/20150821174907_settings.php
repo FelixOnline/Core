@@ -13,7 +13,7 @@ class Settings extends AbstractMigration
               ->save();
 
         $this->execute('INSERT INTO settings VALUES("articles_per_search_page", "Number of articles shown on each page of a search for articles", "8");');
-        $this->execute('INSERT INTO settings VALUES("image_url", "URL including trailing slash to host pointing to the main site\'s image directory (must point to the Felix image auto-resizer)", "http://img.felixonline.co.uk");');
+        $this->execute('INSERT INTO settings VALUES("image_url", "URL including trailing slash to host pointing to the main site\'s image directory (must point to the Felix image auto-resizer)", "http://img.felixonline.co.uk/");');
         $this->execute('INSERT INTO settings VALUES("email_extcomment_notifyaddr", "Comma-separated list of email addresses to notify when a comment requires moderation/abuse reviewing", "felix@imperial.ac.uk");');
         $this->execute('INSERT INTO settings VALUES("email_replyto_addr", "Reply-to email for emails sent by the system", "no-reply@imperial.ac.uk");');
         $this->execute('INSERT INTO settings VALUES("email_replyto_name", "Reply-to name for emails sent by the system", "Felix Online");');
