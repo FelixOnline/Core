@@ -223,12 +223,13 @@ class BaseManager
 	/**
 	 * Join managers together
 	 */
-	public function join(BaseManager $manager, $type = null, $column = null)
+	public function join(BaseManager $manager, $type = null, $column = null, $column_right = null)
 	{
 		$this->joins[$manager->table] = array(
 			'manager' => $manager,
 			'type' => $type,
-			'column' => $column
+			'column' => $column,
+			'column_right' => $column_right
 		);
 		return $this;
 	}
@@ -274,13 +275,19 @@ class BaseManager
 				} else {
 					$column = $this->pk;
 				}
+
+				if ($join['column_right']) {
+					$column_right = $join['column_right'];
+				} else {
+					$column_right = $manager->pk;
+				}
 				   
 				$st[] = "JOIN `" . $manager->table . "`";
 
 				$st[] = "ON (";
 				$st[] = "`" . $this->table . "`.`" . $column . "`";
 				$st[] = "=";
-				$st[] = "`" . $manager->table . "`.`" . $manager->pk . "`";
+				$st[] = "`" . $manager->table . "`.`" . $column_right . "`";
 				$st[] = ")";
 				$joins[] = implode(' ', $st);
 				$joins[] = $manager->getJoin();
