@@ -55,11 +55,11 @@ class Image extends BaseDB
 	public function getURL($width = '', $height = '') {
 		$uri = $this->getName();
 		if ($height && $width) {
-			return IMAGE_URL.$width.'/'.$height.'/'.$uri;
+			return Settings::get('image_url').$width.'/'.$height.'/'.$uri;
 		} else if ($width) {
-			return IMAGE_URL.$width.'/'.$uri;
+			return Settings::get('image_url').$width.'/'.$uri;
 		} else { // original image
-			return IMAGE_URL.'upload/'.$uri;
+			return Settings::get('image_url').'upload/'.$uri;
 		}
 	}
 

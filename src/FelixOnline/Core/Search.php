@@ -14,7 +14,7 @@ class Search
 		global $safesql;
 		$this->db = $db;
 		$this->safesql = $safesql;
-		$this->pageSize = ARTICLES_PER_CAT_PAGE;
+		$this->pageSize = Settings::get('articles_per_search_page');
 
 		$this->query = $query;
 	}

@@ -500,7 +500,7 @@ class Comment extends BaseDB
 		// Create message
 		$message = \Swift_Message::newInstance()
 			->setSubject($this->getName().' has commented on "'.$this->getArticle()->getTitle().'"')
-			->setFrom(array(EMAIL_REPLYTO_ADDR => EMAIL_REPLYTO_NAME));
+			->setFrom(array(Settings::get('email_replyto_addr') => Settings::get('email_replyto_name')));
 
 		foreach ($authors as $author) {
 			// Get content
@@ -560,7 +560,7 @@ class Comment extends BaseDB
 			->setTo(array(
 				$reply->getEmail() => $reply->getName(),
 			))
-			->setFrom(array(EMAIL_REPLYTO_ADDR => EMAIL_REPLYTO_NAME))
+			->setFrom(array(Settings::get('email_replyto_addr') => Settings::get('email_replyto_name')))
 			->setBody($content, 'text/html');
 
 		// Send message
@@ -592,8 +592,8 @@ class Comment extends BaseDB
 		// Create message
 		$message = \Swift_Message::newInstance()
 			->setSubject('New comment to moderate on "'.$this->getArticle()->getTitle().'"')
-			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
-			->setFrom(array(EMAIL_REPLYTO_ADDR => EMAIL_REPLYTO_NAME))
+			->setTo(explode(", ", Settings::get('email_extcomment_notifyaddr')))
+			->setFrom(array(Settings::get('email_replyto_addr') => Settings::get('email_replyto_name')))
 			->setBody($content, 'text/html');
 
 		// Send message
@@ -625,8 +625,8 @@ class Comment extends BaseDB
 		// Create message
 		$message = \Swift_Message::newInstance()
 			->setSubject('Abuse reported for comment on "'.$this->getArticle()->getTitle().'"')
-			->setTo(explode(", ", EMAIL_EXTCOMMENT_NOTIFYADDR))
-			->setFrom(array(EMAIL_REPLYTO_ADDR => EMAIL_REPLYTO_NAME))
+			->setTo(explode(", ", Settings::get('email_extcomment_notifyaddr')))
+			->setFrom(array(Settings::get('email_replyto_addr') => Settings::get('email_replyto_name')))
 			->setBody($content, 'text/html');
 
 		// Send message
