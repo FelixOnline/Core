@@ -25,7 +25,7 @@
 	<row>
 		<field name="setting">image_url</field>
 		<field name="description">URL including trailing slash to host pointing to the main site's image directory (must point to the Felix image auto-resizer)</field>
-		<field name="value">http://img.felixonline.co.uk</field>
+		<field name="value">http://img.felixonline.co.uk/</field>
 	</row>
 	</table_data>
 </database>
