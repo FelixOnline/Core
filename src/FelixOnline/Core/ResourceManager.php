@@ -161,7 +161,7 @@ class ResourceManager {
 	 */
 	private function getFilename($file, $type, $version = 'url') {
 		if($version == 'url') { 
-			$root = STANDARD_URL.'themes/'.THEME_NAME.'/';
+			$root = STANDARD_URL.'themes/'.Settings::get('theme_name').'/';
 		}
 		else if($version == 'dir') {
 			$root = THEME_DIRECTORY.'/';
