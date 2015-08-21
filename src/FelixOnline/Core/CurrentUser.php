@@ -16,7 +16,7 @@ class CurrentUser extends User
 		$app = App::getInstance();
 
 		if (!isset($app['env']['session'])) {
-			$app['env']['session'] = new Session('felix');
+			$app['env']['session'] = new Session(SESSION_NAME);
 		}
 		$app['env']['session']->start();
 
@@ -110,8 +110,8 @@ class CurrentUser extends User
 			));
 		$app['db']->query($sql);
 
-		$_SESSION['felix']['uname'] = $this->getUser();
-		$_SESSION['felix']['loggedin'] = true;
+		$_SESSION[SESSION_NAME]['uname'] = $this->getUser();
+		$_SESSION[SESSION_NAME]['loggedin'] = true;
 
 		$app['env']['session']['uname'] = $this->getUser();
 		$app['env']['session']['loggedin'] = true;
@@ -310,7 +310,7 @@ class CurrentUser extends User
 			"DELETE FROM cookies
 			WHERE hash = '%s'",
 			array(
-				$app['env']['cookies']['felixonline']
+				$app['env']['cookies'][COOKIE_NAME]
 			));
 
 		$app['db']->query($sql);
@@ -323,7 +323,7 @@ class CurrentUser extends User
 
 		$app['db']->query($sql);
 
-		$app['env']['cookies']->delete('felixonline');
+		$app['env']['cookies']->delete(COOKIE_NAME);
 	}
 
 	/*
@@ -337,7 +337,7 @@ class CurrentUser extends User
 
 		$expiry_time = time() + COOKIE_LENGTH;
 
-		$app['env']['cookies']->set('felixonline', $hash, $expiry_time, '/');
+		$app['env']['cookies']->set(COOKIE_NAME, $hash, $expiry_time, '/');
 		$sql = $app['safesql']->query("INSERT INTO `cookies` 
 									(
 										hash,
@@ -364,7 +364,7 @@ class CurrentUser extends User
 		$app = App::getInstance();
 
 		// is there a cookie?
-		if (!isset($app['env']['cookies']['felixonline'])) {
+		if (!isset($app['env']['cookies'][COOKIE_NAME])) {
 			return false;
 		}
 
@@ -376,7 +376,7 @@ class CurrentUser extends User
 			ORDER BY expires ASC
 			LIMIT 1",
 			array(
-				$app['env']['cookies']['felixonline']
+				$app['env']['cookies'][COOKIE_NAME]
 			));
 
 		$cookie = $app['db']->get_row($sql);
