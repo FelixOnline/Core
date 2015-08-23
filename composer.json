@@ -28,7 +28,7 @@
 	],
 	"require": {
 		"robmorgan/phinx": "0.4.*",
-		"rzekanet/service-akismet": "dev-master#569a13c65058eb59d28b2645f9d9965b98ab3868",
+		"rzekanet/service-akismet": "dev-master",
 		"jv2222/ezsql": "dev-master",
 		"d11wtq/boris": "1.0.*",
 		"tedivm/stash": "0.11.*",
