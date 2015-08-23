@@ -78,7 +78,7 @@ class Theme {
 		$themeData = $this->data;
 		call_user_func(function() use($themeData, $themePage) {
 			extract($themeData);
-			include(THEME_DIRECTORY.'/'.$themePage.'.php');
+			include($this->directory.'/'.$themePage.'.php');
 		});
 	}
 
@@ -105,7 +105,7 @@ class Theme {
 	 * Private: Check whether file exists
 	 */
 	private function fileExists($file) {
-		return file_exists(THEME_DIRECTORY.'/'.$file.'.php');
+		return file_exists($this->directory.'/'.$file.'.php');
 	}
 
 	/*

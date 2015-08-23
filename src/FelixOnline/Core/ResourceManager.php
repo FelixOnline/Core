@@ -160,11 +160,13 @@ class ResourceManager {
 	 * Get path to file
 	 */
 	private function getFilename($file, $type, $version = 'url') {
+		$theme = new Theme(Settings::get('current_theme'));
+
 		if($version == 'url') { 
-			$root = STANDARD_URL.'themes/'.Settings::get('current_theme').'/';
+			$root = $theme->getURL();
 		}
 		else if($version == 'dir') {
-			$root = THEME_DIRECTORY.'/';
+			$root = $theme->getDirectory();
 		}
 		switch($type) {
 			case 'css':
