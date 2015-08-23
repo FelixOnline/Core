@@ -6,7 +6,7 @@ namespace FelixOnline\Core;
  */
 class Link extends BaseDb
 {
-	public $dbtable = 'Link';
+	public $dbtable = 'link';
 
 	/**
 	 * Constructor
