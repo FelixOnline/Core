@@ -31,6 +31,7 @@ class Category extends BaseDB
 			'twitter' => new Type\CharField(),
 			'description' => new Type\TextField(),
 			'hidden' => new Type\BooleanField(),
+			'secret' => new Type\BooleanField(),
 		);
 
 		parent::__construct($fields, $id);
