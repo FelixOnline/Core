@@ -25,7 +25,7 @@ namespace FelixOnline\Core;
  *			 1   |	0	|   0	  approved comment
  *			 1   |	1	|   0	  pending moderation comment
  *			 0   |	0	|   1	  spam comment
- *			 0   |	1	|   0	  INVALID
+ *			 0   |	1	|   0	  email pending approval
  *			 1   |	0	|   1	  INVALID
  *			 0   |	1	|   1	  INVALID
  *			 1   |	1	|   1	  INVALID
