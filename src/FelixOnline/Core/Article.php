@@ -9,9 +9,7 @@ use FelixOnline\Core\Type;
  * Fields:
  *	  id			  - id of article
  *	  title		   - title of article
- *	  short_title	 - short title of article for boxes on front page [optional]
  *	  teaser		  - article teaser
- *	  author		  - first author of article, superseded by article_author table [depreciated]
  *	  category		- id of category article is in
  *	  date			- timestamp when article was added to site
  *	  approvedby	  - user who approved the article to be published
@@ -20,11 +18,6 @@ use FelixOnline\Core\Type;
  *	  searchable       - can article be seen by search engines?
  *	  text1		   - id of main article text
  *	  img1			- id of main article image
- *	  text2		   - id of second article text [depreciated]
- *	  img2			- id of second image text [depreciated]
- *	  img2lr		  - not quite sure [TODO]
- *	  hits			- number of views the article has had
- *	  short_desc	  - short description of article for boxes on front page [optional]
  */
 class Article extends BaseDB {
 	const TEASER_LENGTH = 200;
@@ -66,9 +59,7 @@ class Article extends BaseDB {
 	{
 		$fields = array(
 			'title' => new Type\CharField(),
-			'short_title' => new Type\CharField(),
 			'teaser' => new Type\CharField(),
-			//'author' => new ForeignKey('User'),
 			'approvedby' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'category' => new Type\ForeignKey('FelixOnline\Core\Category'),
 			'date' => new Type\DateTimeField(),
@@ -81,10 +72,7 @@ class Article extends BaseDB {
 			)),
 			'text1' => new Type\ForeignKey('FelixOnline\Core\Text'),
 			'img1' => new Type\ForeignKey('FelixOnline\Core\Image'),
-			'hits' => new Type\IntegerField(array(
-				'null' => false,
-			)),
-			'short_desc' => new Type\CharField(),
+			'img_caption' => new Type\CharField(),
 			'comment_status' => new Type\IntegerField(),
 		);
 

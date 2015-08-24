@@ -12,7 +12,6 @@ namespace FelixOnline\Core;
  *	  timestamp	   -
  *	  v_offset		-
  *	  h_offset
- *	  caption
  *	  attribution
  *	  attr_link
  *	  width
@@ -39,7 +38,6 @@ class Image extends BaseDB
 			'timestamp' => new Type\DateTimeField(),
 			'v_offset' => new Type\IntegerField(),
 			'h_offset' => new Type\IntegerField(),
-			'caption' => new Type\CharField(),
 			'attribution' => new Type\CharField(),
 			'attr_link' => new Type\CharField(),
 			'width' => new Type\IntegerField(),
