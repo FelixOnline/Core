@@ -48,6 +48,11 @@ class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
 			$pdo->exec("DROP TABLE IF EXISTS `$table`;");
 		}
 
+		$conn = $this->getConnection();
+		$pdo = $conn->getConnection();
+
+		$this->conn = null;
+
 		parent::tearDown();
 	}
  
