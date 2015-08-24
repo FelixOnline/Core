@@ -23,7 +23,7 @@
 		},
 		{
 			"type": "vcs",
-			"url": "https://github.com/Xymanek/ezSQL.git"
+			"url": "https://github.com/FelixOnline/ezSQL.git"
 		}
 	],
 	"require": {
