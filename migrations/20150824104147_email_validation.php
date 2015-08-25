@@ -10,6 +10,8 @@ class EmailValidation extends AbstractMigration
         $table->addColumn('email', 'string', array('limit' => 500))
               ->addColumn('code', 'string', array('limit' => 13))
               ->addColumn('confirmed', 'boolean')
+              ->addIndex(array('email'), array('unique' => true))
+              ->addIndex(array('email', 'confirmed'))
               ->create();
 
         // Add existing email addresses from comments
