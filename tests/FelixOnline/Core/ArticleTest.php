@@ -70,7 +70,7 @@ class ArticleTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(1);
 		$this->assertEquals(
 			$article->getShortDesc(),
-			"Simon Singh returning to Imperial!"
+			"As Imperial alumnus Simon Singh prepares to return to College to give a guest le"
 		);
 	}
 
@@ -206,7 +206,7 @@ class ArticleTest extends AppTestCase
 		// Get article hit count
 		$pdo = $this->getConnection()->getConnection();
 
-		$stm = $pdo->prepare("SELECT hits FROM article WHERE id = :id");
+		$stm = $pdo->prepare("SELECT COUNT(article) AS hits FROM article_visit WHERE repeat_visit = 0 AND article = :id");
 		$stm->execute(array(':id' => 1));
 		$row = $stm->fetch();
 
@@ -226,7 +226,7 @@ class ArticleTest extends AppTestCase
 		$this->assertEquals(3, $this->getConnection()->getRowCount('article_visit'));
 
 		$pdo = $this->getConnection()->getConnection();
-		$stm = $pdo->prepare("SELECT hits FROM article WHERE id = :id");
+		$stm = $pdo->prepare("SELECT COUNT(article) AS hits FROM article_visit WHERE repeat_visit = 0 AND article = :id");
 		$stm->execute(array(':id' => 1));
 		$row = $stm->fetch();
 
@@ -241,7 +241,7 @@ class ArticleTest extends AppTestCase
 		$article = new \FelixOnline\Core\Article(1);
 		$article->logVisit();
 
-		$stm = $pdo->prepare("SELECT hits FROM article WHERE id = :id");
+		$stm = $pdo->prepare("SELECT COUNT(article) AS hits FROM article_visit WHERE repeat_visit = 0 AND article = :id");
 		$stm->execute(array(':id' => 1));
 		$row = $stm->fetch();
 

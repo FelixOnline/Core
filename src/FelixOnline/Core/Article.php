@@ -167,17 +167,12 @@ class Article extends BaseDB {
 
 	/*
 	 * Public: Get short description
-	 * If a short description is specified in the database then use that.
-	 * Otherwise limit article content to a certain character length
+	 * Limit article content to a certain character length
 	 *
 	 * $limit - character limit for description [defaults to 80]
 	 */
 	public function getShortDesc($limit = 80) {
-		if(array_key_exists('short_desc', $this->fields) && $this->fields['short_desc']->getValue()) {
-			return substr(trim(preg_replace( "/\r|\n/", " ", strip_tags($this->fields['short_desc']->getValue()))), 0, $limit);
-		} else {
-			return substr(trim(preg_replace( "/\r|\n/", " ", strip_tags($this->getContent()))), 0, $limit);
-		}
+		return substr(trim(preg_replace( "/\r|\n/", " ", strip_tags($this->getContent()))), 0, $limit);
 	}
 
 	/*
@@ -253,28 +248,9 @@ class Article extends BaseDB {
 	public function logVisit() {
 		if (!$this->recentlyVisited()) {
 			$this->logVisitor();
-			$this->hitArticle();
 		} else {
 			$this->logVisitor(1);
 		}
-	}
-
-	/*
-	 * Private: Increment hit count on article
-	 */
-	private function hitArticle() {
-		$app = App::getInstance();
-
-		$sql = $app['safesql']->query(
-			"UPDATE
-				`article`
-			SET hits=hits+1
-			WHERE id=%i",
-			array(
-				$this->getId()
-			)
-		);
-		return $app['db']->query($sql);
 	}
 
 	/*

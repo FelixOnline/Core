@@ -13,6 +13,7 @@
         <field name="active">1</field>
         <field name="order">1</field>
         <field name="parent" xsi:nil="true" />
+        <field name="secret">0</field>
     </row>
     <row>
         <field name="id">2</field>
@@ -25,6 +26,7 @@
         <field name="active">1</field>
         <field name="order">1</field>
         <field name="parent">1</field>
+        <field name="secret">0</field>
     </row>
 </table_data>
 </database>

@@ -7,7 +7,7 @@ class ArticleCleanup extends AbstractMigration
     public function up()
     {
         $table = $this->table('article');
-        $table->addColumn('img_caption', 'string', array('after' => 'img1', 'limit' => 300))
+        $table->addColumn('img_caption', 'string', array('after' => 'img1', 'limit' => 300, 'null' => true))
               ->dropForeignKey('img2')
               ->dropForeignKey('text2')
               ->removeColumn('short_title')
@@ -58,7 +58,7 @@ class ArticleCleanup extends AbstractMigration
               ->save();
 
         foreach($this->fetchAll('SELECT * FROM article') as $article) {
-            $hits = $this->fetchRow('SELECT COUNT("article") AS hits FROM article_visit WHERE article = '.$article['id']);
+            $hits = $this->fetchRow('SELECT COUNT("article") AS hits FROM article_visit WHERE repeat_visit = 0 AND article = '.$article['id']);
             $this->execute('UPDATE article SET hits = "'.$hits['hits'].'" WHERE id = '.$article['id']);
         }
 
