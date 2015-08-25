@@ -20,8 +20,8 @@ class Theme {
 	function __construct($name) {
 		global $currentuser, $db;
 		$this->name = $name;
-		$this->directory = BASE_DIRECTORY.'/themes/'.$this->name;
-		$this->url = STANDARD_URL.'themes/'.$this->name;
+		$this->directory = BASE_DIRECTORY.'/themes/'.$this->name.'/';
+		$this->url = STANDARD_URL.'themes/'.$this->name.'/';
 
 		/*
 		 * Check if there is theme specific theme class and load in if there is
