@@ -40,6 +40,11 @@ class BaseManager
 	protected $limit;
 
 	/**
+	 * Group
+	 */
+	protected $group;
+
+	/**
 	 * Joins
 	 */
 	protected $joins = array();
@@ -138,6 +143,20 @@ class BaseManager
 	}
 
 	/**
+	 * Add limit to query
+	 */
+	public function group($group)
+	{
+		if(!is_array($group)) {
+			$this->group = array($group);
+		} else {
+			$this->group = $group;
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Get count
 	 */
 	public function count()
@@ -189,6 +208,7 @@ class BaseManager
 		$statement[] = $this->getFrom();
 		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
+		$statement[] = $this->getGroup();
 		$statement[] = $this->getOrder();
 		$statement[] = $this->getLimit();
 
@@ -358,6 +378,31 @@ class BaseManager
 		return null;
 	}
 	
+	/**
+	 * Group
+	 */
+	protected function getGroup()
+	{
+		if ($this->group) {
+			$group = "GROUP BY ";
+
+			$first = true;
+
+			foreach($this->group as $groupCol) {
+				if(!$first) {
+					$group .= ", ";
+				}
+
+				$group .= $this->getColumnReference($groupCol);
+
+				$first = false;
+			}
+
+			return $group;
+		}
+		return null;
+	}
+
 	/**
 	 * Get column reference
 	 */
