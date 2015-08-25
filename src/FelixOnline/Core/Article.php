@@ -220,6 +220,28 @@ class Article extends BaseDB {
 	}
 
 	/*
+	 * Public: Get number of unique visits the article has
+	 *
+	 * Returns integer
+	 */
+	public function getHits() {
+		$app = App::getInstance();
+		$sql = $app['safesql']->query(
+			"SELECT
+				COUNT(id)
+			FROM
+				`article_visit`
+			WHERE article = %i
+			AND repeat_visit = 0",
+			array(
+				$this->getId()
+			)
+		);
+
+		return $app['db']->get_var($sql);
+	}
+
+	/*
 	 * Public: Get full article url
 	 *
 	 * Returns string
