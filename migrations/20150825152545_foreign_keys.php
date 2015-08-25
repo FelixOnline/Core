@@ -208,6 +208,20 @@ class ForeignKeys extends AbstractMigration
         $table = $this->table('text_story');
         $table->addForeignKey('user', 'user', 'user', array('delete'=> 'CASCADE', 'update'=> 'CASCADE'))
               ->save();
+
+        // Set to felix any approvedby relating to missing users
+        foreach($this->fetchAll('SELECT DISTINCT approvedby FROM article') as $user) {
+            $count = $this->fetchAll('SELECT * FROM user WHERE user = "'.$user['approvedby'].'"');
+
+            if(count($count) == 0) {
+                $this->execute("UPDATE article SET approvedby = 'felix' WHERE approvedby = '".$user['approvedby']."'");
+            }
+        }
+
+        $table = $this->table('article');
+        $table->addForeignKey('text1', 'text_story', 'id', array('delete'=> 'RESTRICT', 'update'=> 'CASCADE'))
+              ->addForeignKey('approvedby', 'user', 'user', array('delete'=> 'RESTRICT', 'update'=> 'CASCADE'))
+              ->save();
     }
 
     public function down()
@@ -290,6 +304,11 @@ class ForeignKeys extends AbstractMigration
 
         $table = $this->table('text_story');
         $table->dropForeignKey('user')
+              ->save();
+
+        $table = $this->table('article');
+        $table->dropForeignKey('text1')
+              ->dropForeignKey('approvedby')
               ->save();
     }
 }
