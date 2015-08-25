@@ -293,7 +293,7 @@ class User extends BaseDB
 
 		$sql = $app['safesql']->query(
 			"SELECT
-				COUNT(id)
+				COUNT(article_author.article)
 			FROM `article_author`
 			INNER JOIN `article` 
 			ON article_author.article = article.id 
@@ -434,7 +434,6 @@ class User extends BaseDB
 	{
 		$editors = BaseManager::build('FelixOnline\Core\Category', 'category_author', 'category')
 			->filter("user = '%s'", array($this->getUser()))
-			->filter("admin = 1")
 			->values();
 
 		return $editors;
