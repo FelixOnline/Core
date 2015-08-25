@@ -262,14 +262,35 @@ class Article extends BaseDB {
 		$user = NULL;
 		if ($app['currentuser']->isLoggedIn()) {
 			$user = $app['currentuser']->getUser();
-		}
 
+			$sql = $app['safesql']->query(
+				"INSERT INTO
+					article_visit
+				(
+					article,
+					user,
+					IP,
+					browser,
+					referrer,
+					repeat_visit
+				) VALUES (%q)",
+					array(
+						array(
+							$this->getId(),
+							$user,
+							$app['env']['REMOTE_ADDR'],
+							$app['env']['HTTP_USER_AGENT'],
+							$app['env']['HTTP_REFERER'],
+							$repeat
+						)
+					)
+				);
+		} else {
 		$sql = $app['safesql']->query(
 			"INSERT INTO
 				article_visit
 			(
 				article,
-				user,
 				IP,
 				browser,
 				referrer,
@@ -278,7 +299,6 @@ class Article extends BaseDB {
 				array(
 					array(
 						$this->getId(),
-						$user,
 						$app['env']['REMOTE_ADDR'],
 						$app['env']['HTTP_USER_AGENT'],
 						$app['env']['HTTP_REFERER'],
@@ -286,6 +306,8 @@ class Article extends BaseDB {
 					)
 				)
 			);
+		}
+
 		return $app['db']->query($sql);
 	}
 
