@@ -30,11 +30,14 @@ class EmailValidation extends AbstractMigration
 
             $migratedEmails[] = $email;
 
-            $this->execute('INSERT INTO email_validation (id, email, code, confirmed) VALUES(NULL, "'.$email.'", "", 1)');
+            try {
+                $this->execute('INSERT INTO email_validation (id, email, code, confirmed) VALUES(NULL, "'.$email.'", "", 1)');
+            } catch(\Exception $e) {
+                // Don't do anything if insert fails as we'll just have to get them to validate their email unless its a double entry issue
+            }
         }
 
         // Add existing email addresses from users
-        $migratedEmails = array();
 
         foreach($this->fetchAll('SELECT email FROM user') as $email) {
             $email = strtolower($email['email']);
@@ -49,7 +52,11 @@ class EmailValidation extends AbstractMigration
 
             $migratedEmails[] = $email;
 
-            $this->execute('INSERT INTO email_validation (id, email, code, confirmed) VALUES(NULL, "'.$email.'", "", 1)');
+            try {
+                $this->execute('INSERT INTO email_validation (id, email, code, confirmed) VALUES(NULL, "'.$email.'", "", 1)');
+            } catch(\Exception $e) {
+                // Don't do anything if insert fails as we'll just have to get them to validate their email unless its a double entry issue
+            }
         }
     }
 
