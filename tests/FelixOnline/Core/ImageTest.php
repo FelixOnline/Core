@@ -32,7 +32,7 @@ class ImageTest extends AppTestCase
 	{
 		$image = new \FelixOnline\Core\Image(22);
 
-		$this->assertEquals($image->getURL(), 'http://img.felixonline.co.uk/upload/201001081608-felix-SimonSin.jpg');
+		$this->assertEquals($image->getURL(), 'http://img.felixonline.co.uk/201001081608-felix-SimonSin.jpg');
 		$this->assertEquals($image->getURL(400), 'http://img.felixonline.co.uk/400/201001081608-felix-SimonSin.jpg');
 		$this->assertEquals($image->getURL(400, 500), 'http://img.felixonline.co.uk/400/500/201001081608-felix-SimonSin.jpg');
 	}

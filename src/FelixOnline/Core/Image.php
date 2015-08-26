@@ -57,7 +57,7 @@ class Image extends BaseDB
 		} else if ($width) {
 			return Settings::get('image_url').$width.'/'.$uri;
 		} else { // original image
-			return Settings::get('image_url').'upload/'.$uri;
+			return Settings::get('image_url').$uri;
 		}
 	}
 
