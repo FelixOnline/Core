@@ -192,6 +192,28 @@ class Article extends BaseDB {
 	}
 
 	/*
+	 * Public: Get number of comments which have been validated on article
+	 *
+	 * Returns int
+	 */
+	public function getNumValidatedComments()
+	{
+		$count = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("active = 1")
+			->filter("spam = 0 ");
+
+		$validation = BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation')
+			->filter("confirmed = 1");
+
+		$count->join($validation, null, 'email', 'email');
+
+		$count = $count->count();
+
+		return $count;
+	}
+
+	/*
 	 * Public: Get comments
 	 *
 	 * $ip - server ip
@@ -206,6 +228,33 @@ class Article extends BaseDB {
 			->filter("active = 1")
 			->filter("spam = 0 ")
 			->values();
+
+		$comments = is_null($comments) ? array() : $comments;
+
+		return $comments;
+	}
+
+	/*
+	 * Public: Get comments with validated email addresses
+	 *
+	 * $ip - server ip
+	 *
+	 * Returns array
+	 */
+	public function getValidatedComments($ip = NULL) {
+		$app = App::getInstance();
+
+		$comments = (new CommentManager())
+			->filter("article = %i", array($this->getId()))
+			->filter("active = 1")
+			->filter("spam = 0 ");
+
+		$validation = BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation')
+			->filter("confirmed = 1");
+
+		$comments->join($validation, null, 'email', 'email');
+
+		$comments = $comments->values();
 
 		$comments = is_null($comments) ? array() : $comments;
 
