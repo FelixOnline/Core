@@ -51,4 +51,17 @@ class Advert extends BaseDB
 
 		return $this;
 	}
+
+	public function getActive()
+	{
+		if($this->getMaxImpressions() <= $this->getViews()) {
+			return false;
+		}
+
+		if(strtotime($this->getEndDate()) <= time()) {
+			return false;
+		}
+
+		return true;
+	}
 }
