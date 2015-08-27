@@ -37,6 +37,8 @@ class IssueArchive extends AbstractMigration
               ->addIndex('part')
               ->create();
 
+        $this->execute("ALTER TABLE `archive_file` ADD FULLTEXT(`content`);");
+
         $db = readline("Please enter the name of the archive database to copy data from. Phinx must have read access to this database. To skip this step, press CTRL-D.\n");
 
         if(!$db) { return; }
