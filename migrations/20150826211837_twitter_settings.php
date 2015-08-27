@@ -12,7 +12,7 @@ class TwitterSettings extends AbstractMigration
 
     public function down()
     {
-        $this->execute('DELETE FROM settings WHERE key = "twitter_key"');
-        $this->execute('DELETE FROM settings WHERE key = "twitter_secret"');
+        $this->execute('DELETE FROM settings WHERE setting = "twitter_key"');
+        $this->execute('DELETE FROM settings WHERE setting = "twitter_secret"');
     }
 }
