@@ -45,7 +45,7 @@ class Theme {
 
 	public function getClass() { return $this->themeclass; }
 	public function getName() { return $this->name; }
-	public function getDirectory() { return $this->name; }
+	public function getDirectory() { return $this->directory; }
 	public function getURL() { return $this->url; }
 
 	public function appendData($array) {
