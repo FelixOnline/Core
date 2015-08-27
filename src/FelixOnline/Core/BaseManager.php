@@ -55,6 +55,11 @@ class BaseManager
 	protected $cache = false;
 
 	/**
+	 * Random flag
+	 */
+	protected $random = false;
+
+	/**
 	 * Cache expiry
 	 */
 	protected $cacheExpiry = null;
@@ -143,7 +148,15 @@ class BaseManager
 	}
 
 	/**
-	 * Add limit to query
+	 * Make the select result appear in random order
+	 */
+	public function randomise($switch = true) {
+		$this->random = $switch;
+		return $this;
+	}
+
+	/**
+	 * Add grouping to query
 	 */
 	public function group($group)
 	{
@@ -210,6 +223,7 @@ class BaseManager
 		$statement[] = $this->getWhere();
 		$statement[] = $this->getGroup();
 		$statement[] = $this->getOrder();
+		$statement[] = $this->getRandom();
 		$statement[] = $this->getLimit();
 
 		// Remove null values
@@ -378,6 +392,19 @@ class BaseManager
 		return null;
 	}
 	
+	/**
+	 * Random Order
+	 */
+	protected function getRandom()
+	{
+		if ($this->random) {
+			$random = "ORDER BY RAND() ASC";
+
+			return $random;
+		}
+		return null;
+	}
+
 	/**
 	 * Group
 	 */

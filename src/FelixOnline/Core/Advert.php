@@ -21,6 +21,7 @@ class Advert extends BaseDB
 			'frontpage' => new Type\BooleanField(),
 			'categories' => new Type\BooleanField(),
 			'articles' => new Type\BooleanField(),
+			'sidebar' => new Type\BooleanField(),
 		);
 
 		parent::__construct($fields, $id);
@@ -63,5 +64,36 @@ class Advert extends BaseDB
 		}
 
 		return true;
+	}
+
+	public static function randomPick($on = 'frontpage', $sidebar = 0, $category = null) {
+		if($on != 'frontpage' && $on != 'categories' && $on != 'articles') {
+			throw new \FelixOnline\Exceptions\InternalException('Trying to find advert on invalid on type');
+		}
+
+		$ads = BaseManager::build('FelixOnline\Core\Advert', 'advert')
+			->filter('max_impressions > views')
+			->filter('start_date < NOW()')
+			->filter('end_date > NOW()')
+			->filter($on.' = 1')
+			->filter('sidebar = %i', array((bool) $sidebar))
+			->randomise()
+			->limit(0, 1);
+
+		// If we have categories we need to filter by adverts in these categories
+		if($category) {
+			$cat = BaseManager::build('FelixOnline\Core\AdvertCategory', 'advert_category');
+			$cat->filter('category = %i', array($category->getId()));
+
+			$ads->join($cat, null, null, 'advert');
+		}
+
+		$ads = $ads->values();
+
+		if(!$ads) {
+			return false;
+		}
+
+		return $ads[0];
 	}
 }
