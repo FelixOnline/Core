@@ -6,7 +6,7 @@
  */
 ?>
 <p>
-	Hi <?php echo $reply->getUser()->getFirstName(); ?>
+	Hi <?php echo $reply->getName(); ?>
 </p>
 
 <p>
