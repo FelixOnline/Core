@@ -125,11 +125,25 @@ class CommentTest extends AppTestCase
 		$this->assertTrue($external->isPending());
 	}
 
+	public function testUserLikedOrDislikedComment()
+	{
+		$comment = new \FelixOnline\Core\Comment(1);
+		$user = new \FelixOnline\Core\User('felix');
+		$this->assertTrue($comment->userLikedOrDislikedComment($user));
+	}
+
 	public function testUserLikedComment()
 	{
 		$comment = new \FelixOnline\Core\Comment(1);
 		$user = new \FelixOnline\Core\User('felix');
 		$this->assertTrue($comment->userLikedComment($user));
+	}
+
+	public function testUserDislikedComment()
+	{
+		$comment = new \FelixOnline\Core\Comment(2);
+		$user = new \FelixOnline\Core\User('felix');
+		$this->assertTrue($comment->userDislikedComment($user));
 	}
 
 	public function testUserLikesComment()

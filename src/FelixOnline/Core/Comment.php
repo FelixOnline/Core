@@ -180,11 +180,47 @@ class Comment extends BaseDB
 	 *
 	 * Returns true or false
 	 */
+	public function userLikedOrDislikedComment($user)
+	{
+		$count = BaseManager::build(null, 'comment_like')
+			->filter("user = '%s'", array($user->getUser()))
+			->filter("comment = %i", array($this->getId()))
+			->count();
+
+		return (boolean) $count;
+	}
+
+	/**
+	 * Public: Check if current user has liked the comment
+	 *
+	 * $user - user object
+	 *
+	 * Returns true or false
+	 */
 	public function userLikedComment($user)
 	{
 		$count = BaseManager::build(null, 'comment_like')
 			->filter("user = '%s'", array($user->getUser()))
 			->filter("comment = %i", array($this->getId()))
+			->filter("binlike = 1")
+			->count();
+
+		return (boolean) $count;
+	}
+
+	/**
+	 * Public: Check if current user has disliked the comment
+	 *
+	 * $user - user object
+	 *
+	 * Returns true or false
+	 */
+	public function userDislikedComment($user)
+	{
+		$count = BaseManager::build(null, 'comment_like')
+			->filter("user = '%s'", array($user->getUser()))
+			->filter("comment = %i", array($this->getId()))
+			->filter("binlike = 0")
 			->count();
 
 		return (boolean) $count;
