@@ -237,7 +237,7 @@ class Comment extends BaseDB
 	{
 		$app = App::getInstance();
 
-		if (!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+		if (!$this->userLikedOrDislikedComment($user)) { // check user hasn't already liked the comment
 			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
@@ -276,7 +276,7 @@ class Comment extends BaseDB
 	{
 		$app = App::getInstance();
 
-		if (!$this->userLikedComment($user)) { // check user hasn't already liked the comment
+		if (!$this->userLikedOrDislikedComment($user)) { // check user hasn't already liked the comment
 			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
