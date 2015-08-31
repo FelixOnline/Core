@@ -59,7 +59,7 @@ class Advert extends BaseDB
 			return false;
 		}
 
-		if(strtotime($this->getEndDate()) <= time()) {
+		if($this->getEndDate() <= time()) {
 			return false;
 		}
 
@@ -80,20 +80,26 @@ class Advert extends BaseDB
 			->randomise()
 			->limit(0, 1);
 
-		// If we have categories we need to filter by adverts in these categories
 		if($category) {
-			$cat = BaseManager::build('FelixOnline\Core\AdvertCategory', 'advert_category');
-			$cat->filter('category = %i', array($category->getId()));
+			$second = BaseManager::build('FelixOnline\Core\AdvertCategory', 'advert_category')
+				->filter('category = '.$category->getId(), array(), array(array('category IS NULL', array())));
 
-			$ads->join($cat, null, null, 'advert');
+			$ads->join($second, 'LEFT OUTER', null, 'advert');
+		} else {
+			$second = BaseManager::build('FelixOnline\Core\AdvertCategory', 'advert_category')
+				->filter('category IS NULL');
+
+			$ads->join($second, 'LEFT OUTER', null, 'advert');
 		}
 
 		$ads = $ads->values();
 
-		if(!$ads) {
+		if($ads) {
+			$ads = $ads[0];
+		} else {
 			return false;
 		}
 
-		return $ads[0];
+		return $ads;
 	}
 }
