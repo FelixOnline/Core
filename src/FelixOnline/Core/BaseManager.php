@@ -95,7 +95,7 @@ class BaseManager
 	/**
 	 * Filter objects
 	 */
-	public function filter($filter, $values = array())
+	public function filter($filter, $values = array(), $or = array())
 	{
 		$app = \FelixOnline\Core\App::getInstance();
 
@@ -105,7 +105,23 @@ class BaseManager
 
 		$filter = trim($filter);
 
-		$this->filters[] = "`" . $this->table . "`." . $app['safesql']->query($filter, $values);
+		$string = '';
+
+		if(count($or) > 0) {
+			$string .= '(';
+		}
+
+		$string .= "`" . $this->table . "`." . $app['safesql']->query($filter, $values);
+
+		if(count($or) > 0) {
+			foreach($or as $orStatement) {
+				$string .= " OR `" . $this->table . "`." . $app['safesql']->query($orStatement[0], $orStatement[1]);
+			}
+
+			$string .= ')';
+		}
+
+		$this->filters[] = $string;
 
 		return $this;
 	}
@@ -338,11 +354,19 @@ class BaseManager
 	{
 		$filters = $this->getWhereAsArray();
 
-		if (!empty($filters)) {
-			return "WHERE " . implode(" AND ", $filters);
+		$string = '';
+
+		foreach($filters as $filter) {
+			if($string == '') {
+				$string .= 'WHERE ';
+			} else {
+				$string .= ' AND ';
+			}
+
+			$string .= $filter;
 		}
 
-		return null;
+		return $string;
 	}
 
 	/**
