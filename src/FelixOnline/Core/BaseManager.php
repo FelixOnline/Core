@@ -60,6 +60,11 @@ class BaseManager
 	protected $random = false;
 
 	/**
+	 * Distinct select flag
+	 */
+	protected $distinct = false;
+
+	/**
 	 * Cache expiry
 	 */
 	protected $cacheExpiry = null;
@@ -211,8 +216,10 @@ class BaseManager
 	/**
 	 * Get values
 	 */
-	public function values()
+	public function values($distinct = false)
 	{
+		$this->distinct = $distinct;
+
 		$sql = $this->getSQL();
 
 		$results = $this->query($sql);
@@ -233,7 +240,13 @@ class BaseManager
 	{
 		$statement = [];
 
-		$statement[] = "SELECT `" . $this->table . "`.`" . $this->pk . "`";
+		if($this->distinct) {
+			$distinct = 'DISTINCT ';
+		} else {
+			$distinct = '';
+		}
+
+		$statement[] = "SELECT $distinct`" . $this->table . "`.`" . $this->pk . "`";
 		$statement[] = $this->getFrom();
 		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
