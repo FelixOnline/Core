@@ -14,7 +14,7 @@ class SidebarAds extends AbstractMigration
      */
     public function change()
     {
-        $ads = $table->getTable('advert');
+        $ads = $this->table('advert');
         $ads->addColumn('sidebar', 'boolean', array('default' => 0))
             ->save();
     }
