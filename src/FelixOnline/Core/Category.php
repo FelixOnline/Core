@@ -30,6 +30,7 @@ class Category extends BaseDB
 			'email' => new Type\CharField(),
 			'twitter' => new Type\CharField(),
 			'description' => new Type\TextField(),
+			'order' => new Type\IntegerField(),
 			'hidden' => new Type\BooleanField(),
 			'secret' => new Type\BooleanField(),
 		);
