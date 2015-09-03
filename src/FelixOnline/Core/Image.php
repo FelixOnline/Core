@@ -36,8 +36,6 @@ class Image extends BaseDB
 			'user' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'description' => new Type\CharField(),
 			'timestamp' => new Type\DateTimeField(),
-			'v_offset' => new Type\IntegerField(),
-			'h_offset' => new Type\IntegerField(),
 			'attribution' => new Type\CharField(),
 			'attr_link' => new Type\CharField(),
 			'width' => new Type\IntegerField(),
