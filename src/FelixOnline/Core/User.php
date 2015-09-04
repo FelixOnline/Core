@@ -170,9 +170,9 @@ class User extends BaseDB
 	}
 
 	/*
-	 * Public: Get implicit roles
+	 * Public: Get explicit roles
 	 */
-	public function getImplicitRoles() {
+	public function getExplicitRoles() {
 		$manager = \FelixOnline\Core\BaseManager::build('FelixOnline\Core\UserRole', 'user_roles', 'id');
 		$manager->filter('user = "%s"', array($this->getUser()));
 
@@ -193,7 +193,7 @@ class User extends BaseDB
 	 * Public: Get all including inherited roles
 	 */
 	public function getRoles() {
-		$roles = $this->getImplicitRoles();
+		$roles = $this->getExplicitRoles();
 
 		if(!$roles) {
 			return null;
