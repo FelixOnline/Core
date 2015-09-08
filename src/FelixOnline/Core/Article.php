@@ -69,7 +69,7 @@ class Article extends BaseDB {
 			'text1' => new Type\ForeignKey('FelixOnline\Core\Text'),
 			'img1' => new Type\ForeignKey('FelixOnline\Core\Image'),
 			'img_caption' => new Type\CharField(),
-			'comment_status' => new Type\IntegerField(),
+			'comment_status' => new Type\ForeignKey('FelixOnline\Core\ArticleCommentStatus'),
 		);
 
 		parent::__construct($fields, $id);
@@ -478,11 +478,11 @@ class Article extends BaseDB {
 	 * Public: Are comments enabled
 	 */
 	public function canComment($user = NULL) {
-		if ($this->getCommentStatus() == ArticleCommentStatus::ARTICLE_COMMENTS_OFF) {
+		if ($this->getCommentStatus()->getId() == ArticleCommentStatus::ARTICLE_COMMENTS_OFF) {
 			return false;
 		}
 
-		if ($this->getCommentStatus() == ArticleCommentStatus::ARTICLE_COMMENTS_INTERNAL) {
+		if ($this->getCommentStatus()->getId() == ArticleCommentStatus::ARTICLE_COMMENTS_INTERNAL) {
 			if ($user && $user->isLoggedIn()) {
 				return true;
 			} else {
@@ -490,7 +490,7 @@ class Article extends BaseDB {
 			}
 		}
 
-		if ($this->getCommentStatus() == ArticleCommentStatus::ARTICLE_COMMENTS_ON) {
+		if ($this->getCommentStatus()->getId() == ArticleCommentStatus::ARTICLE_COMMENTS_ON) {
 			return true;
 		}
 
