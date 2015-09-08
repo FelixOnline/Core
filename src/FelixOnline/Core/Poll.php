@@ -14,9 +14,7 @@ class Poll extends BaseDB
 			'ended' => new Type\BooleanField(array(
 				'null' => false,
 			)),
-			'location' => new Type\IntegerField(array(
-				'null' => false,
-			)),
+			'location' => new Type\ForeignKey('FelixOnline\Core\PollLocation'),
 			'hide_results' => new Type\BooleanField(array(
 				'null' => false,
 			)),
