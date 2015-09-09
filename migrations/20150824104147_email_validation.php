@@ -7,7 +7,7 @@ class EmailValidation extends AbstractMigration
     public function up()
     {
         $table = $this->table('email_validation');
-        $table->addColumn('email', 'string', array('limit' => 500))
+        $table->addColumn('email', 'string', array('limit' => 255))
               ->addColumn('code', 'string', array('limit' => 13))
               ->addColumn('confirmed', 'boolean')
               ->addIndex(array('email'), array('unique' => true))
