@@ -18,7 +18,7 @@ class ForeignKeys extends AbstractMigration
 
         $table = $this->table('blog_post');
         $table->addForeignKey('blog', 'blogs', 'id', array('delete'=> 'CASCADE', 'update'=> 'CASCADE'))
-              ->addForeignKey('author', 'user', 'user', array('delete'=> 'SET_NULL', 'update'=> 'CASCADE'))
+              //->addForeignKey('author', 'user', 'user', array('delete'=> 'SET_NULL', 'update'=> 'CASCADE'))
               ->save();
 
         $table = $this->table('category');
