@@ -10,6 +10,7 @@ class ArticleCleanup extends AbstractMigration
         $table->addColumn('img_caption', 'string', array('after' => 'img1', 'limit' => 300, 'null' => true))
               ->dropForeignKey('img2')
               ->dropForeignKey('text2')
+              ->dropForeignKey('author')
               ->removeColumn('short_title')
               ->removeColumn('text2')
               ->removeColumn('img2')
