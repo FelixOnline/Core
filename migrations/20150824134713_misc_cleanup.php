@@ -7,8 +7,8 @@ class MiscCleanup extends AbstractMigration
     public function up()
     {
         // Some of these tables may not exist so use alternative way to handle migration
-        $tables = array('engine_page', 'ffs_completers', 'ffs_responses', 'optimise', 'page', 'poll', 'poll_chart_type',
-            'poll_option', 'poll_vote', 'preview_email', 'sport_table', 'text_global', 'text_story_bkp', 'thephig_albums',
+        $tables = array('engine_page', 'ffs_completers', 'ffs_responses', 'optimise', 'page', 'poll_vote', 'poll_chart_type',
+            'poll_option', 'poll', 'preview_email', 'sport_table', 'text_global', 'text_story_bkp', 'thephig_albums',
             'thephig_images', 'thephig_info', 'thephig_users', 'top_2col', 'top_extrapage_cat');
 
         foreach($tables as $table) {
