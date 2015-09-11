@@ -65,24 +65,24 @@ class App implements \ArrayAccess
 		}
 
 		if (!isset($this->container['db']) || !($this->container['db'] instanceof \ezSQL_mysqli)) {
-			throw new InternalException('No db setup');
+			throw new \Exception('No db setup');
 		}
 
 		if (!isset($this->container['safesql']) || !($this->container['safesql'] instanceof \SafeSQL_MySQLi)) {
-			throw new InternalException('No safesql setup');
+			throw new \Exception('No safesql setup');
 		}
 	}
 
 	/**
 	 * Check that all required options are defined
 	 *
-	 * Throws InternalException if option is not defined
+	 * Throws Exception if option is not defined
 	 */
 	private function checkOptions($options)
 	{
 		foreach($this->required as $req) {
 			if (!array_key_exists($req, $options)) {
-				throw new InternalException('"' . $req . '" option has not been defined');
+				throw new \Exception('"' . $req . '" option has not been defined');
 			}
 		}
 	}
@@ -95,7 +95,7 @@ class App implements \ArrayAccess
 	public static function getInstance()
 	{
 		if (is_null(self::$instance)) {
-			throw new InternalException('App has not been initialised yet');
+			throw new \Exception('App has not been initialised yet');
 		}
 		return self::$instance;
 	}
