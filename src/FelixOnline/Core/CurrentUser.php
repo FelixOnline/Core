@@ -210,9 +210,22 @@ class CurrentUser extends User
 									array($existing_id, SESSION_NAME));
 		$login = $app['db']->get_row($sql);
 
+		if (LOCAL) {
+			// Local testing only - force ::1 to IPv4 to avoid a transient bug
+			if($login->ip == '127.0.0.1' && $app['env']['REMOTE_ADDR'] == '::1') {
+				$ip = '::1';
+			} elseif($login->ip == '::1' && $app['env']['REMOTE_ADDR'] == '127.0.0.1') {
+				$ip = '127.0.0.1';
+			} else {
+				$ip = $login->ip;
+			}
+		} else {
+			$ip = $login->ip;
+		}
+
 		if(
 			$login->timediff <= LOGIN_CHECK_LENGTH 
-			&& $login->ip == $app['env']['REMOTE_ADDR'] 
+			&& $ip == $app['env']['REMOTE_ADDR'] 
 			&& $login->browser == $app['env']['HTTP_USER_AGENT']
 		) {
 			// Sessions is valid, now reconfigure it for the current session
@@ -232,7 +245,7 @@ class CurrentUser extends User
 
 			return true;
 		} else {
-			return array($login->timediff, LOGIN_CHECK_LENGTH, $login->ip, $app['env']['REMOTE_ADDR'], $login->browser, $app['env']['HTTP_USER_AGENT']);
+			return array($login->timediff, LOGIN_CHECK_LENGTH, $ip, $app['env']['REMOTE_ADDR'], $login->browser, $app['env']['HTTP_USER_AGENT']);
 		}
 	}
 
