@@ -17,7 +17,8 @@ class FrontpageManager extends BaseManager
 
 		$categoryManager = BaseManager::build('FelixOnline\Core\Category', 'category');
 
-		global $currentuser;
+		$app = App::getInstance();
+		$currentuser = $app['currentuser'];
 
 		if(!$currentuser->isLoggedIn()) {
 			$categoryManager->filter('secret = 0');
@@ -40,7 +41,8 @@ class FrontpageManager extends BaseManager
 
 		$categoryManager = BaseManager::build('FelixOnline\Core\Category', 'category');
 
-		global $currentuser;
+		$app = App::getInstance();
+		$currentuser = $app['currentuser'];
 
 		if(!$currentuser->isLoggedIn()) {
 			$categoryManager->filter('secret = 0');

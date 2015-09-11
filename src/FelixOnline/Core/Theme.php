@@ -18,7 +18,9 @@ class Theme {
 	protected $themeclass; // theme specific class
 
 	function __construct($name) {
-		global $currentuser, $db;
+		$app = App::getInstance();
+		$currentuser = $app['currentuser'];
+
 		$this->name = $name;
 		$this->directory = BASE_DIRECTORY.'/themes/'.$this->name.'/';
 		$this->url = STANDARD_URL.'themes/'.$this->name.'/';
@@ -34,7 +36,6 @@ class Theme {
 		} else {
 			$this->appendData(array(
 				'currentuser' => $currentuser, 
-				'db' => $db, 
 				'theme' => $this
 			));
 

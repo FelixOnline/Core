@@ -287,7 +287,6 @@ class CurrentUser extends User
 	 * Private: Destroy old sessions
 	 */
 	private function destroyOldSessions() {
-		global $currentuser;
 		$sql = "DELETE FROM cookies 
 				WHERE UNIX_TIMESTAMP() > UNIX_TIMESTAMP(expires)
 		";
@@ -298,7 +297,7 @@ class CurrentUser extends User
 				AND session_name='%s'
 				AND logged_in=0
 				OR TIMESTAMPDIFF(SECOND,timestamp,NOW()) > %i",
-				array($currentuser->getUser(),
+				array($this->getUser(),
 						SESSION_NAME,
 						SESSION_LENGTH));
 

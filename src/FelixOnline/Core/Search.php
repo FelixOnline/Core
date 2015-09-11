@@ -10,10 +10,9 @@ class Search
 	protected $query;
 
 	function __construct($query) {
-		global $db;
-		global $safesql;
-		$this->db = $db;
-		$this->safesql = $safesql;
+		$app = App::getInstance();
+		$this->db = $app['db'];
+		$this->safesql = $app['safesql'];
 		$this->pageSize = Settings::get('articles_per_search_page');
 
 		$this->query = $query;
