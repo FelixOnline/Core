@@ -65,7 +65,7 @@ class AppTest extends DatabaseTestCase
 		\FelixOnline\Core\App::setInstance(null);
 
 		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException',
+			'Exception',
 			'App has not been initialised yet'
 		);
 
@@ -75,7 +75,7 @@ class AppTest extends DatabaseTestCase
 	public function testRequiredOptions()
 	{
 		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException',
+			'Exception',
 			'"base_url" option has not been defined'
 		);
 
@@ -118,7 +118,7 @@ class AppTest extends DatabaseTestCase
 		\FelixOnline\Core\App::setInstance(null);
 
 		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException',
+			'Exception',
 			'No db setup'
 		);
 
@@ -133,7 +133,7 @@ class AppTest extends DatabaseTestCase
 		\FelixOnline\Core\App::setInstance(null);
 
 		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException',
+			'Exception',
 			'No db setup'
 		);
 
@@ -149,7 +149,7 @@ class AppTest extends DatabaseTestCase
 		\FelixOnline\Core\App::setInstance(null);
 
 		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException',
+			'Exception',
 			'No safesql setup'
 		);
 
@@ -167,7 +167,7 @@ class AppTest extends DatabaseTestCase
 		\FelixOnline\Core\App::setInstance(null);
 
 		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException',
+			'Exception',
 			'No safesql setup'
 		);
 

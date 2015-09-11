@@ -19,8 +19,13 @@ class UniversalException extends \Exception {
 		$code = self::EXCEPTION_UNIVERSAL,
 		\Exception $previous = null
 	) {
-		$app = \FelixOnline\Core\App::getInstance();
-		$this->user = $app['currentuser'];
+		try {
+			$app = \FelixOnline\Core\App::getInstance();
+			$this->user = $app['currentuser'];
+		} catch(\Exception $e) {
+			// no app
+			$this->user = null;
+		}
 
 		parent::__construct($message, $code, $previous);
 	}
