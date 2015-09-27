@@ -681,4 +681,30 @@ class Comment extends BaseDB
 			->filter('spam = 0')
 			->count();
 	}
+
+	/*
+	 * Public: Get replies with validated email addresses
+	 *
+	 * Returns array
+	 */
+	public function getValidatedReplies() {
+		$app = App::getInstance();
+
+		$comments = (new CommentManager())
+			->filter("active = 1")
+			->filter("spam = 0 ")
+			->filter("reply = %i", array($this->getId()))
+			->order("timestamp", "ASC");
+
+		$validation = BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation')
+			->filter("confirmed = 1");
+
+		$comments->join($validation, null, 'email', 'email');
+
+		$comments = $comments->values();
+
+		$comments = is_null($comments) ? array() : $comments;
+
+		return $comments;
+	}
 }
