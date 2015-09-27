@@ -233,11 +233,9 @@ class Article extends BaseDB {
 	/*
 	 * Public: Get comments with validated email addresses
 	 *
-	 * $ip - server ip
-	 *
 	 * Returns array
 	 */
-	public function getValidatedComments($ip = NULL) {
+	public function getValidatedComments() {
 		$app = App::getInstance();
 
 		$comments = (new CommentManager())
