@@ -44,19 +44,8 @@ class Category extends BaseDB
 	public function getURL($pagenum = NULL)
 	{
 		$app = App::getInstance();
+		$output = $app->getOption('base_url').$this->getCat().'/';
 
-		$endpoint = array();
-		$endpoint[] = $this->getCat();
-
-		$subCat = $this;
-
-		while($subCat = $subCat->getParent()) {
-			$endpoint[] = $subCat->getCat();
-		}
-		
-		$endpoint = array_reverse($endpoint);
-
-		$output = $app->getOption('base_url').implode('/', $endpoint).'/';
 		if ($pagenum != NULL) {
 			$output .= $pagenum.'/';
 		}
