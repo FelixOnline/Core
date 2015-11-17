@@ -197,18 +197,16 @@ class ResourceManager {
 	private function processLess($lessfile) {
 		$filename = strstr($lessfile, '.', true);
 		$cssfile = $this->getFilename($filename.'.css', 'css', 'dir');
-		// load the cache
-		$cachefile = $this->getFilename($filename.".cache", 'css', 'dir');
-		if (file_exists($cachefile)) {
-			$cache = unserialize(file_get_contents($cachefile));
-		} else {
-			$cache = $this->getFilename($lessfile, 'css', 'dir');
+
+		if(PRODUCTION_FLAG && file_exists($cssfile)) {
+			return $filename.'.css';
 		}
-		$newcache = \lessc::cexecute($cache);
-		if (!is_array($cache) || $newcache['updated'] > $cache['updated']) {
-			file_put_contents($cachefile, serialize($newcache));
-			file_put_contents($cssfile, $newcache['compiled']);
-		} 
+
+		$parser = new \Less_Parser();
+		$parser->parseFile(dirname($cssfile).'/'.$lessfile, STANDARD_URL);
+		$css = $parser->getCss();
+
+		file_put_contents($cssfile, $css);
 		return $filename.'.css';
 	}
 
