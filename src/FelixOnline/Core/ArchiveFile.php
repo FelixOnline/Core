@@ -30,7 +30,8 @@ class ArchiveFile extends BaseDb {
 	}
 
 	public function getThumbnailURL() {
-		$url = 'http://felixonline.co.uk/archive/thumbs/'.$this->getThumbnail();
+		$folder = \FelixOnline\Core\Settings::get('archive_url_location');
+		$url = $folder.'/thumbs/'.$this->getThumbnail();
 		return $url;
 	}
 
