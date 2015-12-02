@@ -37,7 +37,7 @@ class ArchiveFile extends BaseDb {
 	public function getOnlyFilename() {
 		$file = $this->getFilename();
 		preg_match('/\/(\w+)_[A-Z]/', $file, $matches);
-		$filename = $matches[1] . '.pdf';
+		$filename = $matches[1] . '_' . $this->getPart() . '.pdf';
 
 		return $filename;
 	}
