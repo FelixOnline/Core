@@ -57,7 +57,13 @@ class App implements \ArrayAccess
 		}
 
 		if (!isset($this->container['cache']) || is_null($this->container['cache'])) {
-			$this->container['cache'] = new \Stash\Pool(new \Stash\Driver\FileSystem());
+			if(defined('CACHE_FOLDER')) {
+				$driver = new \Stash\Driver\FileSystem(array('path' => CACHE_FOLDER));
+			} else {
+				$driver = new \Stash\Driver\FileSystem();
+			}
+
+			$this->container['cache'] = new \Stash\Pool($driver);
 		}
 
 		if (!isset($this->container['currentuser']) || is_null($this->container['currentuser'])) {
