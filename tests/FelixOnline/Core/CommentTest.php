@@ -357,7 +357,7 @@ class CommentTest extends AppTestCase
 				$test->assertNotEmpty($message->getBody());
 
 				return true;
-			}, $this->exactly(2))
+			}, $this->exactly(1))
 			->new();
 
 		$this->app['email'] = $emailMock;
@@ -391,10 +391,11 @@ class CommentTest extends AppTestCase
 			->new();
 
 		$this->app['email'] = $emailMock;
-		$comment->setUser($user)
+		$comment = $comment->setUser($user)
 			->setComment($content)
-			->setArticle($article)
-			->save();
+			->setArticle($article);
+		$comment->save();
+		$comment->emailAuthors();
 	}
 
 	public function testSendAuthorNotificationByAuthor()
@@ -420,10 +421,11 @@ class CommentTest extends AppTestCase
 			->new();
 
 		$this->app['email'] = $emailMock;
-		$comment->setUser($user)
+		$comment = $comment->setUser($user)
 			->setComment($content)
-			->setArticle($article)
-			->save();
+			->setArticle($article);
+		$comment->save();
+		$comment->emailAuthors();
 	}
 
 	public function testReplyCommentNotification()
@@ -455,11 +457,13 @@ class CommentTest extends AppTestCase
 
 		$this->app['email'] = $emailMock;
 
-		$comment->setUser($user)
+		$comment = $comment->setUser($user)
 			->setComment($content)
 			->setArticle($article)
-			->setReply($replyingto)
-			->save();
+			->setReply($replyingto);
+		$comment->save();
+		$comment->emailAuthors();
+		$comment->emailReply();
 	}
 
 	public function testToEmailsAreSentIfUpdate()
@@ -472,5 +476,6 @@ class CommentTest extends AppTestCase
 		$this->app['email'] = $emailMock;
 
 		$comment->save();
+		$comment->emailAuthors();
 	}
 }

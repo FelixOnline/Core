@@ -404,13 +404,6 @@ class Comment extends BaseDB
 					$this->emailComment();
 				}
 			}
-			
-			if ($this->getReply()) { // if comment is replying to an internal comment 
-				$this->emailReply();
-			}
-
-			// email authors of article
-			$this->emailAuthors();
 		}		
 		
 		return $this->getId(); // return new comment id
@@ -571,7 +564,7 @@ class Comment extends BaseDB
 	/*
 	 * Private: Email comment author with reply
 	 */
-	private function emailReply()
+	public function emailReply()
 	{
 		$app = App::getInstance();
 		$reply = $this->getReply();
