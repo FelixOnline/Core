@@ -76,6 +76,25 @@ class Article extends BaseDB {
 	}
 
 	/*
+	 * Public: Get array of topics of article
+	 *
+	 * Returns array
+	 */
+	public function getTopics()
+	{
+
+		$topic = BaseManager::build('FelixOnline\Core\ArticleTopic', 'article_topic', 'topic')
+			->filter('article = %i', array($this->getId()));
+
+		$topics = BaseManager::build('FelixOnline\Core\Topic', 'topic', 'slug')
+			->join($topic, 'LEFT', 'slug', 'topic')
+			->filter('disabled = 0')
+			->values();
+
+		return $topics;
+	}
+
+	/*
 	 * Public: Get array of authors of article
 	 *
 	 * Returns array
