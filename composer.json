@@ -16,10 +16,6 @@
 		{
 			"type": "vcs",
 			"url": "https://github.com/mrclay/minify.git"
-		},
-		{
-			"type": "vcs",
-			"url": "https://github.com/FelixOnline/ezSQL.git"
 		}
 	],
 	"require": {
