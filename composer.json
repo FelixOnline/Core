@@ -15,10 +15,6 @@
 	"repositories": [
 		{
 			"type": "vcs",
-			"url": "https://github.com/FelixOnline/Service-Akismet.git"
-		},
-		{
-			"type": "vcs",
 			"url": "https://github.com/mrclay/minify.git"
 		},
 		{
@@ -30,7 +26,6 @@
 		"robmorgan/phinx": "0.4.*",
 		"rzekanet/service-akismet": "dev-master",
 		"jv2222/ezsql": "dev-master",
-		"d11wtq/boris": "1.0.*",
 		"tedivm/stash": "0.11.*",
 		"swiftmailer/swiftmailer": "5.*",
 		"oyejorge/less.php": "1.7.*",
