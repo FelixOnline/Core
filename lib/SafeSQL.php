@@ -34,7 +34,7 @@ class SafeSQL
     Function: SafeSQL
     Purpose:  constructor
 \*======================================================================*/
-	function SafeSQL() { }
+	function __construct() { }
 
 /*======================================================================*\
     Function: query
@@ -221,7 +221,7 @@ class SafeSQL_MySQLi extends SafeSQL {
     Function: SafeSQL_MySQL
     Purpose:  constructor
 \*======================================================================*/
-	function SafeSQL_MySQLi() {
+	function __construct() {
 	}
 
 /*======================================================================*\
@@ -239,8 +239,7 @@ class SafeSQL_MySQLi extends SafeSQL {
 			return $link_id->real_escape_string($var);
 		} else {
 			return addslashes($var);
-		}	
-		break;
+		}
 	}	
 }
 
