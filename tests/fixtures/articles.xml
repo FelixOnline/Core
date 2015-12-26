@@ -7,6 +7,7 @@
 		<field Field="teaser" Type="varchar(300)" Null="NO" Key="" Extra="" Comment="" />
 		<field Field="category" Type="int(11)" Null="NO" Key="MUL" Extra="" Comment="" />
 		<field Field="date" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" Comment="" />
+		<field Field="reviewedby" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
 		<field Field="approvedby" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
 		<field Field="published" Type="timestamp" Null="YES" Key="MUL" Extra="" Comment="" />
 		<field Field="hidden" Type="tinyint(1)" Null="NO" Key="MUL" Default="0" Extra="" Comment="" />
@@ -32,6 +33,7 @@
 		<field name="teaser">In light of Simon Singh returning to Imperial to give a lecture on libel laws that he is personally embroiled in!</field>
 		<field name="category">1</field>
 		<field name="date">2010-01-08 16:10:52</field>
+		<field name="reviewedby">felix</field>
 		<field name="approvedby">felix</field>
 		<field name="published">2010-01-08 16:11:02</field>
 		<field name="hidden">0</field>
@@ -47,6 +49,7 @@
 		<field name="teaser"></field>
 		<field name="category">1</field>
 		<field name="date">2010-01-08 16:44:21</field>
+		<field name="reviewedby">felix</field>
 		<field name="approvedby">felix</field>
 		<field name="published">2010-01-09 01:05:12</field>
 		<field name="hidden">0</field>
@@ -62,6 +65,7 @@
 		<field name="teaser"> you've won again</field>
 		<field name="category">1</field>
 		<field name="date">2010-01-10 01:29:25</field>
+		<field name="reviewedby">felix</field>
 		<field name="approvedby">felix</field>
 		<field name="published">2010-02-02 15:47:59</field>
 		<field name="hidden">0</field>
