@@ -13,13 +13,9 @@
 		}
 	],
 	"repositories": [
-		{
-			"type": "vcs",
-			"url": "https://github.com/mrclay/minify.git"
-		}
 	],
 	"require": {
-		"robmorgan/phinx": "0.4.*",
+		"robmorgan/phinx": "0.5.*",
 		"rzekanet/service-akismet": "dev-master",
 		"jv2222/ezsql": "dev-master",
 		"tedivm/stash": "0.11.*",
