@@ -56,6 +56,7 @@ class Article extends BaseDB {
 		$fields = array(
 			'title' => new Type\CharField(),
 			'teaser' => new Type\CharField(),
+			'reviewedby' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'approvedby' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'category' => new Type\ForeignKey('FelixOnline\Core\Category'),
 			'date' => new Type\DateTimeField(),
