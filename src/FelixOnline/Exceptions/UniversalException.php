@@ -21,7 +21,12 @@ class UniversalException extends \Exception {
 	) {
 		try {
 			$app = \FelixOnline\Core\App::getInstance();
-			$this->user = $app['currentuser'];
+
+			if(isset($app['currentuser'])) {
+				$this->user = $app['currentuser'];
+			} else {
+				$this->user = null;
+			}
 		} catch(\Exception $e) {
 			// no app
 			$this->user = null;
