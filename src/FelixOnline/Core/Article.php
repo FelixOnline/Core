@@ -135,6 +135,10 @@ class Article extends BaseDB {
 	 * Public: Get article content
 	 */
 	public function getContent() {
+		if($this->getText1() == null) {
+			throw new \FelixOnline\Exceptions\InternalException('Article text has gone missing!');
+		}
+
 		$string = $this->getText1()->getContent();
 
 		return $string;
