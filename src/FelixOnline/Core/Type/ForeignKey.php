@@ -19,7 +19,12 @@ class ForeignKey extends BaseType
 	public function getValue()
 	{
 		if (!is_null($this->value)) {
-			return new $this->class($this->value);
+			try {
+				return new $this->class($this->value);
+			} catch(\FelixOnline\Exceptions\ModelNotFoundException $e) {
+				$this->value = null;
+				return null;
+			}
 		}
 		return null;
 	}
