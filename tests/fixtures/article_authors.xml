@@ -1,22 +1,36 @@
 <?xml version="1.0"?>
 <mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <database name="media_felix">
+	<table_structure name="article_author">
+		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+		<field Field="article" Type="int(11)" Null="NO" Key="MUL" Extra="" Comment="" />
+		<field Field="user" Type="varchar(16)" Null="YES" Key="" Extra="" Comment="" />
+		<field Field="deleted" Type="tinyint(1)" Null="NO" Key="" Extra="" Comment="" />
+		<key Table="article_author" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="5923144" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article_author" Non_unique="1" Key_name="article" Seq_in_index="1" Column_name="article" Collation="A" Cardinality="6274" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="article_author" Non_unique="1" Key_name="article" Seq_in_index="3" Column_name="user" Collation="A" Cardinality="5923144" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="article_author" Engine="InnoDB" Version="10" Row_format="Compact" Rows="5923144" Avg_row_length="96" Data_length="569376768" Max_data_length="0" Index_length="236371968" Data_free="7340032" Auto_increment="5708720" Create_time="2013-11-27 20:58:59" Collation="utf8_general_ci" Create_options="" Comment="" />
+	</table_structure>
 	<table_data name="article_author">
 	<row>
 		<field name="article">1</field>
 		<field name="author">felix</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="article">2</field>
 		<field name="author">felix</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="article">2</field>
 		<field name="author">jk708</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="article">3</field>
 		<field name="author">felix</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>

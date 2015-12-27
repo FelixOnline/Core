@@ -95,14 +95,16 @@ class CurrentUser extends User
 				ip,
 				browser,
 				user,
-				logged_in
+				logged_in,
+				deleted
 			) VALUES (
 				'%s',
 				'%s',
 				'%s',
 				'%s',
 				'%s',
-				1
+				1,
+				0
 			)",
 			array(
 				$app['env']['session']->getId(),
@@ -147,6 +149,7 @@ class CurrentUser extends User
 			AND logged_in = 1
 			AND valid = 1
 			AND user = '%s'
+			AND deleted = 0
 			ORDER BY timediff ASC
 			LIMIT 1",
 			array(
@@ -205,6 +208,7 @@ class CurrentUser extends User
 									AND session_name='%s'
 									AND valid=1 
 									AND logged_in=0 
+									AND deleted = 0
 									ORDER BY timediff ASC 
 									LIMIT 1",
 									array($existing_id, SESSION_NAME));
@@ -236,7 +240,8 @@ class CurrentUser extends User
 										WHERE session_id='%s' 
 										AND session_name='%s'
 										AND valid=1 
-										AND logged_in=0",
+										AND logged_in=0
+										AND deleted=0",
 										array($existing_id, SESSION_NAME));
 			$login = $app['db']->query($sql);
 
@@ -263,7 +268,8 @@ class CurrentUser extends User
 					logged_in = 0
 					WHERE user='%s'
 					AND session_id='%s'
-					AND session_name='%s'",
+					AND session_name='%s'
+					AND deleted = 0",
 					array($this->getUser(), $sessionid, SESSION_NAME));
 					
 			return $app['db']->query($sql);
@@ -273,7 +279,8 @@ class CurrentUser extends User
 					logged_in = 0
 					WHERE user='%s'
 					AND session_id='%s'
-					AND session_name='%s'",
+					AND session_name='%s'
+					AND deleted = 0",
 					array($this->getUser(), $sessionid, SESSION_NAME));
 					
 			return $app['db']->query($sql);
@@ -290,7 +297,8 @@ class CurrentUser extends User
 				SET valid = 0,
 				logged_in = 0
 				WHERE user='%s'
-				AND session_name='%s'",
+				AND session_name='%s'
+				AND deleted = 0",
 				array($this->getUser(), SESSION_NAME));
 
 		return $app['db']->query($sql);
@@ -307,6 +315,7 @@ class CurrentUser extends User
 		$sql = $this->safesql->query("UPDATE `login` 
 				SET valid = 0
 				WHERE user='%s'
+				AND deleted = 0
 				AND session_name='%s'
 				AND logged_in=0
 				OR TIMESTAMPDIFF(SECOND,timestamp,NOW()) > %i",
@@ -331,7 +340,8 @@ class CurrentUser extends User
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
-			"DELETE FROM cookies
+			"UPDATE cookies
+			SET deleted = 1
 			WHERE hash = '%s'",
 			array(
 				$app['env']['cookies'][COOKIE_NAME]
@@ -342,7 +352,8 @@ class CurrentUser extends User
 		// also remove any expired cookies for anyone
 		// TODO move to cron
 		$sql = $app['safesql']->query(
-			"DELETE FROM cookies
+			"UPDATE cookies
+			SET deleted = 1
 			WHERE expires < NOW()", array());
 
 		$app['db']->query($sql);
@@ -366,11 +377,13 @@ class CurrentUser extends User
 									(
 										hash,
 										user,
-										expires
+										expires,
+										deleted
 									) VALUES (
 										'%s',
 										'%s',
 										FROM_UNIXTIME(%i)
+										0
 									)",
 									array($hash, $this->getUser(), $expiry_time));
 
@@ -397,6 +410,7 @@ class CurrentUser extends User
 			FROM `cookies`
 			WHERE hash='%s'
 			AND UNIX_TIMESTAMP(expires) > UNIX_TIMESTAMP()
+			AND deleted = 0
 			ORDER BY expires ASC
 			LIMIT 1",
 			array(

@@ -7,6 +7,7 @@
 		<field Field="content" Type="mediumtext" Null="YES" Key="" Extra="" Comment="" />
 		<field Field="timestamp" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" Comment="" />
 		<field Field="converted" Type="int(1)" Null="YES" Key="" Default="FALSE" Extra="" Comment="" />
+		<field Field="deleted" Type="tinyint(1)" Null="NO" Key="" Extra="" Comment="" />
 		<key Table="text_story" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="3692" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="text_story" Non_unique="1" Key_name="user" Seq_in_index="1" Column_name="user" Collation="A" Cardinality="246" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
 		<options Name="text_story" Engine="InnoDB" Version="10" Row_format="Compact" Rows="3692" Avg_row_length="8107" Data_length="29933568" Max_data_length="0" Index_length="98304" Data_free="0" Auto_increment="4316" Create_time="2014-02-03 21:43:51" Collation="utf8_general_ci" Create_options="" Comment="" />
@@ -18,6 +19,7 @@
 		<field name="content">&lt;p&gt;As Imperial alumnus Simon Singh prepares to return to College to give a guest lecture on the libel laws in science of which he has fallen foul of, the Government have announced the commencement of a working group on libel reform.&lt;/p&gt;</field>
 		<field name="timestamp">2011-04-18 08:52:32</field>
 		<field name="converted">0</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="id">28</field>
@@ -27,6 +29,7 @@
 </field>
 		<field name="timestamp">2011-04-18 08:53:59</field>
 		<field name="converted">0</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="id">31</field>
@@ -36,6 +39,7 @@
 </field>
 		<field name="timestamp">2010-01-14 15:43:38</field>
 		<field name="converted">0</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>

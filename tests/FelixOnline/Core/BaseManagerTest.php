@@ -32,7 +32,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.title IS NOT NULL AND `article`.category IS NOT NULL ORDER BY `article`.`id` DESC LIMIT 0, 10');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.title IS NOT NULL AND `article`.category IS NOT NULL AND `article`.deleted = 0 ORDER BY `article`.`id` DESC LIMIT 0, 10');
 	}
 
 	public function testAll()
@@ -65,7 +65,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.category = 1');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.category = 1 AND `article`.deleted = 0');
 	}
 
 	public function testFilterParamsException()
@@ -102,7 +102,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` ORDER BY `article`.`id` DESC, `article`.`title` DESC");
+		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` WHERE `article`.deleted = 0 ORDER BY `article`.`id` DESC, `article`.`title` DESC");
 	}
 
 	public function testOrderWithTable()
@@ -113,7 +113,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` ORDER BY another_table.id DESC");
+		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` WHERE `article`.deleted = 0 ORDER BY another_table.id DESC");
 	}
 
 	public function testLimit()
@@ -229,7 +229,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.published < NOW() AND `article_author`.author = "felix" ORDER BY `article`.`id` ASC');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.published < NOW() AND `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0 ORDER BY `article`.`id` ASC');
 	}
 
 	public function testNestedJoin()
@@ -258,7 +258,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `category` ON ( `article`.`category` = `category`.`id` ) JOIN `category_author` ON ( `category`.`id` = `category_author`.`category` )  WHERE `article`.published < NOW() AND `category`.id = "1" AND `category_author`.user = "pk1811" ORDER BY `article`.`id` ASC');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `category` ON ( `article`.`category` = `category`.`id` ) JOIN `category_author` ON ( `category`.`id` = `category_author`.`category` )  WHERE `article`.published < NOW() AND `article`.deleted = 0 AND `category`.id = "1" AND `category`.deleted = 0 AND `category_author`.user = "pk1811" AND `category_author`.deleted = 0 ORDER BY `article`.`id` ASC');
 	}
 
 	public function testLeftJoin()
@@ -275,7 +275,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article_author`.author = "felix"');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0');
 	}
 
 	public function testLeftJoinSpecificColumn()
@@ -292,7 +292,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`TEST` = `article_author`.`article` )  WHERE `article_author`.author = "felix"');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`TEST` = `article_author`.`article` )  WHERE `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0');
 	}
 
 	public function testJoinCount()

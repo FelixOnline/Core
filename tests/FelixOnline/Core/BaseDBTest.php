@@ -83,28 +83,6 @@ class BaseDBTest extends AppTestCase
 		);
 	}
 
-	public function testConstructDeleteSQL()
-	{
-		$model = $this->mock('FelixOnline\\Core\\BaseDB')
-			->new();
-
-		$model->this()->dbtable = 'test';
-		$model->this()->pk = 'id';
-
-		$fields = array(
-			'id' => (new IntegerField())->setValue(1),
-			'foo' => (new CharField())->setValue('bar'), // string
-			'fizz' => (new IntegerField())->setValue(1), // number
-			'buzz' => (new CharField())->setValue(NULL), // null
-			'empty' => (new CharField())->setValue(''), // empty
-		);
-
-		$this->assertEquals(
-			$model->constructDeleteSQL($fields),
-			"DELETE FROM `test` WHERE `id` = 1"
-		);
-	}
-
 	public function testConstructUpdateSQL()
 	{
 		$model = $this->mock('FelixOnline\\Core\\BaseDB')
@@ -159,7 +137,16 @@ class BaseDBTest extends AppTestCase
 
 		$user->delete();
 
-		$this->assertEquals(2, $this->getConnection()->getRowCount('user'));
+		$this->assertEquals(3, $this->getConnection()->getRowCount('user'));
+
+		$this->setExpectedException('FelixOnline\Exceptions\ModelNotFoundException', 'This model has been deleted');
+
+		$user = new \FelixOnline\Core\BaseDB(array(
+			'user' => new CharField(array('primary' => true)),
+			'name' => new CharField(),
+			'role' => new IntegerField(),
+			'info' => new CharField(),
+		), 'felix', 'user');
 	}
 
 	public function testSaveArticle()

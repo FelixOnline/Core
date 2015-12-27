@@ -25,6 +25,7 @@ class Search
 			user, name
 			FROM user
 			WHERE name LIKE '%s'
+			AND deleted = 0
 			ORDER BY name ASC",
 			array(
 				"%" . $this->query. "%"
@@ -51,6 +52,7 @@ class Search
 		$filters = "FROM article
 			WHERE title LIKE '%s'
 			AND hidden = 0
+			AND deleted = 0
 			AND published < NOW()
 			ORDER BY article.date DESC,
 			article.id DESC";
@@ -106,6 +108,8 @@ class Search
 			ON (article.text1 = text_story.id)
 			WHERE text_story.content LIKE '%s'
 			AND article.hidden = 0
+			AND article.deleted = 0
+			AND text_story.deleted = 0
 			AND article.published < NOW()
 			ORDER BY article.date DESC,
 			article.id DESC";

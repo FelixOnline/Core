@@ -118,7 +118,8 @@ class User extends BaseDB
 					SUM(likes) 
 				FROM `comment` 
 				WHERE user='%s'
-				AND `active`=1",
+				AND `active`=1
+				AND deleted=0",
 				array(
 					$this->getUser(),
 				));
@@ -140,7 +141,8 @@ class User extends BaseDB
 					SUM(dislikes) 
 				FROM `comment` 
 				WHERE user='%s'
-				AND `active`=1",
+				AND `active`=1
+				AND deleted = 0",
 				array(
 					$this->getUser(),
 				));
@@ -234,7 +236,8 @@ class User extends BaseDB
 			"SELECT 
 				UNIX_TIMESTAMP(timestamp) as timestamp 
 			FROM `login` 
-			WHERE user='%s' 
+			WHERE user='%s'
+			AND deleted=0 
 			ORDER BY timestamp ASC 
 			LIMIT 1",
 			array(
@@ -256,6 +259,7 @@ class User extends BaseDB
 				UNIX_TIMESTAMP(timestamp) as timestamp 
 			FROM `login` 
 			WHERE user='%s' 
+			AND deleted=0
 			ORDER BY timestamp DESC 
 			LIMIT 1",
 			array(
@@ -298,6 +302,8 @@ class User extends BaseDB
 			INNER JOIN `article` 
 			ON article_author.article = article.id 
 			WHERE article_author.`author` = '%s'
+			AND article.deleted = 0
+			AND article_author.deleted = 0
 			AND searchable = 0",
 			array(
 				$this->getUser())

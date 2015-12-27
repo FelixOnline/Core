@@ -88,7 +88,7 @@ class BaseManager
 	public function all()
 	{
 		$_filters = $this->filters; // store filters
-		$this->filters = array(); // reset them
+		$this->filters = array("`" . $this->table . "`.deleted = 0"); // reset them
 
 		$values = $this->values();
 
@@ -391,6 +391,8 @@ class BaseManager
 		if (!empty($this->filters)) {
 			$filters = $this->filters;
 		}
+
+		$filters[] = "`" . $this->table . "`.deleted = 0";
 
 		if (!empty($this->joins)) {
 			foreach ($this->joins as $join) {

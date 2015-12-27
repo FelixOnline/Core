@@ -100,6 +100,7 @@ class Category extends BaseDB
 
 	/**
 	 * Static: Get all categories
+	 * FIXME: Use manager
 	 */
 	public static function getCategories()
 	{
@@ -110,6 +111,7 @@ class Category extends BaseDB
 				`id`
 			FROM `category`
 			WHERE hidden = 0
+			AND deleted = 0
 			AND id > 0
 			ORDER BY `order` ASC",
 			array());
@@ -138,6 +140,7 @@ class Category extends BaseDB
 			WHERE hidden = 0
 			AND id > 0
 			AND parent IS NULL
+			AND deleted = 0
 			ORDER BY `order` ASC",
 			array());
 		$results = $app['db']->get_results($sql);

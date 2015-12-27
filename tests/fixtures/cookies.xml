@@ -7,6 +7,7 @@
 		<field name="hash">foobar</field>
 		<field name="user">felix</field>
 		<field name="expires">2013-12-30 16:53:38</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>

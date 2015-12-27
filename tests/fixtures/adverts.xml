@@ -16,6 +16,7 @@
 		<field name="categories">0</field>
 		<field name="articles">1</field>
 		<field name="sidebar">1</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="id">2</field>
@@ -31,6 +32,7 @@
 		<field name="categories">1</field>
 		<field name="articles">0</field>
 		<field name="sidebar">0</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="id">3</field>
@@ -46,6 +48,7 @@
 		<field name="categories">0</field>
 		<field name="articles">1</field>
 		<field name="sidebar">0</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>

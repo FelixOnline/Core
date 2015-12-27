@@ -6,6 +6,7 @@
 		<field Field="user" Type="varchar(16)" Null="NO" Key="MUL" Extra="" Comment="" />
 		<field Field="comment" Type="int(11)" Null="NO" Key="" Extra="" Comment="" />
 		<field Field="binlike" Type="tinyint(1)" Null="NO" Key="" Extra="" Comment="0 dislike, 1 like" />
+		<field Field="deleted" Type="tinyint(1)" Null="NO" Key="" Extra="" Comment="" />
 		<key Table="comment_like" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="5059" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="comment_like" Non_unique="0" Key_name="comment_like_check" Seq_in_index="1" Column_name="user" Collation="A" Cardinality="843" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="comment_like" Non_unique="0" Key_name="comment_like_check" Seq_in_index="2" Column_name="comment" Collation="A" Cardinality="5059" Null="" Index_type="BTREE" Comment="" Index_comment="" />
@@ -18,18 +19,21 @@
 		<field name="user">felix</field>
 		<field name="comment">1</field>
 		<field name="binlike">1</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="id">2</field>
 		<field name="user">felix</field>
 		<field name="comment">2</field>
 		<field name="binlike">0</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="id">3</field>
 		<field name="user">felix</field>
 		<field name="comment">80000001</field>
 		<field name="binlike">1</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>

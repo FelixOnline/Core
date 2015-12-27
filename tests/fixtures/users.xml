@@ -19,6 +19,7 @@
 		<field name="image">23</field>
 		<field name="show_email">0</field>
 		<field name="show_ldap">0</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="user">jk708</field>
@@ -37,6 +38,7 @@
 		<field name="image">24</field>
 		<field name="show_email">0</field>
 		<field name="show_ldap">0</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="user">pk1811</field>
@@ -59,6 +61,7 @@
 		<field name="image">23</field>
 		<field name="show_email">1</field>
 		<field name="show_ldap">1</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>

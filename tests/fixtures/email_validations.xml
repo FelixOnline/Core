@@ -6,6 +6,7 @@
 		<field Field="email" Type="varchar(500)" Null="NO" Key="" Extra="" Comment="" />
 		<field Field="code" Type="varchar(13)" Null="NO" Key="" Extra="" Comment="" />
 		<field Field="confirmed" Type="tinyint(1)" Null="NO" Key="" Extra="" />
+		<field Field="deleted" Type="tinyint(1)" Null="NO" Key="" Extra="" Comment="" />
 		<key Table="email_validation" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="3692" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 	</table_structure>
 	<table_data name="email_validation">
@@ -14,12 +15,14 @@
 		<field name="email">test@test.com</field>
 		<field name="code">abc</field>
 		<field name="confirmed">1</field>
+		<field name="deleted">0</field>
 	</row>
 	<row>
 		<field name="id">2</field>
 		<field name="email">test2@test.com</field>
 		<field name="code">def</field>
 		<field name="confirmed">0</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>

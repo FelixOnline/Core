@@ -294,7 +294,8 @@ class Article extends BaseDB {
 				COUNT(id)
 			FROM
 				`article_visit`
-			WHERE article = %i",
+			WHERE article = %i
+			AND `article_visit`.deleted = 0",
 			array(
 				$this->getId()
 			)
@@ -316,7 +317,8 @@ class Article extends BaseDB {
 			FROM
 				`article_visit`
 			WHERE article = %i
-			AND repeat_visit = 0",
+			AND repeat_visit = 0
+			AND `article_visit`.deleted = 0",
 			array(
 				$this->getId()
 			)
@@ -378,7 +380,8 @@ class Article extends BaseDB {
 					IP,
 					browser,
 					referrer,
-					repeat_visit
+					repeat_visit,
+					deleted
 				) VALUES (%q)",
 					array(
 						array(
@@ -387,7 +390,8 @@ class Article extends BaseDB {
 							$app['env']['REMOTE_ADDR'],
 							$app['env']['HTTP_USER_AGENT'],
 							$app['env']['HTTP_REFERER'],
-							$repeat
+							$repeat,
+							0
 						)
 					)
 				);
@@ -400,7 +404,8 @@ class Article extends BaseDB {
 				IP,
 				browser,
 				referrer,
-				repeat_visit
+				repeat_visit,
+				deleted
 			) VALUES (%q)",
 				array(
 					array(
@@ -408,7 +413,8 @@ class Article extends BaseDB {
 						$app['env']['REMOTE_ADDR'],
 						$app['env']['HTTP_USER_AGENT'],
 						$app['env']['HTTP_REFERER'],
-						$repeat
+						$repeat,
+						0,
 					)
 				)
 			);
@@ -433,6 +439,7 @@ class Article extends BaseDB {
 					`article_visit`
 				WHERE user = '%s'
 				AND article = '%s'
+				AND `article_visit`.deleted = 0
 				AND timestamp >= NOW() - INTERVAL 4 WEEK",
 				array(
 					$app['currentuser']->getUser(),
@@ -449,6 +456,7 @@ class Article extends BaseDB {
 				WHERE IP = '%s'
 				AND browser = '%s'
 				AND article = %i
+				AND `article_visit`.deleted = 0
 				AND timestamp >= NOW() - INTERVAL 4 WEEK",
 				array(
 					$app['env']['REMOTE_ADDR'],
@@ -483,11 +491,8 @@ class Article extends BaseDB {
 		$app = App::getInstance();
 
 		foreach ($authors as $author) {
-			$sql = $app['safesql']->query(
-				"INSERT INTO article_author (`article`, `author`) VALUES (%i, '%s')",
-				array($this->getId(), $author->getUser())
-			);
-			$app['db']->query($sql);
+			$authorRecord = new ArticleAuthor();
+			$authorRecord->setArticle($this)->setAuthor($author)->save();
 		}
 		return $authors;
 	}

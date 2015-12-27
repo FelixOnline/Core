@@ -243,11 +243,13 @@ class Comment extends BaseDB
 				(
 					user,
 					comment,
-					binlike
+					binlike,
+					deleted
 				) VALUES (
 					'%s',
 					%i,
-					1
+					1,
+					0
 				)",
 				array(
 					$user->getUser(),
@@ -282,10 +284,12 @@ class Comment extends BaseDB
 				(
 					user,
 					comment,
-					binlike
+					binlike,
+					deleted
 				) VALUES (
 					'%s',
 					%i,
+					0,
 					0
 				)",
 				array(

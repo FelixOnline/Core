@@ -30,6 +30,12 @@ class BaseDB extends BaseModel
 			throw new InternalException('No fields defined');
 		}
 
+		if (array_key_exists('deleted', $fields)) {
+			throw new InternalException('The column "deleted" is reserved by the database layer, and should not be specified.');
+		}
+
+		$fields['deleted'] = new Type\BooleanField();
+
 		if (!$this->dbtable) {
 			throw new InternalException('No table specified');
 		}
@@ -49,7 +55,13 @@ class BaseDB extends BaseModel
 				$fields[$column]->setValue($value);
 			}
 
+			if ($fields['deleted']->getValue() == true) {
+				throw new ModelNotFoundException('This model has been deleted', $this->dbtable, $this->constructorId);
+			}
+
 			$this->new = false;
+		} else {
+			$fields['deleted']->setValue(false);
 		}
 
 		// PHP passes all objects by refernce so we need to clone the fields 
@@ -112,12 +124,7 @@ class BaseDB extends BaseModel
 
 		// update model
 		if ($this->pk && $this->getPk()->getValue()) {
-			$sql = $this->constructDeleteSQL($this->fields);
-
-			$app['db']->query($sql);
-			if ($app['db']->last_error) {
-				throw new SQLException($app['db']->last_error, $sql);
-			}
+			$this->setDeleted(true)->save();
 
 			// clear cache
 			$item = $this->getCache($this->getPk());
@@ -191,20 +198,6 @@ class BaseDB extends BaseModel
 	}
 
 	/**
-	 * Construct the delete sql to remove model from db
-	 */
-	public function constructDeleteSQL($fields)
-	{
-		$sql = array();
-
-		$sql[] = "DELETE";
-		$sql[] = "FROM `" . $this->dbtable . "`";
-		$sql[] = "WHERE `" . $this->pk . "` = " . $fields[$this->pk]->getSQL();
-
-		return implode(" ", $sql);
-	}
-
-	/**
 	 * Construct the select sql to retrive model from db
 	 */
 	public function constructSelectSQL($fields)
@@ -236,6 +229,7 @@ class BaseDB extends BaseModel
 		foreach($fields as $key => $value) {
 			$columns[] = "`" . $key . "`";
 		}
+
 		$sql[] = implode(", ", $columns);
 
 		$sql[] = ") VALUES (";
@@ -243,8 +237,8 @@ class BaseDB extends BaseModel
 		$values = [];
 		foreach($fields as $key => $value) {
 			$values[] = $value->getSQL();
-
 		}
+
 		$sql[] = implode(", ", $values);
 		$sql[] = ")";
 

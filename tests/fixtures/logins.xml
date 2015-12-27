@@ -12,6 +12,7 @@
 		<field name="timestamp">2009-12-26 18:36:12</field>
 		<field name="valid">0</field>
 		<field name="logged_in">0</field>
+		<field name="deleted">0</field>
 	</row>
 	</table_data>
 </database>
