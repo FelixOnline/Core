@@ -69,6 +69,7 @@ class Article extends BaseDB {
 			)),
 			'text1' => new Type\ForeignKey('FelixOnline\Core\Text'),
 			'img1' => new Type\ForeignKey('FelixOnline\Core\Image'),
+			'video_url' => new Type\CharField(),
 			'img_caption' => new Type\CharField(),
 			'comment_status' => new Type\ForeignKey('FelixOnline\Core\ArticleCommentStatus'),
 		);
@@ -522,5 +523,38 @@ class Article extends BaseDB {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Public: Convert video URL to a valid video URL
+	 */
+	public function getVideo() {
+		// This function is based on code by Wouter Sioen released under the MIT license
+		// see woutersioen/sir-trevor-php
+		// Regexps from http://stackoverflow.com/questions/10488943/easy-way-to-get-vimeo-id-from-a-vimeo-url
+		// and http://stackoverflow.com/questions/3452546/javascript-regex-how-to-get-youtube-video-id-from-url
+		if(preg_match('/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/', $this->getVideoUrl(), $matches)) {
+			$data = array(
+				'source' => 'youtube',
+				'remote_id' => $matches[1]
+			);
+		} elseif(preg_match('/(?:https?:\/\/)?(?:www\.)?(?:player\.)?vimeo\.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/', $this->getVideoUrl(), $matches)) {
+			$data = array(
+				'source' => 'vimeo',
+				'remote_id' => $matches[2]
+			);
+		} else {
+			throw new \FelixOnline\Exceptions\InternalException('The specified video URL is not valid');
+		}
+
+		if($data['source'] == 'youtube') {
+			$html = '<iframe src="//www.youtube.com/embed/' . $data['remote_id'] . '?rel=0" ';
+			$html .= 'frameborder="0" allowfullscreen></iframe>' . "\n";
+		} else {
+			$html = '<iframe src="//player.vimeo.com/video/' . $data['remote_id'];
+			$html .= '?title=0&amp;byline=0" frameborder="0"></iframe>' . "\n";
+		}
+
+		return $html;
 	}
 }
