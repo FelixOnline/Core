@@ -517,7 +517,7 @@ class BaseManager
 		restore_error_handler(); // restore old error handler
 
 		if ($app['db']->last_error) {
-			throw new SQLException($app['db']->last_error, $sql);
+			throw new SQLException($app['db']->last_error, $app['db']->captured_errors);
 		}
 
 		if ($item) {

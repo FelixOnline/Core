@@ -91,7 +91,7 @@ class BaseDB extends BaseModel
 			$results = $app['db']->get_row($sql);
 
 			if ($app['db']->last_error) {
-				throw new SQLException($app['db']->last_error, $sql);
+				throw new SQLException($app['db']->last_error, $app['db']->captured_errors);
 			}
 
 			if (is_null($results)) {
@@ -170,7 +170,7 @@ class BaseDB extends BaseModel
 
 				$app['db']->query($sql);
 				if ($app['db']->last_error) {
-					throw new SQLException($app['db']->last_error, $sql);
+					throw new SQLException($app['db']->last_error, $app['db']->captured_errors);
 				}
 
 				// clear cache
@@ -182,7 +182,7 @@ class BaseDB extends BaseModel
 
 			$app['db']->query($sql);
 			if ($app['db']->last_error) {
-				throw new SQLException($app['db']->last_error, $sql);
+				throw new SQLException($app['db']->last_error, $app['db']->captured_errors);
 			}
 
 			$this->pk = $this->findPk($this->fields);
