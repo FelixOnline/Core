@@ -147,7 +147,6 @@ class Article extends BaseDB {
 
 	/**
 	 * Public: Get article teaser
-	 * TODO
 	 *
 	 * Returns string
 	 */

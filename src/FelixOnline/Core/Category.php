@@ -100,30 +100,24 @@ class Category extends BaseDB
 
 	/**
 	 * Static: Get all categories
-	 * FIXME: Use manager
 	 */
 	public static function getCategories()
 	{
 		$app = App::getInstance();
 
-		$sql = $app['safesql']->query(
-			"SELECT
-				`id`
-			FROM `category`
-			WHERE hidden = 0
-			AND deleted = 0
-			AND id > 0
-			ORDER BY `order` ASC",
-			array());
-		$results = $app['db']->get_results($sql);
-		$cats = array();
+		$manager = BaseManager::build('FelixOnline\Core\Category', 'category');
 
-		if (!is_null($results)) {
-			foreach($results as $cat) {
-				$cats[] = new Category($cat->id);
-			}
+		try {
+			$values = $manager->filter('hidden = 0')
+							->filter('deleted = 0')
+							->filter('id > 0')
+							->order('order', 'ASC')
+							->values();
+
+			return $values;
+		} catch(\Exception $e) {
+			return array();
 		}
-		return $cats;
 	}
 
 	/**

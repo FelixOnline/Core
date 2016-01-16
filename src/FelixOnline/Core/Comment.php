@@ -328,8 +328,6 @@ class Comment extends BaseDB
 	/**
 	 * Public: Save new comment into database
 	 *
-	 * TODO
-	 *
 	 * Returns id of new comment
 	 */
 	public function save()

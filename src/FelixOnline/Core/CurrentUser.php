@@ -394,7 +394,6 @@ class CurrentUser extends User
 	 * Protected: Check if there is a valid permanent cookie, if so log in with it
 	 *
 	 * Returns false if failed, username otherwise
-	 * TODO make sure there isn't redundant code
 	 */
 	protected function loginFromCookie()
 	{

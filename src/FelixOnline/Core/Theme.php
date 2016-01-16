@@ -93,11 +93,11 @@ class Theme {
 			foreach($this->hierarchy as $key => $value) { // loop through each hierarchy
 				$file = $this->page . '-' . $value;
 				if($this->fileExists($file)) { // if that file exists then return it
-					$this->hierarchy = array(); // reset hierarchy for further renders TODO
+					$this->hierarchy = array(); // reset hierarchy for further renders
 					return $file;
 				}		
 			}
-			$this->hierarchy = array(); // reset hierarchy for further renders TODO
+			$this->hierarchy = array(); // reset hierarchy for further renders
 		}
 		return $this->page; // if no page found then return base page
 	}
