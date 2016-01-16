@@ -30,6 +30,6 @@ class ArticleVideo extends AbstractMigration
         $table = $this->table('article');
 
         $table->addColumn('video_url', 'string', array('length' => 600))
-              ->save();
+              ->update();
     }
 }
