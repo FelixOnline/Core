@@ -32,9 +32,9 @@ class User extends BaseDB
 		$fields = array(
 			'user' => new Type\CharField(array('primary' => true)),
 			'name' => new Type\CharField(),
-			'visits' => new Type\IntegerField(),
-			'ip' => new Type\CharField(),
-			'timestamp' => new Type\DateTimeField(),
+			'visits' => new Type\IntegerField(array('dont_log' => true)),
+			'ip' => new Type\CharField(array('dont_log' => true)),
+			'timestamp' => new Type\DateTimeField(array('dont_log' => true)),
 			'info' => new Type\TextField(),
 			'description' => new Type\TextField(array(
 				'transformers' => array(

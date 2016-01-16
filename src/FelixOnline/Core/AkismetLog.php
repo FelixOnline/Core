@@ -29,6 +29,6 @@ class AkismetLog extends BaseDB
 			'response' => new Type\TextField(),
 		);
 
-		parent::__construct($fields, $id);
+		parent::__construct($fields, $id, null, true);
 	}
 }

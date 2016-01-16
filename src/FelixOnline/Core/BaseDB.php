@@ -17,14 +17,17 @@ class BaseDB extends BaseModel
 	protected $constructorId;
 
 	private $new;
+	private $dontlog;
 
-	function __construct($fields, $id = null, $dbtable = null)
+	function __construct($fields, $id = null, $dbtable = null, $dontlog = false)
 	{
 		$app = \FelixOnline\Core\App::getInstance();
 
 		if (!is_null($dbtable)) {
 			$this->dbtable = $dbtable;
 		}
+
+		$this->dontlog = $dontlog;
 
 		if (!is_array($fields) || empty($fields)) {
 			throw new InternalException('No fields defined');
@@ -160,7 +163,7 @@ class BaseDB extends BaseModel
 			// Determine what has been modified
 			$changed = array();
 			foreach ($this->initialFields as $column => $field) {
-				if ($this->fields[$column]->getValue() !== $field->getValue()) {
+				if ($this->fields[$column]->getRawValue() !== $field->getRawValue()) {
 					$changed[$column] = $this->fields[$column];
 				}
 			}
@@ -176,6 +179,8 @@ class BaseDB extends BaseModel
 				// clear cache
 				$item = $this->getCache($this->getPk());
 				$item->clear();
+
+				$this->log_update();
 			}
 		} else { // insert model
 			$sql = $this->constructInsertSQL($this->fields);
@@ -192,7 +197,11 @@ class BaseDB extends BaseModel
 			}
 
 			$this->new = false;
+
+			$this->log_create();
 		}
+
+		$this->initialFields = $this->fields;
 
 		return $this->getPk()->getValue(); // return new id
 	}
@@ -317,5 +326,60 @@ class BaseDB extends BaseModel
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Audit log functions
+	 */
+	private function log_create() {
+		$this->log('create', array());
+	}
+
+	private function log_update() {
+		$fields = array();
+
+		foreach($this->initialFields as $column => $field) {
+			if($this->fields[$column]->config['dont_log'] == true) {
+				continue;
+			}
+
+			if($this->fields[$column]->getRawValue() !== $field->getRawValue()) {
+				$fields[$column] = array('old' => $field->getRawValue(),
+										'new' => $this->fields[$column]->getRawValue());
+			}
+		}
+
+		if(count($fields) == 0) {
+			return;
+		}
+
+		$this->log('update', $fields);
+	}
+
+	private function log($action, $fields, $pk = null) {
+		if($this->dontlog) {
+			return;
+		}
+
+		if(is_null($pk)) {
+			$pk = $this->fields[$this->pk]->getValue();
+		}
+
+		$app = App::getInstance();
+
+		if(isset($app['currentuser']) && $app['currentuser']->isLoggedIn()) {
+			$user = $app['currentuser']->getUser();
+		} else {
+			$user = 'ANON';
+		}
+
+		$sql = $app['safesql']->query("INSERT INTO audit_log (`id`, `timestamp`, `table`, `key`, `user`, `action`, `fields`) VALUES (NULL, NOW(), '%s', '%s', '%s', '%s', '%s')",
+			array($this->dbtable,
+				$pk,
+				$user,
+				$action,
+				json_encode($fields)));
+
+		$app['db']->query($sql);
 	}
 }

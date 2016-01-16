@@ -12,7 +12,7 @@ class DateTimeField extends BaseType
 			$this->raw_value = $value;
 		} else if (is_int($value)) {
 			$this->value = $value;
-			$this->raw_value = $value;
+			$this->raw_value = date('Y-m-d H:i:s', $value);
 		} else if (is_null($value)) {
 			$this->value = $value;
 			$this->raw_value = $value;

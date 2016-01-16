@@ -16,6 +16,7 @@ class BaseType
 			'primary' => false,
 			'null' => true,
 			'transformers' => array(),
+			'dont_log' => false
 		);
 	}
 

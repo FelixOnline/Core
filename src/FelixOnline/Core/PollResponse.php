@@ -15,6 +15,6 @@ class PollResponse extends BaseDB
 			'useragent' => new Type\TextField(),
 		);
 
-		parent::__construct($fields, $id);
+		parent::__construct($fields, $id, null, true);
 	}
 }

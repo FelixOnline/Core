@@ -15,7 +15,7 @@ class EmailValidation extends BaseDB
 			'confirmed' => new Type\BooleanField(),
 		);
 
-		parent::__construct($fields, $id);
+		parent::__construct($fields, $id, null, true);
 	}
 
 	public static function create($email) {
