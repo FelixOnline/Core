@@ -10,6 +10,7 @@ class BaseDBTest extends AppTestCase
 	public $fixtures = array(
 		'articles',
 		'users',
+		'audit_log'
 	);
 
 	public function testInit()

@@ -7,6 +7,7 @@ class EmailValidationTest extends AppTestCase
 {
 	public $fixtures = array(
 		'email_validations',
+		'audit_log'
 	);
 
 	public function testCreate()

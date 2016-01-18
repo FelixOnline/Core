@@ -9,6 +9,7 @@ class CategoryTest extends AppTestCase
 		'categories',
 		'users',
 		'category_authors',
+		'audit_log'
 	);
 
 	public function testGetURL()

@@ -8,6 +8,7 @@ class BaseManagerTest extends AppTestCase
 	public $fixtures = array(
 		'articles',
 		'article_authors',
+		'audit_log'
 	);
 
 	public function getManager()

@@ -33,7 +33,13 @@ class DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
 			}
 
 			$create .= '('.implode(',', $cols).');';
-			$pdo->exec($create);
+
+			try {
+				$pdo->exec($create);
+			} catch(\Exception $e) {
+				echo $create."\n";
+				throw $e;
+			}
 		}
 
 		parent::setUp();

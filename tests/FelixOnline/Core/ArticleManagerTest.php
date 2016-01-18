@@ -10,6 +10,7 @@ class ArticleManagerTest extends AppTestCase
 		'article_visits',
 		'text_stories',
 		'comments',
+		'audit_log'
 	);
 
 	public function testMostPopularQuery()

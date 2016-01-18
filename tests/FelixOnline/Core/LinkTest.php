@@ -6,7 +6,8 @@ require_once __DIR__ . '/../../../constants.php';
 class LinkTest extends AppTestCase
 {
 	public $fixtures = array(
-		'links'
+		'links',
+		'audit_log'
 	);
 
 	public function testGetActiveLink()

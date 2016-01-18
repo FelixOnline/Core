@@ -8,6 +8,7 @@ class ImageTest extends AppTestCase
 	public $fixtures = array(
 		'images',
 		'settings',
+		'audit_log'
 	);
 
 	public function testGetName()

@@ -11,6 +11,7 @@ class UserTest extends AppTestCase
 		'article_authors',
 		'comments',
 		'images',
+		'audit_log'
 	);
 
 	public function testGetURL()

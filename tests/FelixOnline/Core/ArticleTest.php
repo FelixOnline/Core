@@ -15,6 +15,7 @@ class ArticleTest extends AppTestCase
 		'images',
 		'article_visits',
 		'logins',
+		'audit_log'
 	);
 
 	public function testGetTitle()
@@ -126,9 +127,9 @@ class ArticleTest extends AppTestCase
 		$article->setContent('Foo bar');
 		$this->assertEquals(4, $this->getConnection()->getRowCount('text_story'));
 
-		$app = \FelixOnline\Core\App::getInstance();
-		$insert_id = $app['db']->dbh->insert_id;
-		$this->assertEquals($insert_id, $article->getText1()->getId());
+		$manager = \FelixOnline\Core\BaseManager::build('\FelixOnline\Core\Text', 'text_story');
+		$text = $manager->filter('content = "Foo bar"')->one();
+		$this->assertEquals($text->getId(), $article->getText1()->getId());
 	}
 
 	public function testAddAuthors()

@@ -12,6 +12,7 @@ class CurrentUserTest extends AppTestCase
 		'logins',
 		'cookies',
 		'images',
+		'audit_log'
 	);
 
 	public function testNotLoggedIn()

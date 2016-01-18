@@ -9,7 +9,8 @@ class AdvertTest extends AppTestCase
 		'categories',
 		'adverts',
 		'advert_categories',
-		'images'
+		'images',
+		'audit_log'
 	);
 
 	public function testGetDetails()

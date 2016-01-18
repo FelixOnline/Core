@@ -8,6 +8,7 @@ class BaseModelTest extends AppTestCase
 {
 	public $fixtures = array(
 		'users',
+		'audit_log'
 	);
 
 	public function testGetField()

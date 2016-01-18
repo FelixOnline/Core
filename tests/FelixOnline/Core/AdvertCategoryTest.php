@@ -9,7 +9,8 @@ class AdvertCategoryTest extends AppTestCase
 		'categories',
 		'adverts',
 		'advert_categories',
-		'images'
+		'images',
+		'audit_log'
 	);
 
 	public function testGetAdvert()
