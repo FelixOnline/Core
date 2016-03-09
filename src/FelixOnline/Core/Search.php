@@ -93,7 +93,9 @@ class Search
 		} else {
 			$articles = array();
 			foreach ($results as $a) {
-				array_push($articles, new Article($a->id));
+				try {
+					array_push($articles, new Article($a->id));
+				} catch (\Exception $e) {}
 			}
 			return array(
 				'count' => $count,
@@ -154,7 +156,9 @@ class Search
 		} else {
 			$articles = array();
 			foreach ($results as $a) {
-				array_push($articles, new Article($a->id));
+				try {
+					array_push($articles, new Article($a->id));
+				} catch (\Exception $e) {}
 			}
 			return array(
 				'count' => $count,
