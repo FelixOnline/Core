@@ -8,6 +8,7 @@ class ArticleManagerTest extends AppTestCase
 	public $fixtures = array(
 		'articles',
 		'article_visits',
+		'categories',
 		'text_stories',
 		'comments',
 		'audit_log'
