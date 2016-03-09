@@ -81,4 +81,14 @@ class CategoryTest extends AppTestCase
 		$this->assertInstanceOf('FelixOnline\Core\Category', $categories[0]);
 		$this->assertEquals($categories[0]->getLabel(), 'News');
 	}
+
+	public function testSecretCategory()
+	{
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\ModelNotFoundException',
+			'This is a secret category and you don\'t have permission to access it'
+		);
+
+		$category = new \FelixOnline\Core\Category(3);
+	}
 }

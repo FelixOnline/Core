@@ -8,6 +8,7 @@ class BaseManagerTest extends AppTestCase
 	public $fixtures = array(
 		'articles',
 		'article_authors',
+		'categories',
 		'audit_log'
 	);
 
@@ -338,15 +339,15 @@ class BaseManagerTest extends AppTestCase
 		$all = $manager->all();
 
 		$selects = $app['db']->get_row("SHOW STATUS LIKE 'Com_select'")->Value;
-		// 4 because of the selects when instantiating the models
-		$this->assertEquals(4, (int) $selects);
+		// 7 because of the selects when instantiating the models
+		$this->assertEquals(7, (int) $selects);
 		$this->assertCount(3, $all);
 		$this->assertInstanceOf('FelixOnline\Core\Article', $all[0]);
 
 		$all = $manager->all();
 
 		$selects = $app['db']->get_row("SHOW STATUS LIKE 'Com_select'")->Value;
-		$this->assertEquals(4, (int) $selects);
+		$this->assertEquals(7, (int) $selects);
 		$this->assertCount(3, $all);
 		$this->assertInstanceOf('FelixOnline\Core\Article', $all[0]);
 	}

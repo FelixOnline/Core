@@ -539,7 +539,10 @@ class BaseManager
 		$models = array();
 		foreach ($result as $r) {
 			$pk = $r->{$this->pk};
-			$models[] = new $this->class($pk);
+
+			try {
+				$models[] = new $this->class($pk);
+			} catch(\Exception $e) { }
 		}
 		return $models;
 	}

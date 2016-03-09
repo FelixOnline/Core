@@ -80,6 +80,23 @@
         <field name="comment_status">1</field>
         <field name="deleted">0</field>
 	</row>
+	<row>
+		<field name="id">4</field>
+		<field name="title">Secret Category</field>
+		<field name="teaser"> you've won again</field>
+		<field name="category">3</field>
+		<field name="date">2010-01-10 01:29:25</field>
+		<field name="reviewedby">felix</field>
+		<field name="approvedby">felix</field>
+		<field name="published">2010-02-02 15:47:59</field>
+		<field name="hidden">0</field>
+		<field name="searchable">0</field>
+		<field name="text1">31</field>
+		<field name="img1">33</field>
+		<field name="img_caption">Efgh</field>
+        <field name="comment_status">1</field>
+        <field name="deleted">0</field>
+	</row>
 	</table_data>
 </database>
 </mysqldump>

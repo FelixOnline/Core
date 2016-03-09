@@ -152,7 +152,7 @@ class BaseDBTest extends AppTestCase
 
 	public function testSaveArticle()
 	{
-		$this->assertEquals(3, $this->getConnection()->getRowCount('article'));
+		$this->assertEquals(4, $this->getConnection()->getRowCount('article'));
 
 		$user = new \FelixOnline\Core\BaseDB(array(
 			'title' => (new CharField())->setValue('test'),
@@ -163,7 +163,7 @@ class BaseDBTest extends AppTestCase
 
 		$user->save();
 
-		$this->assertEquals(4, $this->getConnection()->getRowCount('article'));
+		$this->assertEquals(5, $this->getConnection()->getRowCount('article'));
 	}
 
 	public function testSaveUpdate()

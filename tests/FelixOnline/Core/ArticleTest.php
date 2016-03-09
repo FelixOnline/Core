@@ -17,7 +17,15 @@ class ArticleTest extends AppTestCase
 		'logins',
 		'audit_log'
 	);
+	public function testArticleSecretCategory()
+	{
+		$this->setExpectedException(
+			'FelixOnline\Exceptions\ModelNotFoundException',
+			'This article is in a secret category which you cannot access'
+		);
 
+		$category = new \FelixOnline\Core\Article(4);
+	}
 	public function testGetTitle()
 	{
 		$article = new \FelixOnline\Core\Article(1);

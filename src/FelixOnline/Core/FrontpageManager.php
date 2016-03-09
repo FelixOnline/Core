@@ -20,10 +20,6 @@ class FrontpageManager extends BaseManager
 		$app = App::getInstance();
 		$currentuser = $app['currentuser'];
 
-		if(!$currentuser->isLoggedIn()) {
-			$categoryManager->filter('secret = 0');
-		}
-
 		$articleManager->join($categoryManager, null, 'category');
 
 		$articles->join($articleManager, null, 'article');
@@ -43,10 +39,6 @@ class FrontpageManager extends BaseManager
 
 		$app = App::getInstance();
 		$currentuser = $app['currentuser'];
-
-		if(!$currentuser->isLoggedIn()) {
-			$categoryManager->filter('secret = 0');
-		}
 
 		$articleManager->join($categoryManager, null, 'category');
 

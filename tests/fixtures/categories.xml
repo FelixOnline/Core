@@ -30,6 +30,20 @@
         <field name="secret">0</field>
         <field name="deleted">0</field>
     </row>
+    <row>
+        <field name="id">3</field>
+        <field name="label">Secret</field>
+        <field name="cat">secret</field>
+        <field name="email">secret.felix@imperial.ac.uk</field>
+        <field name="twitter" xsi:nil="true" />
+        <field name="description" xsi:nil="true" />
+        <field name="hidden">0</field>
+        <field name="active">1</field>
+        <field name="order">1</field>
+        <field name="parent">0</field>
+        <field name="secret">1</field>
+        <field name="deleted">0</field>
+    </row>
 </table_data>
 </database>
 </mysqldump>

@@ -36,6 +36,12 @@ class Category extends BaseDB
 		);
 
 		parent::__construct($fields, $id);
+
+		$currentuser = new CurrentUser();
+
+		if($this->getSecret() && !$currentuser->isLoggedIn() && !Utility::isInCollege()) {
+			throw new \FelixOnline\Exceptions\ModelNotFoundException("This is a secret category and you don't have permission to access it", "Category", $id);
+		}
 	}
 
 	/**

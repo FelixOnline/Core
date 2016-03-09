@@ -275,6 +275,39 @@ class Utility {
 	}
 
 	/**
+	 * Identify if the user is on the IC network
+	 *
+	 * @static
+	 *
+	 * @return boolean
+	 */
+	static function isInCollege() {
+		if(!isset($_SERVER['REMOTE_ADDR'])) {
+			return false;
+		}
+
+		// College IP ranges
+		// Downloaded from RIPE on 06.03.2016
+		$ipranges = array('129.31', '146.169', '146.179', '155.198', '192.149.111', '192.156.162', '192.195.105', '192.195.116', '192.68.153', '193.61.68', '193.61.70', '193.63.111', '193.63.254', '193.63.255', '193.63.75', '194.81.211', '194.82.152', '2001:630:12');
+
+		$ip = $_SERVER['REMOTE_ADDR'];
+
+		// if running locally, add localhost
+		if(LOCAL) {
+			$ipranges[] = '127.0.0.1';
+			$ipranges[] = '::1';
+		}
+
+		foreach($ipranges as $iprange) {
+			if(substr($ip, 0, strlen($iprange)) === $iprange) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Throw json last error
 	 */
 	public static function jsonLastError()

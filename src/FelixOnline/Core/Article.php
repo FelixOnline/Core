@@ -75,6 +75,10 @@ class Article extends BaseDB {
 		);
 
 		parent::__construct($fields, $id);
+
+		if($this->getCategory() == NULL) {
+			throw new \FelixOnline\Exceptions\ModelNotFoundException("This article is in a secret category which you cannot access", "Article", $id);
+		}
 	}
 
 	/*
