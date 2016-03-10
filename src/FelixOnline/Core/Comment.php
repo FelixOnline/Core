@@ -180,10 +180,11 @@ class Comment extends BaseDB
 	 *
 	 * Returns true or false
 	 */
-	public function userLikedOrDislikedComment($user)
+	public function userLikedOrDislikedComment($ip, $useragent)
 	{
 		$count = BaseManager::build(null, 'comment_like')
-			->filter("user = '%s'", array($user->getUser()))
+			->filter("ip = '%s'", array($ip))
+			->filter("user_agent = '%s'", array($useragent))
 			->filter("comment = %i", array($this->getId()))
 			->count();
 
@@ -197,10 +198,11 @@ class Comment extends BaseDB
 	 *
 	 * Returns true or false
 	 */
-	public function userLikedComment($user)
+	public function userLikedComment($ip, $useragent)
 	{
 		$count = BaseManager::build(null, 'comment_like')
-			->filter("user = '%s'", array($user->getUser()))
+			->filter("ip = '%s'", array($ip))
+			->filter("user_agent = '%s'", array($useragent))
 			->filter("comment = %i", array($this->getId()))
 			->filter("binlike = 1")
 			->count();
@@ -215,10 +217,11 @@ class Comment extends BaseDB
 	 *
 	 * Returns true or false
 	 */
-	public function userDislikedComment($user)
+	public function userDislikedComment($ip, $useragent)
 	{
 		$count = BaseManager::build(null, 'comment_like')
-			->filter("user = '%s'", array($user->getUser()))
+			->filter("ip = '%s'", array($ip))
+			->filter("user_agent = '%s'", array($useragent))
 			->filter("comment = %i", array($this->getId()))
 			->filter("binlike = 0")
 			->count();
@@ -233,26 +236,29 @@ class Comment extends BaseDB
 	 *
 	 * Returns number of likes
 	 */
-	public function likeComment($user)
+	public function likeComment($ip, $useragent)
 	{
 		$app = App::getInstance();
 
-		if (!$this->userLikedOrDislikedComment($user)) { // check user hasn't already liked the comment
+		if (!$this->userLikedOrDislikedComment($ip, $useragent)) { // check user hasn't already liked the comment
 			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
-					user,
+					ip,
+					user_agent,
 					comment,
 					binlike,
 					deleted
 				) VALUES (
+					'%s',
 					'%s',
 					%i,
 					1,
 					0
 				)",
 				array(
-					$user->getUser(),
+					$ip,
+					$useragent,
 					$this->getId(),
 				));
 			$app['db']->query($sql);
@@ -274,26 +280,29 @@ class Comment extends BaseDB
 	 *
 	 * Returns number of dislikes
 	 */
-	public function dislikeComment($user)
+	public function dislikeComment($ip, $useragent)
 	{
 		$app = App::getInstance();
 
-		if (!$this->userLikedOrDislikedComment($user)) { // check user hasn't already liked the comment
+		if (!$this->userLikedOrDislikedComment($ip, $useragent)) { // check user hasn't already liked the comment
 			$sql = $app['safesql']->query(
 				"INSERT INTO `comment_like` 
 				(
-					user,
+					ip,
+					user_agent,
 					comment,
 					binlike,
 					deleted
 				) VALUES (
+					'%s',
 					'%s',
 					%i,
 					0,
 					0
 				)",
 				array(
-					$user->getUser(),
+					$ip,
+					$useragent,
 					$this->getId(),
 				));
 			$app['db']->query($sql);
