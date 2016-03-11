@@ -8,6 +8,7 @@ class AnonymousCommentRating extends AbstractMigration
     {
         $table = $this->table('comment_like');
         $table->dropForeignKey('user')
+              ->removeIndex('comment_like_check')
               ->addColumn('ip', 'string', array('length' => 255, 'null' => true))
               ->addColumn('user_agent', 'string', array('length' => 255, 'null' => true))
               ->removeColumn('user')
@@ -21,6 +22,7 @@ class AnonymousCommentRating extends AbstractMigration
               ->removeColumn('user_agent')
               ->removeColumn('ip')
               ->addForeignKey('user', 'user', 'user', array('delete'=> 'SET_NULL', 'update'=> 'NO_ACTION'))
+              ->addIndex(array('user', 'comment'), array('unique' => true, 'name' => 'comment_like_check'))
               ->save();
     }
 }
