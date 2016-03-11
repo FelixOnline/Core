@@ -129,22 +129,19 @@ class CommentTest extends AppTestCase
 	public function testUserLikedOrDislikedComment()
 	{
 		$comment = new \FelixOnline\Core\Comment(1);
-		$user = new \FelixOnline\Core\User('felix');
-		$this->assertTrue($comment->userLikedOrDislikedComment($user));
+		$this->assertTrue($comment->userLikedOrDislikedComment('127.0.0.1', 'test'));
 	}
 
 	public function testUserLikedComment()
 	{
 		$comment = new \FelixOnline\Core\Comment(1);
-		$user = new \FelixOnline\Core\User('felix');
-		$this->assertTrue($comment->userLikedComment($user));
+		$this->assertTrue($comment->userLikedComment('127.0.0.1', 'test'));
 	}
 
 	public function testUserDislikedComment()
 	{
 		$comment = new \FelixOnline\Core\Comment(2);
-		$user = new \FelixOnline\Core\User('felix');
-		$this->assertTrue($comment->userDislikedComment($user));
+		$this->assertTrue($comment->userDislikedComment('127.0.0.1', 'test'));
 	}
 
 	public function testUserLikesComment()
@@ -152,9 +149,8 @@ class CommentTest extends AppTestCase
 		$this->assertEquals(3, $this->getConnection()->getRowCount('comment_like'));
 
 		$comment = new \FelixOnline\Core\Comment(1);
-		$user = new \FelixOnline\Core\User('jk708');
 
-		$comment->likeComment($user);
+		$comment->likeComment('127.0.0.1', 'test2');
 
 		$this->assertEquals(4, $this->getConnection()->getRowCount('comment_like'));
 
@@ -165,12 +161,13 @@ class CommentTest extends AppTestCase
 		$stm->execute();
 		$row = $stm->fetch();
 
-		$this->assertEquals($row['user'], $user->getUser());
+		$this->assertEquals($row['ip'], '127.0.0.1');
+		$this->assertEquals($row['user_agent'], 'test2');
 		$this->assertEquals($row['comment'], 1);
 		$this->assertEquals($row['binlike'], 1);
 
 		// Try and like again
-		$this->assertFalse($comment->likeComment($user));
+		$this->assertFalse($comment->likeComment('127.0.0.1', 'test2'));
 	}
 
 	public function testUserDislikesComment()
@@ -178,9 +175,8 @@ class CommentTest extends AppTestCase
 		$this->assertEquals(3, $this->getConnection()->getRowCount('comment_like'));
 
 		$comment = new \FelixOnline\Core\Comment(1);
-		$user = new \FelixOnline\Core\User('jk708');
 
-		$comment->dislikeComment($user);
+		$comment->dislikeComment('127.0.0.1', 'test2');
 
 		$this->assertEquals(4, $this->getConnection()->getRowCount('comment_like'));
 
@@ -191,11 +187,12 @@ class CommentTest extends AppTestCase
 		$stm->execute();
 		$row = $stm->fetch();
 
-		$this->assertEquals($row['user'], $user->getUser());
+		$this->assertEquals($row['ip'], '127.0.0.1');
+		$this->assertEquals($row['user_agent'], 'test2');
 		$this->assertEquals($row['comment'], 1);
 		$this->assertEquals($row['binlike'], 0);
 
-		$this->assertFalse($comment->dislikeComment($user));
+		$this->assertFalse($comment->dislikeComment('127.0.0.1', 'test2'));
 	}
 
 	public function testNewExternalComment()
