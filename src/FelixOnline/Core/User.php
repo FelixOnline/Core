@@ -323,7 +323,6 @@ class User extends BaseDB
 		$user->setInfo(json_encode(array()));
 		$user->setVisits(0);
 		$user->setIp(0);
-		$user->setRole(0);
 		$user->setImage(676); // FIXME - Move to const
 		$user->setShowEmail(TRUE);
 		$user->setShowLdap(TRUE);
