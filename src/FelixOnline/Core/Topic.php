@@ -38,6 +38,10 @@ class Topic extends BaseDB
 			->limit(0, 1)
 			->values();
 
+		if(!$article) {
+			throw new \FelixOnline\Exceptions\InternalException('No articles posted in this topic');
+		}
+
 		return($article[0]->getPublished());
 	}
 
@@ -54,6 +58,10 @@ class Topic extends BaseDB
 			->order('published', 'DESC')
 			->limit(0, 1)
 			->values();
+
+		if(!$article) {
+			throw new \FelixOnline\Exceptions\InternalException('No articles posted in this topic');
+		}
 
 		return($article[0]->getPublished());
 	}
