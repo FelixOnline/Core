@@ -15,10 +15,7 @@ class Blog extends BaseDb {
 
 	function __construct($id = NULL) {
 		$fields = array(
-			'name' => new Type\CharField(),
-			'slug' => new Type\CharField(),
-			'controller' => new Type\CharField(array('null' => true)),
-			'sticky' => new Type\TextField(),
+			'sprinkler_prefix' => new Type\CharField()
 		);
 
 		parent::__construct($fields, $id);

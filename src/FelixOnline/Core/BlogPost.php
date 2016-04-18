@@ -18,13 +18,12 @@ class BlogPost extends BaseDb {
 
 	function __construct($id = NULL) {
 		$fields = array(
-			'blog' => new Type\ForeignKey('FelixOnline/Core/Blog'),
+			'blog' => new Type\ForeignKey('FelixOnline\Core\Blog'),
 			'content' => new Type\TextField(),
 			'timestamp' => new Type\DateTimeField(),
-			'author' => new Type\ForeignKey('FelixOnline/Core/User'),
-			'type' => new Type\CharField(array('null' => true)),
-			'meta' => new Type\TextField(array('null' => true)),
-			'visible' => new Type\BooleanField(),
+			'author' => new Type\ForeignKey('FelixOnline\Core\User'),
+			'breaking' => new Type\BooleanField(array('null' => false)),
+			'title' => new Type\CharField()
 		);
 
 		parent::__construct($fields, $id);

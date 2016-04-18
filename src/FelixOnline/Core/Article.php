@@ -72,6 +72,10 @@ class Article extends BaseDB {
 			'video_url' => new Type\CharField(),
 			'img_caption' => new Type\CharField(),
 			'comment_status' => new Type\ForeignKey('FelixOnline\Core\ArticleCommentStatus'),
+			'is_live' => new Type\BooleanField(array(
+				'null' => false,
+			)),
+			'blog' => new Type\ForeignKey('FelixOnline\Core\Blog')
 		);
 
 		parent::__construct($fields, $id);
