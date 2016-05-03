@@ -10,12 +10,15 @@ namespace FelixOnline\Core;
  */
 class Hooks {
 	private $actions = array(); // stores actions
+	private $protected = array();
 
 	/*
 	 * Public: Add action
 	 */
-	public function addAction($action, $function) {
+	public function addAction($action, $function, $protect = true) {
 		$this->actions[$action] = $function;
+		$this->protected[$action] = $protect;
+
 		return $this->actions;
 	}
 
@@ -24,6 +27,14 @@ class Hooks {
 			return $this->actions[$action];
 		} else {
 			return false;
+		}
+	}
+
+	public function isProtected($action) {
+		if(array_key_exists($action, $this->protected)) {
+			return $this->protected[$action];
+		} else {
+			return true;
 		}
 	}
 }
