@@ -18,6 +18,9 @@
 		<field Field="comment_status" Type="int(11)" Null="YES" DEFAULT="1" Key="" Extra="" Comment="" />
 		<field Field="deleted" Type="tinyint(1)" Null="NO" Key="" Extra="" Comment="" />
 		<field Field="video_url" Type="varchar(300)" Null="YES" Key="MUL" Extra="" Comment="" />
+		<field Field="is_live" Type="tinyint(1)" Null="NO" Default="0" Key="" Extra="" Comment="" />
+		<field Field="blog" Type="int(11)" Null="YES" Key="" Extra="" Comment="" />
+
 		<key Table="article" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="3504" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="text1" Seq_in_index="1" Column_name="text1" Collation="A" Cardinality="3504" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="img1" Seq_in_index="1" Column_name="img1" Collation="A" Cardinality="3504" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
@@ -45,6 +48,7 @@
 		<field name="img_caption">Abcd</field>
         <field name="comment_status">1</field>
         <field name="deleted">0</field>
+        <field name="is_live">0</field>
 	</row>
 	<row>
 		<field name="id">2</field>
@@ -62,6 +66,7 @@
 		<field name="img_caption" xsi:nil="true" />
         <field name="comment_status">1</field>
         <field name="deleted">0</field>
+        <field name="is_live">0</field>
 	</row>
 	<row>
 		<field name="id">3</field>
@@ -79,6 +84,7 @@
 		<field name="img_caption">Efgh</field>
         <field name="comment_status">1</field>
         <field name="deleted">0</field>
+        <field name="is_live">0</field>
 	</row>
 	<row>
 		<field name="id">4</field>
@@ -96,6 +102,7 @@
 		<field name="img_caption">Efgh</field>
         <field name="comment_status">1</field>
         <field name="deleted">0</field>
+        <field name="is_live">0</field>
 	</row>
 	</table_data>
 </database>
