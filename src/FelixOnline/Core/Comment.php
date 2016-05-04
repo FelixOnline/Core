@@ -110,6 +110,24 @@ class Comment extends BaseDB
 	}
 
 	/**
+	 * Public: Is any of the comment's parents moderated out
+	 */
+	public function isAccessible() {
+		$loop = $this;
+		$access = true;
+
+		while($loop->getReply() != null) {
+			$loop = $loop->getReply();
+
+			if($loop->getSpam() == 1 || $loop->getActive() == 0) {
+				$access = false;
+			}
+		}
+
+		return $access;
+	}
+
+	/**
 	 * Public: Get commenter's name
 	 */
 	public function getName()

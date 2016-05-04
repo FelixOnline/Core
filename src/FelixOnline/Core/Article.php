@@ -213,10 +213,21 @@ class Article extends BaseDB {
 		$count = (new CommentManager())
 			->filter("article = %i", array($this->getId()))
 			->filter("active = 1")
-			->filter("spam = 0 ")
-			->count();
+			->filter("spam = 0 ");
 
-		return $count;
+		$count = $count->values();
+
+		$num = 0;
+
+		if($count) {
+			foreach($count as $item) {
+				if($item->isAccessible()) {
+					$num++;
+				}
+			}
+		}
+
+		return $num;
 	}
 
 	/*
@@ -235,10 +246,19 @@ class Article extends BaseDB {
 			->filter("confirmed = 1");
 
 		$count->join($validation, null, 'email', 'email');
+		$num = 0;
 
-		$count = $count->count();
+		$count = $count->values();
 
-		return $count;
+		if($count) {
+			foreach($count as $item) {
+				if($item->isAccessible()) {
+					$num++;
+				}
+			}
+		}
+
+		return $num;
 	}
 
 	/*
