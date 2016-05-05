@@ -7,12 +7,16 @@ class DateTimeField extends BaseType
 
 	public function setValue($value)
 	{
-		if (is_string($value) && strtotime($value) !== false) {
-			$this->value = strtotime($value);
-			$this->raw_value = $value;
+		if (is_string($value)) {
+			try {
+				$this->value = (new \DateTime($value))->getTimestamp();
+				$this->raw_value = $value;
+			} catch (\Exception $e) {
+				throw new \FelixOnline\Exceptions\InternalException('Invalid date');
+			}
 		} else if (is_int($value)) {
 			$this->value = $value;
-			$this->raw_value = date('Y-m-d H:i:s', $value);
+			$this->raw_value = (new \DateTime("@$value"))->format('Y-m-d H:i:s');
 		} else if (is_null($value)) {
 			$this->value = $value;
 			$this->raw_value = $value;
@@ -41,7 +45,7 @@ class DateTimeField extends BaseType
 			return 'NULL';
 		}
 
-		$datetime = date('Y-m-d H:i:s', $this->value);
+		$datetime = (new \DateTime("@$this->value"))->format('Y-m-d H:i:s');
 
 		return $app['safesql']->query($this->placeholder, array($datetime));
 	}
