@@ -111,7 +111,14 @@ class ResourceManager {
 			$name = '';
 			foreach($min as $key => $value) {
 				$filename = strstr($value, '.', true);
-				$content .= file_get_contents($this->getFilename($value, 'css'));
+
+				$fileContent = file_get_contents($this->getFilename($value, 'css', 'dir'));
+
+				if($fileContent === false) {
+					throw new InternalException('A minified CSS file does not exist when it should');
+				}
+
+				$content .= $fileContent;
 
 				if($key == 0) {
 					$name .= $filename;
@@ -119,6 +126,8 @@ class ResourceManager {
 					$name .= '-'.$filename;
 				}
 			}
+
+			unset($fileContent);
 
 			file_put_contents($this->getFilename($name.'.min.css', 'css', 'dir'), $content);
 
