@@ -57,10 +57,8 @@ class Article extends BaseDB {
 			'title' => new Type\CharField(),
 			'teaser' => new Type\CharField(),
 			'reviewedby' => new Type\ForeignKey('FelixOnline\Core\User'),
-			'approvedby' => new Type\ForeignKey('FelixOnline\Core\User'),
 			'category' => new Type\ForeignKey('FelixOnline\Core\Category'),
 			'date' => new Type\DateTimeField(),
-			'published' => new Type\DateTimeField(),
 			'hidden' => new Type\BooleanField(array(
 				'null' => false,
 			)),
@@ -584,4 +582,18 @@ class Article extends BaseDB {
 
 		return $html;
 	}
+
+	/**
+	 * Public: Get the date the article was originally published
+	 * Legacy compatability function
+	 */
+	public function getPublished() {
+		$manager = BaseManager::build('\FelixOnline\Core\ArticlePublication', 'article_publication');
+
+		$date = $manager->filter('article = %i', array($this->getId()))
+						->filter('republished = 0')
+						->one();
+
+		return($date->getPublicationDate());
+	}	
 }

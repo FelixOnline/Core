@@ -118,15 +118,6 @@ class ArticleTest extends AppTestCase
 		$this->assertEquals($authors, '<a href="http://localhost/user/felix/">Joseph Letts - Felix Editor</a> and <a href="http://localhost/user/jk708/">Jonathan Kim</a>');
 	}
 
-	public function testGetApprovedBy()
-	{
-		$article = new \FelixOnline\Core\Article(1);
-		$user = $article->getApprovedby();
-
-		$this->assertInstanceOf('FelixOnline\Core\User', $user);
-		$this->assertEquals($user->getUser(), 'felix');
-	}
-
 	public function testSetContent()
 	{
 		$this->assertEquals(3, $this->getConnection()->getRowCount('text_story'));

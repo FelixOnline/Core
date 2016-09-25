@@ -8,6 +8,19 @@ class ArticleManager extends BaseManager
 	public $table = 'article';
 	public $class = 'FelixOnline\Core\Article';
 
+	public function enablePublishedFilter()
+	{
+		$publishedManager = BaseManager::build('\FelixOnline\Core\ArticlePublication', 'article_publication');
+
+		$publishedManager = $publishedManager->filter('republished = 0')
+						 					 ->filter('publication_date <= NOW()');
+
+		$this->join($publishedManager, 'LEFT', 'id', 'article');
+		$this->order(array('article_publication.publication_date', 'id'), 'DESC');
+
+		return $this;
+	}
+
 	public function getMostPopular($number_to_get)
 	{
 		$app = App::getInstance();
@@ -18,19 +31,20 @@ class ArticleManager extends BaseManager
 		if ($item->isMiss()) {
 			$sql = $app['safesql']->query(
 				"SELECT
-					DISTINCT article AS id,
-					COUNT(article) AS c
-				FROM (
-					SELECT article FROM article_visit AS av
-					INNER JOIN article AS a
-					ON (av.article=a.id)
-					WHERE a.published IS NOT NULL
-					AND a.published >= NOW() - INTERVAL 3 WEEK
-					ORDER BY timestamp DESC LIMIT 500
-				) AS t GROUP BY article ORDER BY c DESC LIMIT %i",
+						DISTINCT av_id AS id,
+						COUNT(av_id) AS c
+					FROM (
+						SELECT av.article AS av_id FROM article_visit AS av
+						INNER JOIN article AS a
+							ON (av.article=a.id)
+						INNER JOIN article_publication AS ap
+							ON a.id = ap.article
+							AND ap.republished = 0
+					        AND ap.publication_date >= NOW() - INTERVAL 3 WEEK
+						ORDER BY timestamp DESC LIMIT 500
+					) AS t GROUP BY id ORDER BY c DESC LIMIT %i",
 				array($number_to_get)
 			);
-
 			$results = $this->query($sql);
 
 			if (!is_null($results)) {
@@ -61,14 +75,15 @@ class ArticleManager extends BaseManager
 					SELECT c.article,COUNT(*) AS count
 					FROM `comment` AS c
 					INNER JOIN `article` AS a ON (c.article=a.id)
+					INNER JOIN article_publication
+						ON a.id = article_publication.article
+						AND article_publication.republished = 0
+						AND article_publication.publication_date >= NOW() - INTERVAL 3 WEEK
 					WHERE c.`active`=1
 					AND c.`spam`=0
 					AND c.`pending`=0
 					AND timestamp >= NOW() - INTERVAL 3 WEEK
-					AND a.published IS NOT NULL
-					AND a.published < NOW()
-					AND a.published >= NOW() - INTERVAL 3 WEEK
-					GROUP BY article
+					GROUP BY c.article
 					ORDER BY count DESC
 					LIMIT 20
 				) AS t

@@ -51,7 +51,7 @@ class BaseManagerTest extends AppTestCase
 	{
 		$manager = $this->getManager();
 
-		$filtered = $manager->filter('published IS NOT NULL')
+		$filtered = $manager->filter('date < "2010-12-31 23:59:59"')
 			->filter('`id` IN (1, 2)')
 			->values();
 
@@ -85,7 +85,7 @@ class BaseManagerTest extends AppTestCase
 	{
 		$manager = $this->getManager();
 
-		$query = $manager->filter('published IS NOT NULL')
+		$query = $manager->filter('date < "2010-12-31 23:59:59"')
 			->filter('`id` IN (1, 2)')
 			->order('id', 'ASC');
 
@@ -122,8 +122,7 @@ class BaseManagerTest extends AppTestCase
 	{
 		$manager = $this->getManager();
 
-		$query = $manager->filter('published IS NOT NULL')
-			->filter('published < NOW()')
+		$query = $manager->filter('date < "2010-12-31 23:59:59"')
 			->order('id', 'ASC');
 
 		$query->limit(0, 1);
@@ -137,7 +136,7 @@ class BaseManagerTest extends AppTestCase
 	{
 		$manager = $this->getManager();
 
-		$query = $manager->filter('published IS NOT NULL')
+		$query = $manager->filter('date < "2010-12-31 23:59:59"')
 			->filter('`id` IN (1, 2)')
 			->order('id', 'ASC');
 
@@ -150,7 +149,7 @@ class BaseManagerTest extends AppTestCase
 	{
 		$manager = $this->getManager();
 
-		$query = $manager->filter('published IS NOT NULL')
+		$query = $manager->filter('date < "2010-12-31 23:59:59"')
 			->filter('`id` IN (1, 2)')
 			->order('id', 'ASC')
 			->limit(10, 10);
@@ -165,7 +164,7 @@ class BaseManagerTest extends AppTestCase
 		$manager = $this->getManager();
 
 		$this->setExpectedException(
-			'FelixOnline\Exceptions\InternalException'
+			'FelixOnline\Exceptions\SQLException'
 		);
 		$manager->filter('not valid sql')->values();
 	}
@@ -198,7 +197,7 @@ class BaseManagerTest extends AppTestCase
 			'More than one result'
 		);
 
-		$one = $manager->filter('published IS NOT NULL')
+		$one = $manager->filter('date < "2010-12-31 23:59:59"')
 			->filter('`id` IN (1, 2)')
 			->one();
 	}
@@ -217,7 +216,7 @@ class BaseManagerTest extends AppTestCase
 	public function testJoin()
 	{
 		$m1 = $this->getManager();
-		$m1->filter('published < NOW()');
+		$m1->filter('date < "2010-12-31 23:59:59"');
 
 		$m2 = $this->getManager();
 
@@ -231,13 +230,13 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.published < NOW() AND `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0 ORDER BY `article`.`id` ASC');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.date < "2010-12-31 23:59:59" AND `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0 ORDER BY `article`.`id` ASC');
 	}
 
 	public function testNestedJoin()
 	{
 		$m1 = $this->getManager();
-		$m1->filter('published < NOW()');
+		$m1->filter('date < "2010-12-31 23:59:59"');
 
 		$m2 = $this->getManager();
 
@@ -260,7 +259,7 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `category` ON ( `article`.`category` = `category`.`id` ) JOIN `category_author` ON ( `category`.`id` = `category_author`.`category` )  WHERE `article`.published < NOW() AND `article`.deleted = 0 AND `category`.id = "1" AND `category`.deleted = 0 AND `category_author`.user = "pk1811" AND `category_author`.deleted = 0 ORDER BY `article`.`id` ASC');
+		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `category` ON ( `article`.`category` = `category`.`id` ) JOIN `category_author` ON ( `category`.`id` = `category_author`.`category` )  WHERE `article`.date < "2010-12-31 23:59:59" AND `article`.deleted = 0 AND `category`.id = "1" AND `category`.deleted = 0 AND `category_author`.user = "pk1811" AND `category_author`.deleted = 0 ORDER BY `article`.`id` ASC');
 	}
 
 	public function testLeftJoin()
@@ -300,7 +299,7 @@ class BaseManagerTest extends AppTestCase
 	public function testJoinCount()
 	{
 		$m1 = $this->getManager();
-		$m1->filter('published < NOW()');
+		$m1->filter('date < "2010-12-31 23:59:59"');
 
 		$m2 = $this->getManager();
 
@@ -314,7 +313,7 @@ class BaseManagerTest extends AppTestCase
 
 		$count = $m1->count();
 
-		$this->assertEquals($count, 3);
+		$this->assertEquals($count, 2);
 	}
 
 	public function testBuild()

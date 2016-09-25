@@ -8,6 +8,8 @@ class ArticleManagerTest extends AppTestCase
 	public $fixtures = array(
 		'articles',
 		'article_visits',
+		'article_publication',
+		'users',
 		'categories',
 		'text_stories',
 		'comments',
@@ -33,7 +35,14 @@ class ArticleManagerTest extends AppTestCase
 			->setContent($content1)
 			->setTeaser($title1)
 			->setCategory(1)
-			->setPublished(date('Y-m-d H:i:s'))
+			->save();
+
+		$articlevisit = new \FelixOnline\Core\ArticlePublication();
+
+		$articlevisit->setArticle($article)
+			->setPublicationDate(time())
+			->setPublishedBy((new \FelixOnline\Core\User('felix')))
+			->setRepublished(0)
 			->save();
 
 		$article->logVisit();
@@ -44,7 +53,14 @@ class ArticleManagerTest extends AppTestCase
 			->setContent($content2)
 			->setTeaser($title2)
 			->setCategory(1)
-			->setPublished(date('Y-m-d H:i:s'))
+			->save();
+
+		$articlevisit = new \FelixOnline\Core\ArticlePublication();
+
+		$articlevisit->setArticle($article2)
+			->setPublicationDate(time())
+			->setPublishedBy((new \FelixOnline\Core\User('felix')))
+			->setRepublished(0)
 			->save();
 
 		$article2->logVisit();

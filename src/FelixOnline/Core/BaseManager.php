@@ -498,6 +498,8 @@ class BaseManager
 	 */
 	protected function query($sql)
 	{
+		$GLOBALS['current_sql'] = $sql;
+
 		$app = \FelixOnline\Core\App::getInstance();
 
 		$item = null;
@@ -511,12 +513,16 @@ class BaseManager
 		}
 
 		set_error_handler(function($errno, $errstr) {
-			throw new InternalException($errstr);
+			$sql = $GLOBALS['current_sql']; // $sql in query function not in scope here - this is a nasty hack
+			unset($GLOBALS['current_sql']);
+
+			throw new SQLException($errstr, $sql);
 		});
 		$results = $app['db']->get_results($sql);
 		restore_error_handler(); // restore old error handler
 
 		if ($app['db']->last_error) {
+			unset($GLOBALS['current_sql']);
 			throw new SQLException($app['db']->last_error, $app['db']->captured_errors);
 		}
 
@@ -527,6 +533,8 @@ class BaseManager
 				$item->set($results);
 			}
 		}
+
+		unset($GLOBALS['current_sql']);
 
 		return $results;
 	}

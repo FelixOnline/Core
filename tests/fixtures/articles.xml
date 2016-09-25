@@ -8,8 +8,6 @@
 		<field Field="category" Type="int(11)" Null="NO" Key="MUL" Extra="" Comment="" />
 		<field Field="date" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" Comment="" />
 		<field Field="reviewedby" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
-		<field Field="approvedby" Type="varchar(16)" Null="YES" Key="MUL" Extra="" Comment="" />
-		<field Field="published" Type="timestamp" Null="YES" Key="MUL" Extra="" Comment="" />
 		<field Field="hidden" Type="tinyint(1)" Null="NO" Key="MUL" Default="0" Extra="" Comment="" />
 		<field Field="searchable" Type="tinyint(1)" Null="NO" Key="MUL" Default="1" Extra="" Comment="" />
 		<field Field="text1" Type="int(11)" Null="NO" Key="MUL" Extra="" Comment="" />
@@ -25,9 +23,7 @@
 		<key Table="article" Non_unique="1" Key_name="text1" Seq_in_index="1" Column_name="text1" Collation="A" Cardinality="3504" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="img1" Seq_in_index="1" Column_name="img1" Collation="A" Cardinality="3504" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="category" Seq_in_index="1" Column_name="category" Collation="A" Cardinality="34" Null="" Index_type="BTREE" Comment="" Index_comment="" />
-		<key Table="article" Non_unique="1" Key_name="approvedby" Seq_in_index="1" Column_name="approvedby" Collation="A" Cardinality="34" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="hidden" Seq_in_index="1" Column_name="hidden" Collation="A" Cardinality="4" Null="" Index_type="BTREE" Comment="" Index_comment="" />
-		<key Table="article" Non_unique="1" Key_name="published" Seq_in_index="1" Column_name="published" Collation="A" Cardinality="1168" Null="YES" Index_type="BTREE" Comment="" Index_comment="" />
 		<key Table="article" Non_unique="1" Key_name="searchable" Seq_in_index="1" Column_name="searchable" Collation="A" Cardinality="2" Null="" Index_type="BTREE" Comment="" Index_comment="" />
 		<options Name="article" Engine="InnoDB" Version="10" Row_format="Compact" Rows="3504" Avg_row_length="453" Data_length="1589248" Max_data_length="0" Index_length="720896" Data_free="3145728" Auto_increment="3745" Create_time="2014-01-07 18:46:56" Collation="utf8_general_ci" Create_options="" Comment="" />
 	</table_structure>
@@ -39,8 +35,6 @@
 		<field name="category">1</field>
 		<field name="date">2010-01-08 16:10:52</field>
 		<field name="reviewedby">felix</field>
-		<field name="approvedby">felix</field>
-		<field name="published">2010-01-08 16:11:02</field>
 		<field name="hidden">0</field>
 		<field name="searchable">1</field>
 		<field name="text1">27</field>
@@ -57,8 +51,6 @@
 		<field name="category">1</field>
 		<field name="date">2010-01-08 16:44:21</field>
 		<field name="reviewedby">felix</field>
-		<field name="approvedby">felix</field>
-		<field name="published">2010-01-09 01:05:12</field>
 		<field name="hidden">0</field>
 		<field name="searchable">1</field>
 		<field name="text1">28</field>
@@ -73,10 +65,8 @@
 		<field name="title">Well Done Terrorism - you've won again</field>
 		<field name="teaser"> you've won again</field>
 		<field name="category">1</field>
-		<field name="date">2010-01-10 01:29:25</field>
+		<field name="date">2011-01-10 01:29:25</field>
 		<field name="reviewedby">felix</field>
-		<field name="approvedby">felix</field>
-		<field name="published">2010-02-02 15:47:59</field>
 		<field name="hidden">0</field>
 		<field name="searchable">0</field>
 		<field name="text1">31</field>
@@ -91,10 +81,8 @@
 		<field name="title">Secret Category</field>
 		<field name="teaser"> you've won again</field>
 		<field name="category">3</field>
-		<field name="date">2010-01-10 01:29:25</field>
+		<field name="date">2011-01-10 01:29:25</field>
 		<field name="reviewedby">felix</field>
-		<field name="approvedby">felix</field>
-		<field name="published">2010-02-02 15:47:59</field>
 		<field name="hidden">0</field>
 		<field name="searchable">0</field>
 		<field name="text1">31</field>
