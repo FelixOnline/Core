@@ -102,6 +102,11 @@ class BaseManager
 	 */
 	public function filter($filter, $values = array(), $or = array())
 	{
+		return $this->filterOnSpecifiedTable($this->table, $filter, $values, $or);
+	}
+
+	public function filterOnSpecifiedTable($table, $filter, $values = array(), $or = array())
+	{
 		$app = \FelixOnline\Core\App::getInstance();
 
 		if (!is_array($values)) {
@@ -116,11 +121,11 @@ class BaseManager
 			$string .= '(';
 		}
 
-		$string .= "`" . $this->table . "`." . $app['safesql']->query($filter, $values);
+		$string .= "`" . $table . "`." . $app['safesql']->query($filter, $values);
 
 		if(count($or) > 0) {
 			foreach($or as $orStatement) {
-				$string .= " OR `" . $this->table . "`." . $app['safesql']->query($orStatement[0], $orStatement[1]);
+				$string .= " OR `" . $table . "`." . $app['safesql']->query($orStatement[0], $orStatement[1]);
 			}
 
 			$string .= ')';
