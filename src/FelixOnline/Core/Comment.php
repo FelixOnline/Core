@@ -119,12 +119,24 @@ class Comment extends BaseDB
 		while($loop->getReply() != null) {
 			$loop = $loop->getReply();
 
-			if($loop->getSpam() == 1 || $loop->getActive() == 0) {
+			if($loop->getSpam() == 1 || $loop->getActive() == 0 || $loop->isEmailValid() == 0) {
 				$access = false;
 			}
 		}
 
 		return $access;
+	}
+
+	/**
+	 * Public: Is the comment's email valid?
+	 */
+	public function isEmailValid()
+	{
+		$validation = BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation')
+				->filter('email = "%s"', array($this->getEmail()))
+				->filter("confirmed = 1");
+
+		return $validation->count();
 	}
 
 	/**
@@ -704,14 +716,8 @@ class Comment extends BaseDB
 			->count();
 	}
 
-	/*
-	 * Public: Get replies with validated email addresses
-	 *
-	 * Returns array
-	 */
-	public function getValidatedReplies() {
-		$app = App::getInstance();
-
+	public function getValidatedReplyManager()
+	{
 		$comments = (new CommentManager())
 			->filter("active = 1")
 			->filter("spam = 0 ")
@@ -723,9 +729,33 @@ class Comment extends BaseDB
 
 		$comments->join($validation, null, 'email', 'email');
 
+		return $comments;
+	}
+
+	/*
+	 * Public: Get replies with validated email addresses
+	 *
+	 * Returns array
+	 */
+	public function getValidatedReplies() {
+		$comments = $this->getValidatedReplyManager();
+
 		$comments = $comments->values();
 
 		$comments = is_null($comments) ? array() : $comments;
+
+		return $comments;
+	}
+
+	/*
+	 * Public: Get replies with validated email addresses
+	 *
+	 * Returns array
+	 */
+	public function getNumValidatedReplies() {
+		$comments = $this->getValidatedReplyManager();
+
+		$comments = $comments->count();
 
 		return $comments;
 	}
