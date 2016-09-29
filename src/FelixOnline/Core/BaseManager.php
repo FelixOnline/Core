@@ -397,7 +397,7 @@ class BaseManager
 			$filters = $this->filters;
 		}
 
-		$filters[] = "`" . $this->table . "`.deleted = 0";
+		$filters[] = "(`" . $this->table . "`.deleted = 0 OR `" . $this->table . "`.deleted IS NULL)";
 
 		if (!empty($this->joins)) {
 			foreach ($this->joins as $join) {
