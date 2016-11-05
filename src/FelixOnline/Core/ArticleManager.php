@@ -52,7 +52,7 @@ class ArticleManager extends BaseManager
 			} else {
 				$articles = null;
 			}
-			$item->expireAfter(1800);
+			$item->expiresAfter(1800);
 			// expire in 30 mins
 			$app['cache']->save($item->set($articles));
 		}
@@ -102,7 +102,7 @@ class ArticleManager extends BaseManager
 			} else {
 				$articles = null;
 			}
-			$item->expireAfter(1800);
+			$item->expiresAfter(1800);
 			// expire in 30 mins
 			$app['cache']->save($item->set($articles));
 		}
