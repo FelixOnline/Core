@@ -145,6 +145,37 @@ class BaseDB extends BaseModel
 	}
 
 	/**
+	 * Public: Actually delete the model (i.e. DELETE FROM query). Restores instance of model back to if it was created with no ID
+	 */
+	public function purge($reason)
+	{
+		$app = App::getInstance();
+
+		// update model
+		if ($this->pk && $this->getPk()->getValue()) {
+			$this->log('purge', "**PURGED FROM DATABASE** Reason: ".$reason);
+
+			$sql = $app['safesql']->query("DELETE FROM ".$this->dbtable." WHERE ".$this->pk." = '%s';",
+				array($this->getPk()->getValue()));
+
+			$app['db']->query($sql);
+
+			// clear cache
+			$item = $this->getCache($this->getPk());
+			$item->clear();
+
+			// clear model
+			$this->constructorId = NULL;
+			$this->pk = NULL;
+			$this->initialFields = NULL;
+		} else { 
+			throw new InternalException('Trying to delete a model that does not yet exist');
+		}
+
+		return true;
+	}
+
+	/**
 	 * Public: Save all fields to database
 	 *
 	 * Example:
