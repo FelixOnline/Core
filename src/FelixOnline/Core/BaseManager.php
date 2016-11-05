@@ -50,6 +50,11 @@ class BaseManager
 	protected $joins = array();
 
 	/**
+	 * Unions
+	 */
+	protected $unions = array();
+
+	/**
 	 * Cache flag
 	 */
 	protected $cache = false;
@@ -199,6 +204,14 @@ class BaseManager
 	}
 
 	/**
+	 * Add UNION
+	 */
+	public function union($q2) {
+		$this->unions[] = $q2;
+		return $this;
+	}
+
+	/**
 	 * Add grouping to query
 	 */
 	public function group($group)
@@ -217,22 +230,43 @@ class BaseManager
 	 */
 	public function count()
 	{
+		$sql = $this->getCountSql();
+		$results = $this->query("SELECT COUNT(*) AS count FROM (".$sql.") AS result");
+
+		return (int) $results[0]->count;
+	}
+
+	/**
+	 * Get SQL for Count
+	 */
+	public function getCountSQL()
+	{
 		$statement = [];
 
-		$statement[] = "SELECT COUNT(`" . $this->table . "`.`" . $this->pk . "`) AS count";
+		if($this->distinct) {
+			$distinct = 'DISTINCT ';
+		} else {
+			$distinct = '';
+		}
+
+		$statement[] = "(SELECT $distinct`" . $this->table . "`.`" . $this->pk . "`";
 		$statement[] = $this->getFrom();
 		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
 		$statement[] = $this->getOrder();
+		$statement[] = ")";
+
+		foreach($this->unions as $union) {
+			$statement[] = "UNION ".$distinct;
+			$statement[] = $union->getCountSQL();
+		}
 
 		// Remove null values
 		$statement = array_filter($statement);
 
-		$sql = implode(" ", $statement);
+		$sql = implode("\n", $statement);
 
-		$results = $this->query($sql);
-
-		return (int) $results[0]->count;
+		return $sql;
 	}
 
 	/**
@@ -268,19 +302,33 @@ class BaseManager
 			$distinct = '';
 		}
 
-		$statement[] = "SELECT $distinct`" . $this->table . "`.`" . $this->pk . "`";
+		$statement[] = "(SELECT $distinct`" . $this->table . "`.`" . $this->pk . "`";
 		$statement[] = $this->getFrom();
 		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
-		$statement[] = $this->getGroup();
-		$statement[] = $this->getOrder();
+
+		$statement[] = ")";
+
+		foreach($this->unions as $union) {
+			$statement[] = "UNION ".$distinct;
+			$statement[] = $union->getSQL();
+		}
+
+		if($this->unions) {
+			$statement[] = $this->getGroup(true);
+			$statement[] = $this->getOrder(true);
+		} else {
+			$statement[] = $this->getGroup(false);
+			$statement[] = $this->getOrder(false);
+		}
+
 		$statement[] = $this->getRandom();
 		$statement[] = $this->getLimit();
 
 		// Remove null values
 		$statement = array_filter($statement);
 
-		return implode(" ", $statement);
+		return implode("\n", $statement);
 	}
 
 	/**
@@ -377,7 +425,7 @@ class BaseManager
 				$joins[] = implode(' ', $st);
 				$joins[] = $manager->getJoin();
 			}
-			return implode(" ", $joins);
+			return implode("\n", $joins);
 		}
 		return null;
 	}
@@ -395,7 +443,7 @@ class BaseManager
 			if($string == '') {
 				$string .= 'WHERE ';
 			} else {
-				$string .= ' AND ';
+				$string .= "\nAND ";
 			}
 
 			$string .= $filter;
@@ -414,7 +462,9 @@ class BaseManager
 			$filters = $this->filters;
 		}
 
-		$filters[] = "(`" . $this->table . "`.deleted = 0 OR `" . $this->table . "`.deleted IS NULL)";
+		if(!$this->allowDeleted) {
+			$filters[] = "(`" . $this->table . "`.deleted = 0 OR `" . $this->table . "`.deleted IS NULL)";
+		}
 
 		if (!empty($this->joins)) {
 			foreach ($this->joins as $join) {
@@ -429,7 +479,7 @@ class BaseManager
 	/**
 	 * Order
 	 */
-	protected function getOrder()
+	protected function getOrder($tableless = false)
 	{
 		if ($this->order) {
 			$order = "ORDER BY ";
@@ -441,7 +491,7 @@ class BaseManager
 					$order .= ", ";
 				}
 
-				$order .= $this->getColumnReference($orderItem[0]);
+				$order .= $this->getColumnReference($orderItem[0], $tableless);
 				$order .= " ";
 				$order .= $orderItem[1];
 
@@ -469,7 +519,7 @@ class BaseManager
 	/**
 	 * Group
 	 */
-	protected function getGroup()
+	protected function getGroup($tableless = false)
 	{
 		if ($this->group) {
 			$group = "GROUP BY ";
@@ -481,7 +531,7 @@ class BaseManager
 					$group .= ", ";
 				}
 
-				$group .= $this->getColumnReference($groupCol);
+				$group .= $this->getColumnReference($groupCol, $tableless);
 
 				$first = false;
 			}
@@ -494,8 +544,12 @@ class BaseManager
 	/**
 	 * Get column reference
 	 */
-	protected function getColumnReference($column)
+	protected function getColumnReference($column, $tableless)
 	{
+		if($tableless) {
+			return $column;
+		}
+
 		// check if table is already defined
 		if (count(explode(".", $column)) > 1) {
 			return $column;
