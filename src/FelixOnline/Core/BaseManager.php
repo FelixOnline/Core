@@ -580,8 +580,8 @@ class BaseManager
 
 		$item = null;
 		if ($this->cache == true) {
-			$item = $app['cache']->getItem($this->table, md5($sql));
-			$results = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
+			$item = $app['cache']->getItem($this->table.'/'.md5($sql));
+			$results = $item->get(\Stash\Invalidation::PRECOMPUTE, 300);
 		}
 
 		if ($item && !$item->isMiss()) {
@@ -604,10 +604,9 @@ class BaseManager
 
 		if ($item) {
 			if ($this->cacheExpiry) {
-				$item->set($results, $this->cacheExpiry);
-			} else {
-				$item->set($results);
+				$item->expiresAfter($this->cacheExpiry);
 			}
+			$app['cache']->save($item->set($results));
 		}
 
 		unset($GLOBALS['current_sql']);

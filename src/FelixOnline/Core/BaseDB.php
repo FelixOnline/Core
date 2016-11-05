@@ -88,7 +88,7 @@ class BaseDB extends BaseModel
 
 		// get cache
 		$item = $this->getCache($fields[$this->pk]);
-		$results = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
+		$results = $item->get(\Stash\Invalidation::PRECOMPUTE, 300);
 
 		if ($item->isMiss()) {
 			$results = $app['db']->get_row($sql);
@@ -101,7 +101,7 @@ class BaseDB extends BaseModel
 				throw new ModelNotFoundException('No model in database', $this->dbtable, $this->constructorId);
 			}
 
-			$item->set($results);
+			$app['cache']->save($item->set($results));
 		}
 
 		return $results;
@@ -115,7 +115,7 @@ class BaseDB extends BaseModel
 	protected function getCache($pk)
 	{
 		$app = \FelixOnline\Core\App::getInstance();
-		return $app['cache']->getItem($this->dbtable, $pk->getValue());
+		return $app['cache']->getItem($this->dbtable.'/'.$pk->getValue());
 	}
 
 	/**

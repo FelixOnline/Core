@@ -26,7 +26,7 @@ class ArticleManager extends BaseManager
 		$app = App::getInstance();
 
 		$item = $app['cache']->getItem('articles/most_popular');
-		$articles = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
+		$articles = $item->get(\Stash\Invalidation::PRECOMPUTE, 300);
 
 		if ($item->isMiss()) {
 			$sql = $app['safesql']->query(
@@ -52,8 +52,9 @@ class ArticleManager extends BaseManager
 			} else {
 				$articles = null;
 			}
-
-			$item->set($articles, 1800); // expire in 30 mins
+			$item->expireAfter(1800);
+			// expire in 30 mins
+			$app['cache']->save($item->set($articles));
 		}
 
 		return $articles;
@@ -64,7 +65,7 @@ class ArticleManager extends BaseManager
 		$app = App::getInstance();
 
 		$item = $app['cache']->getItem('articles/most_commented');
-		$articles = $item->get(\Stash\Item::SP_PRECOMPUTE, 300);
+		$articles = $item->get(\Stash\Invalidation::PRECOMPUTE, 300);
 
 		if ($item->isMiss()) {
 			$sql = $app['safesql']->query(
@@ -101,8 +102,9 @@ class ArticleManager extends BaseManager
 			} else {
 				$articles = null;
 			}
-
-			$item->set($articles, 1800); // expire in 30 mins
+			$item->expireAfter(1800);
+			// expire in 30 mins
+			$app['cache']->save($item->set($articles));
 		}
 
 		return $articles;
