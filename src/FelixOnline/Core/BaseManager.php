@@ -69,6 +69,11 @@ class BaseManager
 	 */
 	protected $cacheExpiry = null;
 
+	/**
+	 * Allow fetch of deleted records
+	 */
+	protected $allowDeleted = false;
+
 	public static function build($class, $table, $pk = null)
 	{
 		$manager = new self();
@@ -82,13 +87,25 @@ class BaseManager
 		return $manager;
 	}
 
+	public function allowDeleted()
+	{
+		$this->allowDeleted = true;
+
+		return $this;
+	}
+
 	/**
 	 * Get all objects
 	 */
 	public function all()
 	{
 		$_filters = $this->filters; // store filters
-		$this->filters = array("`" . $this->table . "`.deleted = 0"); // reset them
+
+		if(!$this->allowDeleted) {
+			$this->filters = array("`" . $this->table . "`.deleted = 0"); // reset them
+		} else {
+			$this->filters = array();
+		}
 
 		$values = $this->values();
 
