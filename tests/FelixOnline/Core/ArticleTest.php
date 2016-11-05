@@ -15,7 +15,8 @@ class ArticleTest extends AppTestCase
 		'images',
 		'article_visits',
 		'logins',
-		'audit_log'
+		'audit_log',
+		'email_validations'
 	);
 	public function testArticleSecretCategory()
 	{
@@ -150,7 +151,7 @@ class ArticleTest extends AppTestCase
 	{
 		$article = new \FelixOnline\Core\Article(1);
 
-		$this->assertEquals(5, $article->getNumComments());
+		$this->assertEquals(4, $article->getNumComments());
 	}
 
 	public function testGetComments()

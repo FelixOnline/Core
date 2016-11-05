@@ -34,7 +34,14 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.title IS NOT NULL AND `article`.category IS NOT NULL AND `article`.deleted = 0 ORDER BY `article`.`id` DESC LIMIT 0, 10');
+		$this->assertEquals($sql, '(SELECT `article`.`id`
+FROM `article`
+WHERE `article`.title IS NOT NULL
+AND `article`.category IS NOT NULL
+AND (`article`.deleted = 0 OR `article`.deleted IS NULL)
+)
+ORDER BY `article`.`id` DESC
+LIMIT 0, 10');
 	}
 
 	public function testAll()
@@ -67,7 +74,11 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` WHERE `article`.category = 1 AND `article`.deleted = 0');
+		$this->assertEquals($sql, '(SELECT `article`.`id`
+FROM `article`
+WHERE `article`.category = 1
+AND (`article`.deleted = 0 OR `article`.deleted IS NULL)
+)');
 	}
 
 	public function testFilterParamsException()
@@ -104,7 +115,11 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` WHERE `article`.deleted = 0 ORDER BY `article`.`id` DESC, `article`.`title` DESC");
+		$this->assertEquals($sql, "(SELECT `article`.`id`
+FROM `article`
+WHERE (`article`.deleted = 0 OR `article`.deleted IS NULL)
+)
+ORDER BY `article`.`id` DESC, `article`.`title` DESC");
 	}
 
 	public function testOrderWithTable()
@@ -115,7 +130,11 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $manager->getSQL();
 
-		$this->assertEquals($sql, "SELECT `article`.`id` FROM `article` WHERE `article`.deleted = 0 ORDER BY another_table.id DESC");
+		$this->assertEquals($sql, "(SELECT `article`.`id`
+FROM `article`
+WHERE (`article`.deleted = 0 OR `article`.deleted IS NULL)
+)
+ORDER BY another_table.id DESC");
 	}
 
 	public function testLimit()
@@ -230,7 +249,16 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.date < "2010-12-31 23:59:59" AND `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0 ORDER BY `article`.`id` ASC');
+		$this->assertEquals($sql, '(SELECT `article`.`id`
+FROM `article`
+JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )
+
+WHERE `article`.date < "2010-12-31 23:59:59"
+AND (`article`.deleted = 0 OR `article`.deleted IS NULL)
+AND `article_author`.author = "felix"
+AND (`article_author`.deleted = 0 OR `article_author`.deleted IS NULL)
+)
+ORDER BY `article`.`id` ASC');
 	}
 
 	public function testNestedJoin()
@@ -259,7 +287,19 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` JOIN `category` ON ( `article`.`category` = `category`.`id` ) JOIN `category_author` ON ( `category`.`id` = `category_author`.`category` )  WHERE `article`.date < "2010-12-31 23:59:59" AND `article`.deleted = 0 AND `category`.id = "1" AND `category`.deleted = 0 AND `category_author`.user = "pk1811" AND `category_author`.deleted = 0 ORDER BY `article`.`id` ASC');
+		$this->assertEquals($sql, '(SELECT `article`.`id`
+FROM `article`
+JOIN `category` ON ( `article`.`category` = `category`.`id` )
+JOIN `category_author` ON ( `category`.`id` = `category_author`.`category` )
+
+WHERE `article`.date < "2010-12-31 23:59:59"
+AND (`article`.deleted = 0 OR `article`.deleted IS NULL)
+AND `category`.id = "1"
+AND (`category`.deleted = 0 OR `category`.deleted IS NULL)
+AND `category_author`.user = "pk1811"
+AND (`category_author`.deleted = 0 OR `category_author`.deleted IS NULL)
+)
+ORDER BY `article`.`id` ASC');
 	}
 
 	public function testLeftJoin()
@@ -276,7 +316,14 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )  WHERE `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0');
+		$this->assertEquals($sql, '(SELECT `article`.`id`
+FROM `article`
+LEFT JOIN `article_author` ON ( `article`.`id` = `article_author`.`article` )
+
+WHERE (`article`.deleted = 0 OR `article`.deleted IS NULL)
+AND `article_author`.author = "felix"
+AND (`article_author`.deleted = 0 OR `article_author`.deleted IS NULL)
+)');
 	}
 
 	public function testLeftJoinSpecificColumn()
@@ -293,7 +340,14 @@ class BaseManagerTest extends AppTestCase
 
 		$sql = $m1->getSQL();
 
-		$this->assertEquals($sql, 'SELECT `article`.`id` FROM `article` LEFT JOIN `article_author` ON ( `article`.`TEST` = `article_author`.`article` )  WHERE `article`.deleted = 0 AND `article_author`.author = "felix" AND `article_author`.deleted = 0');
+		$this->assertEquals($sql, '(SELECT `article`.`id`
+FROM `article`
+LEFT JOIN `article_author` ON ( `article`.`TEST` = `article_author`.`article` )
+
+WHERE (`article`.deleted = 0 OR `article`.deleted IS NULL)
+AND `article_author`.author = "felix"
+AND (`article_author`.deleted = 0 OR `article_author`.deleted IS NULL)
+)');
 	}
 
 	public function testJoinCount()
