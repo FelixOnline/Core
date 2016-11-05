@@ -26,10 +26,11 @@ class ErrorHandlerException extends UniversalException {
 	public function getContext() {
 		return $this->params['context'];
 	}
+
+	static function errorhandler($errno, $errstr, $errfile, $errline, $errcontext) {
+		throw new self($errstr, array('errno' => $errno, 'file' => $errfile, 'line' => $errline, 'context' => $errcontext));
+		return true;
+	}
 }
 
-function errorhandler($errno, $errstr, $errfile, $errline, $errcontext) {
-	throw new ErrorHandlerException($errstr, array('errno' => $errno, 'file' => $errfile, 'line' => $errline, 'context' => $errcontext));
-}
-
-set_error_handler('errorhandler', E_ALL & ~E_NOTICE);
+set_error_handler("\\FelixOnline\\Exceptions\\ErrorHandlerException::errorhandler", E_ALL & ~E_NOTICE);

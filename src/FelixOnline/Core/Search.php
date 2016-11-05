@@ -92,7 +92,7 @@ class Search
 		$results = $this->db->get_results($sql);
 
 		if (is_null($results)) {
-			throw new InternalException("Results array is null");
+			throw new \FelixOnline\Exceptions\InternalException("Results array is null");
 		} else {
 			$articles = array();
 			foreach ($results as $a) {
@@ -158,7 +158,7 @@ class Search
 		$results = $this->db->get_results($sql);
 
 		if (is_null($results)) {
-			throw new InternalException("Results array is null");
+			throw new \FelixOnline\Exceptions\InternalException("Results array is null");
 		} else {
 			$articles = array();
 			foreach ($results as $a) {
