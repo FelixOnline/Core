@@ -436,8 +436,6 @@ class Comment extends BaseDB
 					->setAction('check')
 					->setIsSpam($check)
 					->setError($app['akismet']->getError())
-					->setRequest($app['akismet']->getConnector()->getLastRequest())
-					->setResponse($app['akismet']->getConnector()->getLastResponse())
 					->save();
 
 				// If pending comment
@@ -481,8 +479,6 @@ class Comment extends BaseDB
 			->setAction('check')
 			->setIsSpam($check)
 			->setError($app['akismet']->getError())
-			->setRequest($app['akismet']->getConnector()->getLastRequest())
-			->setResponse($app['akismet']->getConnector()->getLastResponse())
 			->save();
 
 		// check for akismet errors
@@ -528,8 +524,6 @@ class Comment extends BaseDB
 			->setAction('check')
 			->setIsSpam($check)
 			->setError($app['akismet']->getError())
-			->setRequest($app['akismet']->getConnector()->getLastRequest())
-			->setResponse($app['akismet']->getConnector()->getLastResponse())
 			->save();
 
 		// check for akismet errors

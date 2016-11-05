@@ -10,8 +10,6 @@ namespace FelixOnline\Core;
  *    action
  *    is_spam
  *    error
- *    request
- *    response
  */
 class AkismetLog extends BaseDB
 {
@@ -24,9 +22,7 @@ class AkismetLog extends BaseDB
 			'timestamp' => new Type\DateTimeField(),
 			'action' => new Type\CharField(),
 			'is_spam' => new Type\BooleanField(),
-			'error' => new Type\TextField(),
-			'request' => new Type\TextField(),
-			'response' => new Type\TextField(),
+			'error' => new Type\TextField()
 		);
 
 		parent::__construct($fields, $id, null, true);
