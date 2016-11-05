@@ -590,9 +590,13 @@ class Article extends BaseDB {
 	public function getPublished() {
 		$manager = BaseManager::build('\FelixOnline\Core\ArticlePublication', 'article_publication');
 
-		$date = $manager->filter('article = %i', array($this->getId()))
-						->filter('republished = 0')
-						->one();
+		try {
+			$date = $manager->filter('article = %i', array($this->getId()))
+							->filter('republished = 0')
+							->one();
+		} catch(\FelixOnline\Exceptions\InternalException $e) {
+			return null;
+		}
 
 		return($date->getPublicationDate());
 	}	
