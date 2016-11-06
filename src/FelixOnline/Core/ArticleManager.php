@@ -40,7 +40,9 @@ class ArticleManager extends BaseManager
 						INNER JOIN article_publication AS ap
 							ON a.id = ap.article
 							AND ap.republished = 0
-					        AND ap.publication_date >= NOW() - INTERVAL 3 WEEK
+							AND ap.publication_date >= NOW() - INTERVAL 3 WEEK
+							AND ap.publication_date < NOW()
+							AND ap.deleted = 0
 						ORDER BY timestamp DESC LIMIT 500
 					) AS t GROUP BY id ORDER BY c DESC LIMIT %i",
 				array($number_to_get)
@@ -80,6 +82,8 @@ class ArticleManager extends BaseManager
 						ON a.id = article_publication.article
 						AND article_publication.republished = 0
 						AND article_publication.publication_date >= NOW() - INTERVAL 3 WEEK
+						AND article_publication.publication_date < NOW()
+						AND article_publication.deleted = 0
 					WHERE c.`active`=1
 					AND c.`spam`=0
 					AND c.`pending`=0
