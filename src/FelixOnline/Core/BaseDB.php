@@ -207,6 +207,8 @@ class BaseDB extends BaseModel
 					throw new SQLException($app['db']->last_error, $app['db']->captured_errors);
 				}
 
+				$this->constructorId = $this->getPk();
+
 				// clear cache
 				$item = $this->getCache($this->getPk());
 				$item->clear();
@@ -298,16 +300,11 @@ class BaseDB extends BaseModel
 
 		$values = array();
 		foreach($changed as $key => $value) {
-			// Don't include the primary key
-			if ($key == $this->pk) {
-				continue;
-			}
-
 			$values[] = "`" . $key . "`=" . $value->getSQL();
 		}
 		$sql[] = implode(", ", $values);
 
-		$sql[] = "WHERE `" . $this->pk . "`=" . $fields[$this->pk]->getSQL();
+		$sql[] = "WHERE `" . $this->pk . "`='" . $this->constructorId . "'";
 
 		return implode(" ", $sql);
 	}
