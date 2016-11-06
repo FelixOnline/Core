@@ -4,6 +4,7 @@
  * Handles all css and javascript resources
  */
 namespace FelixOnline\Core;
+use FelixOnline\Exceptions\InternalException;
 
 class ResourceManager {
 	private $css = array(); // array of css files
@@ -129,6 +130,10 @@ class ResourceManager {
 
 			unset($fileContent);
 
+			if(!is_writable($this->getFilename($name.'.min.css', 'css', 'dir'))) {
+				throw new InternalException('The file '.$this->getFilename($name.'.min.css', 'css', 'dir').', or the folder it is in, is not writable.');
+			}
+
 			file_put_contents($this->getFilename($name.'.min.css', 'css', 'dir'), $content);
 
 			$data['min'] = $this->getFilename($name.'.min.css', 'css');
@@ -215,6 +220,10 @@ class ResourceManager {
 		$parser->parseFile(dirname($cssfile).'/'.$lessfile, STANDARD_URL);
 		$css = $parser->getCss();
 
+		if(!is_writable($cssfile)) {
+			throw new InternalException('The file '.$cssfile.', or the folder it is in, is not writable.');
+		}
+
 		file_put_contents($cssfile, $css);
 		return $filename.'.css';
 	}
@@ -240,6 +249,11 @@ class ResourceManager {
 				) {
 					$cssfile = $this->getFilename($file, 'css', 'dir'); // get file location
 					$min = \Minify_CSS_Compressor::process(file_get_contents($cssfile));
+
+					if(!is_writable($minfilename)) {
+						throw new InternalException('The file '.$minfilename.', or the folder it is in, is not writable.');
+					}
+
 					file_put_contents($this->getFilename($minfilename, 'css', 'dir'), $min);
 				}
 				return $minfilename;
