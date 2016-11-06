@@ -230,6 +230,7 @@ class BaseDB extends BaseModel
 			}
 
 			$this->new = false;
+			$this->constructorId = $this->getPk();
 
 			$this->log_create();
 		}

@@ -91,6 +91,7 @@ class BaseDBTest extends AppTestCase
 
 		$model->this()->dbtable = 'test';
 		$model->this()->pk = 'id';
+		$model->this()->constructorId = '1';
 
 		$fields = array(
 			'id' => (new IntegerField())->setValue(1),
@@ -106,7 +107,7 @@ class BaseDBTest extends AppTestCase
 
 		$this->assertEquals(
 			$model->constructUpdateSQL($changed, $fields),
-			"UPDATE `test` SET `foo`='fizz' WHERE `id`=1"
+			"UPDATE `test` SET `foo`='fizz' WHERE `id`='1'"
 		);
 	}
 
