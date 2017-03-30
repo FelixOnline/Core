@@ -54,16 +54,16 @@ class Search
 				ON article.id = article_publication.article
 				AND article_publication.republished = 0
 				AND article_publication.publication_date <= NOW()
-			WHERE title LIKE '%s'
-			AND hidden = 0
-			AND deleted = 0
+			WHERE article.title LIKE '%s'
+			AND article.hidden = 0
+			AND article.deleted = 0
 			ORDER BY article.date DESC,
 			article.id DESC";
 
 		// get count
 		$sql = $this->safesql->query(
 			"SELECT
-				COUNT(id)
+				COUNT(article.id)
 			" . $filters,
 			array(
 				'%'.$this->query.'%',
@@ -80,7 +80,7 @@ class Search
 
 		$sql = $this->safesql->query(
 			"SELECT
-				id
+				article.id
 			" . $filters . "
 			LIMIT %i, %i",
 			array(
@@ -132,8 +132,6 @@ class Search
 				'%'.$this->query.'%',
 			)
 		);
-
-		die($sql);
 
 		$count = (int)$this->db->get_var($sql);
 
