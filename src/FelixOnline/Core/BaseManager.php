@@ -307,6 +307,8 @@ class BaseManager
 		$statement[] = $this->getJoin();
 		$statement[] = $this->getWhere();
 
+		$statement[] = $this->getGroup(true);
+
 		$statement[] = ")";
 
 		foreach($this->unions as $union) {
@@ -315,10 +317,8 @@ class BaseManager
 		}
 
 		if($this->unions) {
-			$statement[] = $this->getGroup(true);
 			$statement[] = $this->getOrder(true);
 		} else {
-			$statement[] = $this->getGroup(false);
 			$statement[] = $this->getOrder(false);
 		}
 
@@ -414,7 +414,7 @@ class BaseManager
 				} else {
 					$column_right = $manager->pk;
 				}
-				   
+
 				$st[] = "JOIN `" . $manager->table . "`";
 
 				$st[] = "ON (";
@@ -502,7 +502,7 @@ class BaseManager
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Random Order
 	 */
