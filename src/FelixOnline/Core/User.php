@@ -233,7 +233,7 @@ class User extends BaseDB
 	 * Returns array
 	 */
 	public function getInfo() {
-		return Utility::jsonDecode($this->fields['info']->getValue());
+		return array(); // FIXME Utility::jsonDecode($this->fields['info']->getValue());
 	}
 
 	public function getFirstLogin() {

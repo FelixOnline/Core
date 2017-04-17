@@ -1,97 +1,85 @@
 <?php
 
 require_once __DIR__ . '/DatabaseTestCase.php';
-require_once __DIR__ . '/../lib/SafeSQL.php';
 
 /**
- * App test case
+ * App test case - extend from this for anything requiring the App class.
  */
 class AppTestCase extends DatabaseTestCase
 {
-	use \Xpmock\TestCaseTrait;
+    use \Xpmock\TestCaseTrait;
 
-	protected $appConfig = array();
-	protected $app;
-	protected $setCurrentUser = true; // whether to initialise a current user or not
+    protected $appConfig = array();
+    protected $app;
+    protected $setCurrentUser = true; // whether to initialise a current user or not
 
-	public function setUp()
-	{
-		parent::setUp();
+    /*
+     * Set up an instance of App, and connect to the database.
+     */
+    public function setUp()
+    {
+        parent::setUp();
 
-		// create app
-		$config = $this->appConfig + array(
-			'base_url' => 'http://localhost/'
-		);
+        $dbuser = getenv('DB_USER') ? getenv('DB_USER') : 'root';
+        $dbpass = getenv('DB_PASS') ? getenv('DB_PASS') : '';
 
-		$app = new \FelixOnline\Core\App($config);
+        // create app
+        $config = $this->appConfig + array(
+            'base_url' => 'http://localhost/',
+            'db_user' => $dbuser,
+            'db_pass' => $dbpass,
+            'db_name' => 'test_media_felix',
+            'db_host' => 'localhost',
+            'unit_tests' => true,
+            'production' => false
+        );
 
-		$dbuser = getenv('DB_USER') ? getenv('DB_USER') : 'root';
-		$dbpass = getenv('DB_PASS') ? getenv('DB_PASS') : '';
+        $app = new \FelixOnline\Base\App($config);
 
-		$db = new \ezSQL_mysqli();
-		$db->quick_connect(
-			$dbuser,
-			$dbpass,
-			'test_media_felix',
-			'localhost',
-			3306,
-			'utf8'
-		);
-		$app['db'] = $db;
+        $app['env'] = new \FelixOnline\Base\HttpEnvironment();
 
-		$app['safesql'] = new \SafeSQL_MySQLi($db->dbh);
+        // Initialize Akismet
+        $connector = new \Riv\Service\Akismet\Connector\Test();
+        $app['akismet'] = new \Riv\Service\Akismet\Akismet($connector);
 
-		$app['env'] = \FelixOnline\Core\Environment::mock();
+        // Initialize email
+        $transport = \Swift_NullTransport::newInstance();
+        $app['email'] = \Swift_Mailer::newInstance($transport);
 
-		// Initialize Akismet
-		$connector = new \Riv\Service\Akismet\Connector\Test();
-		$app['akismet'] = new \Riv\Service\Akismet\Akismet($connector);
+        $session = $this->mock('FelixOnline\\Base\\Session')
+            ->getId(1)
+            ->start(1)
+            ->reset()
+            ->new();
 
-		// Initialize email
-		$transport = \Swift_NullTransport::newInstance();
-		$app['email'] = \Swift_Mailer::newInstance($transport);
+        $this->reflect($session)
+            ->__set('session', array());
 
-		$session = $this->mock('FelixOnline\\Core\\Session')
-			->getId(1)
-			->start(1)
-			->reset()
-			->new();
+        $app['env']['session'] = $session;
 
-		$this->reflect($session)
-			->__set('session', array());
+        if ($this->setCurrentUser) {
+            $app['currentuser'] = new \FelixOnline\Core\CurrentUser();
+        }
 
-		$app['env']['session'] = $session;
+        // Set empty cache so data isn't cached in tests
+        $app['cache'] = new \Stash\Pool();
 
-		$cookies = $this->mock('FelixOnline\\Core\\Cookies')
-			->set(true)
-			->delete(true)
-			->new();
+        $app->run();
 
-		$this->reflect($cookies)
-			->__set('cookies', array());
+        $this->app = $app;
+    }
 
-		$app['env']['cookies'] = $cookies;
+    /*
+     * Close down App.
+     */
+    public function tearDown()
+    {
+        parent::tearDown();
 
-		if ($this->setCurrentUser) {
-			$app['currentuser'] = new \FelixOnline\Core\CurrentUser();
-		}
+        $app = \FelixOnline\Base\App::getInstance();
 
-		// Set empty cache so data isn't cached in tests
-		$app['cache'] = new \Stash\Pool();
+        $app['db']->dbh->close();
 
-		$app->run();
-
-		$this->app = $app;
-	}
-
-	public function tearDown()
-	{
-		parent::tearDown();
-
-		$app = \FelixOnline\Core\App::getInstance();
-
-		$app['db']->dbh->close();
-
-		\FelixOnline\Core\App::setInstance(null);
-	}
+        \FelixOnline\Base\App::setInstance(null);
+    }
 }

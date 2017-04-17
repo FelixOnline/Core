@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../../AppTestCase.php';
-require_once __DIR__ . '/../../../constants.php';
 
 class EmailValidationTest extends AppTestCase
 {
@@ -12,7 +11,7 @@ class EmailValidationTest extends AppTestCase
 
 	public function testCreate()
 	{
-		$manager = \FelixOnline\Core\BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation');
+		$manager = \FelixOnline\Base\BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation');
 		$this->assertEquals($manager->count(), 2);
 
 		$code = \FelixOnline\Core\EmailValidation::create('test3@test.com');
@@ -23,7 +22,7 @@ class EmailValidationTest extends AppTestCase
 
 	public function testCreateError()
 	{
-		$manager = \FelixOnline\Core\BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation');
+		$manager = \FelixOnline\Base\BaseManager::build('FelixOnline\Core\EmailValidation', 'email_validation');
 		$this->assertEquals($manager->count(), 2);
 
 		$code = \FelixOnline\Core\EmailValidation::create('test2@test.com');

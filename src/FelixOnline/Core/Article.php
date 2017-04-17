@@ -379,7 +379,7 @@ class Article extends BaseDB {
 	 */
 	private function constructURL() {
 		$cat = $this->getCategory()->getCat();
-		$dashed = Utility::urliseText($this->getTitle());
+		/*$dashed = Utility::urliseText($this->getTitle());*/ $dashed = '-'; //FIXME
 		$output = $cat.'/'.$this->getId().'/'.$dashed.'/'; // output: CAT/ID/TITLE/
 		return $output;
 	}

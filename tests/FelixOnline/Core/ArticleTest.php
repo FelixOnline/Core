@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../../AppTestCase.php';
-require_once __DIR__ . '/../../utilities.php';
 
 class ArticleTest extends AppTestCase
 {
@@ -127,7 +126,7 @@ class ArticleTest extends AppTestCase
 		$article->setContent('Foo bar');
 		$this->assertEquals(4, $this->getConnection()->getRowCount('text_story'));
 
-		$manager = \FelixOnline\Core\BaseManager::build('\FelixOnline\Core\Text', 'text_story');
+		$manager = \FelixOnline\Base\BaseManager::build('\FelixOnline\Core\Text', 'text_story');
 		$text = $manager->filter('content = "Foo bar"')->one();
 		$this->assertEquals($text->getId(), $article->getText1()->getId());
 	}
@@ -216,9 +215,9 @@ class ArticleTest extends AppTestCase
 
 	public function testLogVisitLoggedIn()
 	{
-		$app = \FelixOnline\Core\App::getInstance();
-
-		loginUser('felix');
+		$app = \FelixOnline\Base\App::getInstance();
+		$this->fail('This test is broken due to missing loginUser function.');
+		// loginUser('felix');
 
 		$article = new \FelixOnline\Core\Article(1);
 
@@ -236,7 +235,7 @@ class ArticleTest extends AppTestCase
 
 	public function testLogVisitRepeat()
 	{
-		$app = \FelixOnline\Core\App::getInstance();
+		$app = \FelixOnline\Base\App::getInstance();
 		$pdo = $this->getConnection()->getConnection();
 
 		$article = new \FelixOnline\Core\Article(1);

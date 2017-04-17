@@ -1,25 +1,36 @@
 {
-	"name": "felixonline/core",
-	"description": "Felix Online Core Models",
-	"license": "BSD-3-Clause",
-	"authors": [
-		{
-			"name": "Jonathan Kim",
-			"email": "jkimbo@gmail.com"
-		},
-		{
-			"name": "Philip Kent",
-			"email": "kentphilip@gmail.com"
-		}
-	],
-	"repositories": [
-	],
-	"require": {
-		"felixonline/base": "dev-master",
-	},
-	"autoload": {
-		"psr-4": {
-            "FelixOnline\\Core\\": "src/FelixOnline/Core",
-		}
-	}
+    "name": "felixonline/core",
+    "description": "Felix Online Core Models",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Jonathan Kim",
+            "email": "jkimbo@gmail.com"
+        },
+        {
+            "name": "Philip Kent",
+            "email": "kentphilip@gmail.com"
+        }
+    ],
+    "repositories": [
+    ],
+    "require": {
+        "robmorgan/phinx": "@stable",
+        "felixonline/base": "dev-master",
+        "swiftmailer/swiftmailer": "@stable"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.7.*",
+        "phpunit/dbunit": "@stable",
+        "ptrofimov/xpmock": "@stable",
+        "psy/psysh": "@stable",
+        "fzaninotto/faker": "@stable",
+        "johnkary/phpunit-speedtrap": "@stable"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "FelixOnline\\Core\\": "src/FelixOnline/Core"
+        }
+    }
 }

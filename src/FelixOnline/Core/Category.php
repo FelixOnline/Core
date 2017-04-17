@@ -46,7 +46,7 @@ class Category extends BaseDB
 
 		$currentuser = new CurrentUser();
 
-		if($this->getSecret() && !$currentuser->isLoggedIn() && !Utility::isInCollege()) {
+	if($this->getSecret() && !$currentuser->isLoggedIn() /*&& !Utility::isInCollege()*/) { //FIXME
 			throw new \FelixOnline\Exceptions\ModelNotFoundException("This is a secret category and you don't have permission to access it", "Category", $id);
 		}
 	}

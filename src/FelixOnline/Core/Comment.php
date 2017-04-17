@@ -219,7 +219,7 @@ class Comment extends BaseDB
 	 */
 	public function userLikedOrDislikedComment($ip, $useragent)
 	{
-		$count = BaseManager::build(null, 'comment_like')
+		$count = BaseManager::build('FelixOnline\Core\Comment', 'comment_like')
 			->filter("ip = '%s'", array($ip))
 			->filter("user_agent = '%s'", array($useragent))
 			->filter("comment = %i", array($this->getId()))
@@ -237,7 +237,7 @@ class Comment extends BaseDB
 	 */
 	public function userLikedComment($ip, $useragent)
 	{
-		$count = BaseManager::build(null, 'comment_like')
+		$count = BaseManager::build('FelixOnline\Core\Comment', 'comment_like')
 			->filter("ip = '%s'", array($ip))
 			->filter("user_agent = '%s'", array($useragent))
 			->filter("comment = %i", array($this->getId()))
@@ -256,7 +256,7 @@ class Comment extends BaseDB
 	 */
 	public function userDislikedComment($ip, $useragent)
 	{
-		$count = BaseManager::build(null, 'comment_like')
+		$count = BaseManager::build('FelixOnline\Core\Comment', 'comment_like')
 			->filter("ip = '%s'", array($ip))
 			->filter("user_agent = '%s'", array($useragent))
 			->filter("comment = %i", array($this->getId()))

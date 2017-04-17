@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../../AppTestCase.php';
-require_once __DIR__ . '/../../../constants.php';
 
 class CurrentUserTest extends AppTestCase
 {
@@ -24,6 +23,7 @@ class CurrentUserTest extends AppTestCase
 
 	public function testLoggedIn()
 	{
+		$this->fail('This test is broken due to Environment');
 		$env = \FelixOnline\Core\Environment::getInstance();
 
 		$currentUser = new \FelixOnline\Core\CurrentUser();
@@ -35,9 +35,9 @@ class CurrentUserTest extends AppTestCase
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
-		$pdo->exec("INSERT INTO `login` 
+		$pdo->exec("INSERT INTO `login`
 			(`session_id`, `session_name`, `ip`, `browser`, `user`, `timestamp`, `valid`, `logged_in`, `deleted`)
-			VALUES 
+			VALUES
 			('1', 'felix', '".$env['REMOTE_ADDR']."', '".$env['HTTP_USER_AGENT']."', 'felix', NOW(), 1, 1, 0)");
 
 		$this->assertTrue($currentUser->isLoggedIn());
@@ -45,6 +45,7 @@ class CurrentUserTest extends AppTestCase
 
 	public function testInvalidDatabaseSession()
 	{
+		$this->fail('This test is broken due to Environment');
 		$env = \FelixOnline\Core\Environment::getInstance();
 
 		$currentUser = new \FelixOnline\Core\CurrentUser();
@@ -54,9 +55,9 @@ class CurrentUserTest extends AppTestCase
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
-		$pdo->exec("INSERT INTO `login` 
+		$pdo->exec("INSERT INTO `login`
 			(`session_id`, `session_name`, `ip`, `browser`, `user`, `timestamp`, `valid`, `logged_in`, `deleted`)
-			VALUES 
+			VALUES
 			('1', 'felix', '".$env['REMOTE_ADDR']."', '".$env['HTTP_USER_AGENT']."', 'felix', NOW(), 1, 0, 0)");
 
 		$this->assertFalse($currentUser->isLoggedIn());
@@ -64,6 +65,7 @@ class CurrentUserTest extends AppTestCase
 
 	public function testLoginFromCookie()
 	{
+		$this->fail('This test is broken due to Environment');
 		$env = \FelixOnline\Core\Environment::getInstance();
 
 		$currentUser = new \FelixOnline\Core\CurrentUser();
@@ -72,9 +74,9 @@ class CurrentUserTest extends AppTestCase
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
-		$pdo->exec("INSERT INTO `cookies` 
+		$pdo->exec("INSERT INTO `cookies`
 			(`hash`, `user`, `expires`, `deleted`)
-			VALUES 
+			VALUES
 			('foo', 'felix', DATE_ADD(NOW(), INTERVAL 1 DAY), 0)");
 
 		$this->assertTrue($currentUser->isLoggedIn());
@@ -85,6 +87,7 @@ class CurrentUserTest extends AppTestCase
 
 	public function testExpiredCookie()
 	{
+		$this->fail('This test is broken due to Environment');
 		$env = \FelixOnline\Core\Environment::getInstance();
 
 		$currentUser = new \FelixOnline\Core\CurrentUser();
@@ -93,9 +96,9 @@ class CurrentUserTest extends AppTestCase
 
 		$conn = $this->getConnection();
 		$pdo = $conn->getConnection();
-		$pdo->exec("INSERT INTO `cookies` 
+		$pdo->exec("INSERT INTO `cookies`
 			(`hash`, `user`, `expires`, `deleted`)
-			VALUES 
+			VALUES
 			('foo', 'felix', DATE_SUB(NOW(), INTERVAL 1 DAY), 0)");
 
 		$this->assertFalse($currentUser->isLoggedIn());
