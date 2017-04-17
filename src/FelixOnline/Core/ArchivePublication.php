@@ -14,16 +14,17 @@ use FelixOnline\Exceptions\InternalException;
 /**
  * @codeCoverageIgnore
  */
-class ArchivePublication extends BaseDb {
-	public $dbtable = 'archive_publication';
+class ArchivePublication extends BaseDb
+{
+    public $dbtable = 'archive_publication';
 
-	function __construct($id = NULL)
-	{
-		$fields = array(
-			'name' => new Type\CharField(),
-			'inactive' => new Type\BooleanField(),
-		);
+    public function __construct($id = null)
+    {
+        $fields = array(
+            'name' => new Type\CharField(),
+            'inactive' => new Type\BooleanField(),
+        );
 
-		parent::__construct($fields, $id);
-	}
+        parent::__construct($fields, $id);
+    }
 }

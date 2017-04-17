@@ -16,6 +16,6 @@ use FelixOnline\Exceptions\InternalException;
  */
 class CategoryManager extends BaseManager
 {
-	public $table = 'category';
-	public $class = 'FelixOnline\Core\Category';
+    public $table = 'category';
+    public $class = 'FelixOnline\Core\Category';
 }

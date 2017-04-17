@@ -16,14 +16,15 @@ use FelixOnline\Exceptions\InternalException;
  */
 class ArticlePolls extends BaseDB
 {
-	public $dbtable = 'article_polls';
+    public $dbtable = 'article_polls';
 
-	function __construct($id = NULL) {
-		$fields = array(
-			'poll' => new Type\ForeignKey('FelixOnline\Core\Poll'),
-			'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
-		);
+    public function __construct($id = null)
+    {
+        $fields = array(
+            'poll' => new Type\ForeignKey('FelixOnline\Core\Poll'),
+            'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
+        );
 
-		parent::__construct($fields, $id);
-	}
+        parent::__construct($fields, $id);
+    }
 }

@@ -22,126 +22,126 @@ use FelixOnline\Exceptions\InternalException;
  */
 class Category extends BaseDB
 {
-	private $editors = array();
-	private $count; // number of articles in catgeory
-	private $stories; // array of top story objects
-	public $dbtable = 'category';
+    private $editors = array();
+    private $count; // number of articles in catgeory
+    private $stories; // array of top story objects
+    public $dbtable = 'category';
 
-	function __construct($id = NULL)
-	{
-		$fields = array(
-			'label' => new Type\CharField(),
-			'cat' => new Type\CharField(),
-			'active' => new Type\BooleanField(),
-			'parent' => new Type\ForeignKey('FelixOnline\Core\Category'),
-			'email' => new Type\CharField(),
-			'twitter' => new Type\CharField(),
-			'description' => new Type\TextField(),
-			'order' => new Type\IntegerField(),
-			'hidden' => new Type\BooleanField(),
-			'secret' => new Type\BooleanField(),
-		);
+    public function __construct($id = null)
+    {
+        $fields = array(
+            'label' => new Type\CharField(),
+            'cat' => new Type\CharField(),
+            'active' => new Type\BooleanField(),
+            'parent' => new Type\ForeignKey('FelixOnline\Core\Category'),
+            'email' => new Type\CharField(),
+            'twitter' => new Type\CharField(),
+            'description' => new Type\TextField(),
+            'order' => new Type\IntegerField(),
+            'hidden' => new Type\BooleanField(),
+            'secret' => new Type\BooleanField(),
+        );
 
-		parent::__construct($fields, $id);
+        parent::__construct($fields, $id);
 
-		$currentuser = new CurrentUser();
+        $currentuser = new CurrentUser();
 
-	if($this->getSecret() && !$currentuser->isLoggedIn() /*&& !Utility::isInCollege()*/) { //FIXME
-			throw new \FelixOnline\Exceptions\ModelNotFoundException("This is a secret category and you don't have permission to access it", "Category", $id);
-		}
-	}
+        if ($this->getSecret() && !$currentuser->isLoggedIn() /*&& !Utility::isInCollege()*/) { //FIXME
+            throw new \FelixOnline\Exceptions\ModelNotFoundException("This is a secret category and you don't have permission to access it", "Category", $id);
+        }
+    }
 
-	/**
-	 * Public: Get category url
-	 */
-	public function getURL($pagenum = NULL)
-	{
-		$app = App::getInstance();
-		$output = $app->getOption('base_url').$this->getCat().'/';
+    /**
+     * Public: Get category url
+     */
+    public function getURL($pagenum = null)
+    {
+        $app = App::getInstance();
+        $output = $app->getOption('base_url').$this->getCat().'/';
 
-		if ($pagenum != NULL) {
-			$output .= $pagenum.'/';
-		}
-		return $output;
-	}
+        if ($pagenum != null) {
+            $output .= $pagenum.'/';
+        }
+        return $output;
+    }
 
-	/**
-	 * Public: Get category editors
-	 *
-	 * Returns array of user objects
-	 */
-	public function getEditors()
-	{
-		$editors = BaseManager::build('FelixOnline\Core\User', 'category_author', 'user')
-			->filter("category = %i", array($this->getId()))
-			->values();
+    /**
+     * Public: Get category editors
+     *
+     * Returns array of user objects
+     */
+    public function getEditors()
+    {
+        $editors = BaseManager::build('FelixOnline\Core\User', 'category_author', 'user')
+            ->filter("category = %i", array($this->getId()))
+            ->values();
 
-		return $editors;
-	}
+        return $editors;
+    }
 
-	/**
-	 * Public: Get category children
-	 *
-	 * Returns array of category objects
-	 */
-	public function getChildren()
-	{
-		$editors = BaseManager::build('FelixOnline\Core\Category', 'category', 'id')
-			->filter("parent = %i", array($this->getId()))
-			->values();
+    /**
+     * Public: Get category children
+     *
+     * Returns array of category objects
+     */
+    public function getChildren()
+    {
+        $editors = BaseManager::build('FelixOnline\Core\Category', 'category', 'id')
+            ->filter("parent = %i", array($this->getId()))
+            ->values();
 
-		return $editors;
-	}
+        return $editors;
+    }
 
-	/**
-	 * Public: Get all parents
-	 *
-	 * Returns array of parents starting at the root
-	 */
-	public function getAllParents()
-	{
-		$parents = array();
+    /**
+     * Public: Get all parents
+     *
+     * Returns array of parents starting at the root
+     */
+    public function getAllParents()
+    {
+        $parents = array();
 
-		$parent = $this;
+        $parent = $this;
 
-		while($parent = $parent->getParent()) {
-			$parents[] = $parent;
-		}
+        while ($parent = $parent->getParent()) {
+            $parents[] = $parent;
+        }
 
-		return $parents;
-	}
+        return $parents;
+    }
 
-	/**
-	 * Static: Get all categories
-	 */
-	public static function getCategories()
-	{
-		$app = App::getInstance();
+    /**
+     * Static: Get all categories
+     */
+    public static function getCategories()
+    {
+        $app = App::getInstance();
 
-		$manager = BaseManager::build('FelixOnline\Core\Category', 'category');
+        $manager = BaseManager::build('FelixOnline\Core\Category', 'category');
 
-		try {
-			$values = $manager->filter('hidden = 0')
-							->filter('deleted = 0')
-							->filter('id > 0')
-							->order('order', 'ASC')
-							->values();
+        try {
+            $values = $manager->filter('hidden = 0')
+                            ->filter('deleted = 0')
+                            ->filter('id > 0')
+                            ->order('order', 'ASC')
+                            ->values();
 
-			return $values;
-		} catch(\Exception $e) {
-			return array();
-		}
-	}
+            return $values;
+        } catch (\Exception $e) {
+            return array();
+        }
+    }
 
-	/**
-	 * Static: Get all root categories
-	 */
-	public static function getRootCategories()
-	{
-		$app = App::getInstance();
+    /**
+     * Static: Get all root categories
+     */
+    public static function getRootCategories()
+    {
+        $app = App::getInstance();
 
-		$sql = $app['safesql']->query(
-			"SELECT
+        $sql = $app['safesql']->query(
+            "SELECT
 				`id`
 			FROM `category`
 			WHERE hidden = 0
@@ -149,15 +149,15 @@ class Category extends BaseDB
 			AND parent IS NULL
 			AND deleted = 0
 			ORDER BY `order` ASC",
-			array());
-		$results = $app['db']->get_results($sql);
-		$cats = array();
+            array());
+        $results = $app['db']->get_results($sql);
+        $cats = array();
 
-		if (!is_null($results)) {
-			foreach($results as $cat) {
-				$cats[] = new Category($cat->id);
-			}
-		}
-		return $cats;
-	}
+        if (!is_null($results)) {
+            foreach ($results as $cat) {
+                $cats[] = new Category($cat->id);
+            }
+        }
+        return $cats;
+    }
 }

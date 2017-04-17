@@ -12,53 +12,56 @@ use FelixOnline\Exceptions\InternalException;
  */
 class Role extends BaseDB
 {
-	public $dbtable = 'roles';
+    public $dbtable = 'roles';
 
-	function __construct($id = NULL) {
-		$fields = array(
-			'name' => new Type\CharField(),
-			'description' => new Type\CharField(),
-			'parent' => new Type\ForeignKey('FelixOnline\Core\Role'),
-		);
+    public function __construct($id = null)
+    {
+        $fields = array(
+            'name' => new Type\CharField(),
+            'description' => new Type\CharField(),
+            'parent' => new Type\ForeignKey('FelixOnline\Core\Role'),
+        );
 
-		parent::__construct($fields, $id);
-	}
+        parent::__construct($fields, $id);
+    }
 
-	public function getChildRoles() {
-		return $this->internalGetChildRoles($this->getId());
-	}
+    public function getChildRoles()
+    {
+        return $this->internalGetChildRoles($this->getId());
+    }
 
-	private function internalGetChildRoles($data) {
-		$manager = BaseManager::build('FelixOnline\Core\Role', 'roles');
+    private function internalGetChildRoles($data)
+    {
+        $manager = BaseManager::build('FelixOnline\Core\Role', 'roles');
 
-		if(is_int($parentId)) {
-			$manager->filter("parent = %i", array($data));
-		} else {
-			$manager->filter("parent IN (%q)", array($data));
-		}
+        if (is_int($parentId)) {
+            $manager->filter("parent = %i", array($data));
+        } else {
+            $manager->filter("parent IN (%q)", array($data));
+        }
 
-		$values = $manager->values();
+        $values = $manager->values();
 
-		if(!$values) {
-			return array();
-		}
+        if (!$values) {
+            return array();
+        }
 
-		$children = array();
-		$newIds = array();
+        $children = array();
+        $newIds = array();
 
-		foreach($values as $value) {
-			$children[] = $value;
-			$newIds[] = $value->getId();
-		}
+        foreach ($values as $value) {
+            $children[] = $value;
+            $newIds[] = $value->getId();
+        }
 
-		$newIds = array_unique($newIds);
+        $newIds = array_unique($newIds);
 
-		$moreChildren = $this->internalGetChildRoles($newIds);
+        $moreChildren = $this->internalGetChildRoles($newIds);
 
-		if($moreChildren) {
-			$children = array_merge($moreChildren, $children);
-		}
+        if ($moreChildren) {
+            $children = array_merge($moreChildren, $children);
+        }
 
-		return $children;
-	}
+        return $children;
+    }
 }

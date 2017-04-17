@@ -16,6 +16,6 @@ use FelixOnline\Exceptions\InternalException;
  */
 class CommentManager extends BaseManager
 {
-	public $table = 'comment';
-	public $class = 'FelixOnline\Core\Comment';
+    public $table = 'comment';
+    public $class = 'FelixOnline\Core\Comment';
 }

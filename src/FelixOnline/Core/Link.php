@@ -17,20 +17,20 @@ use FelixOnline\Exceptions\InternalException;
  */
 class Link extends BaseDb
 {
-	public $dbtable = 'link';
+    public $dbtable = 'link';
 
-	/**
-	 * Constructor
-	 *
-	 */
-	function __construct($link = NULL)
-	{
-		$fields = array(
-			'link' => new Type\CharField(array('primary' => true)),
-			'url' => new Type\CharField(),
-			'active' => new Type\BooleanField()
-		);
+    /**
+     * Constructor
+     *
+     */
+    public function __construct($link = null)
+    {
+        $fields = array(
+            'link' => new Type\CharField(array('primary' => true)),
+            'url' => new Type\CharField(),
+            'active' => new Type\BooleanField()
+        );
 
-		parent::__construct($fields, $link);
-	}
+        parent::__construct($fields, $link);
+    }
 }

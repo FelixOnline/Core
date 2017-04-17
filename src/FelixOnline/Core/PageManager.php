@@ -12,6 +12,6 @@ use FelixOnline\Exceptions\InternalException;
  */
 class PageManager extends BaseManager
 {
-	public $table = 'pages';
-	public $class = 'FelixOnline\Core\Page';
+    public $table = 'pages';
+    public $class = 'FelixOnline\Core\Page';
 }

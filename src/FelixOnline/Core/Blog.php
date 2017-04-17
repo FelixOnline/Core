@@ -21,14 +21,16 @@ use FelixOnline\Exceptions\InternalException;
 /**
  * @codeCoverageIgnore
  */
-class Blog extends BaseDb {
-	public $dbtable = 'blogs';
+class Blog extends BaseDb
+{
+    public $dbtable = 'blogs';
 
-	function __construct($id = NULL) {
-		$fields = array(
-			'sprinkler_prefix' => new Type\CharField()
-		);
+    public function __construct($id = null)
+    {
+        $fields = array(
+            'sprinkler_prefix' => new Type\CharField()
+        );
 
-		parent::__construct($fields, $id);
-	}
+        parent::__construct($fields, $id);
+    }
 }

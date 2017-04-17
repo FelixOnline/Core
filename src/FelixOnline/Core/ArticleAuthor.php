@@ -14,15 +14,17 @@ use FelixOnline\Exceptions\InternalException;
 /**
  * @codeCoverageIgnore
  */
-class ArticleAuthor extends BaseDb {
-	public $dbtable = 'article_author';
+class ArticleAuthor extends BaseDb
+{
+    public $dbtable = 'article_author';
 
-	function __construct($id = NULL) {
-		$fields = array(
-			'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
-			'author' => new Type\ForeignKey('FelixOnline\Core\User')
-		);
+    public function __construct($id = null)
+    {
+        $fields = array(
+            'article' => new Type\ForeignKey('FelixOnline\Core\Article'),
+            'author' => new Type\ForeignKey('FelixOnline\Core\User')
+        );
 
-		parent::__construct($fields, $id);
-	}
+        parent::__construct($fields, $id);
+    }
 }

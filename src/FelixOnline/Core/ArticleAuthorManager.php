@@ -16,6 +16,6 @@ use FelixOnline\Exceptions\InternalException;
  */
 class ArticleAuthorManager extends BaseManager
 {
-	public $table = 'article_author';
-	public $pk = 'article';
+    public $table = 'article_author';
+    public $pk = 'article';
 }

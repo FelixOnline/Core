@@ -24,19 +24,21 @@ use FelixOnline\Exceptions\InternalException;
 /**
  * @codeCoverageIgnore
  */
-class BlogPost extends BaseDb {
-	public $dbtable = 'blog_post';
+class BlogPost extends BaseDb
+{
+    public $dbtable = 'blog_post';
 
-	function __construct($id = NULL) {
-		$fields = array(
-			'blog' => new Type\ForeignKey('FelixOnline\Core\Blog'),
-			'content' => new Type\TextField(),
-			'timestamp' => new Type\DateTimeField(),
-			'author' => new Type\ForeignKey('FelixOnline\Core\User'),
-			'breaking' => new Type\BooleanField(array('null' => false)),
-			'title' => new Type\CharField()
-		);
+    public function __construct($id = null)
+    {
+        $fields = array(
+            'blog' => new Type\ForeignKey('FelixOnline\Core\Blog'),
+            'content' => new Type\TextField(),
+            'timestamp' => new Type\DateTimeField(),
+            'author' => new Type\ForeignKey('FelixOnline\Core\User'),
+            'breaking' => new Type\BooleanField(array('null' => false)),
+            'title' => new Type\CharField()
+        );
 
-		parent::__construct($fields, $id);
-	}
+        parent::__construct($fields, $id);
+    }
 }
