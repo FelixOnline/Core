@@ -10,10 +10,6 @@ use FelixOnline\Exceptions\InternalException;
 /**
  * @codeCoverageIgnore
  */
-
-/*
- * Article Poll class
- */
 class UserRole extends BaseDB
 {
 	public $dbtable = 'user_roles';

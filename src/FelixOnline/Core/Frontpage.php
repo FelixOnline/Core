@@ -7,15 +7,15 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Frontpage class
  * Represents the frontpage
  *
  * Fields:
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class Frontpage extends BaseDb
 {

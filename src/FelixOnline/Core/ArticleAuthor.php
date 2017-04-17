@@ -7,12 +7,12 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Article Author Class
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class ArticleAuthor extends BaseDb {
 	public $dbtable = 'article_author';

@@ -8,10 +8,6 @@ use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
 /**
- * @codeCoverageIgnore
- */
-
-/**
  * Akismet log entry
  *
  * Fields:
@@ -22,6 +18,10 @@ use FelixOnline\Exceptions\InternalException;
  *    is_spam
  *    error
  */
+
+ /**
+  * @codeCoverageIgnore
+  */
 class AkismetLog extends BaseDB
 {
 	public $dbtable = 'akismet_log';

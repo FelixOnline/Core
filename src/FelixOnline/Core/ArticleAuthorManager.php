@@ -8,11 +8,11 @@ use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
 /**
- * @codeCoverageIgnore
+ * Article Author manager
  */
 
 /**
- * Article Author manager
+ * @codeCoverageIgnore
  */
 class ArticleAuthorManager extends BaseManager
 {

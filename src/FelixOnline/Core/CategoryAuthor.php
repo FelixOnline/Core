@@ -10,7 +10,6 @@ use FelixOnline\Exceptions\InternalException;
 /**
  * @codeCoverageIgnore
  */
-
 class CategoryAuthor extends BaseDB
 {
 	public $dbtable = 'category_author';

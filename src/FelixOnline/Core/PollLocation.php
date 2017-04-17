@@ -7,12 +7,12 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Poll location (for admin pages)
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class PollLocation extends BaseDb {
 	public $dbtable = 'polls_location';

@@ -8,11 +8,11 @@ use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
 /**
- * @codeCoverageIgnore
+ * Category manager
  */
 
 /**
- * Category manager
+ * @codeCoverageIgnore
  */
 class CategoryManager extends BaseManager
 {

@@ -7,14 +7,13 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Article - Publication History
  */
 
+/**
+ * @codeCoverageIgnore
+ */
 class ArticlePublication extends BaseDb {
 	public $dbtable = 'article_publication';
 

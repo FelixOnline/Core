@@ -7,12 +7,12 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Article comment status (for admin pages)
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class ArticleCommentStatus extends BaseDb {
 	public $dbtable = 'article_comment_status';

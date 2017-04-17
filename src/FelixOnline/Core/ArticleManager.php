@@ -6,13 +6,12 @@ use FelixOnline\Base\BaseManager;
 use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
-
 /**
- * @codeCoverageIgnore
+ * Article manager
  */
 
 /**
- * Article manager
+ * @codeCoverageIgnore
  */
 class ArticleManager extends BaseManager
 {

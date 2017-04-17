@@ -8,11 +8,11 @@ use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
 /**
- * @codeCoverageIgnore
- */
-
-/**
  * Advert class
+ */
+ 
+/**
+ * @codeCoverageIgnore
  */
 class AdvertCategory extends BaseDB
 {

@@ -7,13 +7,13 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Link class
  * For link redirections
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class Link extends BaseDb
 {

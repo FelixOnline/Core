@@ -7,10 +7,6 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Blog Class
  *
@@ -20,6 +16,10 @@ use FelixOnline\Exceptions\InternalException;
  *	  slug:	   - url slug of page
  *	  controller: - name of controller used to handle blog
  *	  sticky:	 -
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class Blog extends BaseDb {
 	public $dbtable = 'blogs';

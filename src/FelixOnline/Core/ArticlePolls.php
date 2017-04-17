@@ -7,12 +7,12 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Article Poll class
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class ArticlePolls extends BaseDB
 {

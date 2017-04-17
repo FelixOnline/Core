@@ -7,10 +7,6 @@ use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
 use FelixOnline\Exceptions\InternalException;
 
-/**
- * @codeCoverageIgnore
- */
-
 /*
  * Blog post class
  *
@@ -23,6 +19,10 @@ use FelixOnline\Exceptions\InternalException;
  *	  type:	   - type of post [optional]
  *	  meta:	   - JSON encoded array of post meta [optional]
  *	  visible:	-
+ */
+
+/**
+ * @codeCoverageIgnore
  */
 class BlogPost extends BaseDb {
 	public $dbtable = 'blog_post';
