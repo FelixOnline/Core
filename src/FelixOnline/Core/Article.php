@@ -1,7 +1,12 @@
 <?php
 namespace FelixOnline\Core;
 
-use FelixOnline\Core\Type;
+use FelixOnline\Base\BaseDB;
+use FelixOnline\Base\BaseManager;
+use FelixOnline\Base\Type;
+use FelixOnline\Base\App;
+use FelixOnline\Exceptions\InternalException;
+
 /*
  * Article class
  * Deals with both article retrieval and article submission
@@ -539,7 +544,7 @@ class Article extends BaseDB {
 			if ($user && $user->isLoggedIn()) {
 				return true;
 			} else {
-				return false;	
+				return false;
 			}
 		}
 
@@ -599,5 +604,5 @@ class Article extends BaseDB {
 		}
 
 		return($date->getPublicationDate());
-	}	
+	}
 }

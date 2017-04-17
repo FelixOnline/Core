@@ -1,5 +1,12 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Base\BaseDB;
+use FelixOnline\Base\BaseManager;
+use FelixOnline\Base\Type;
+use FelixOnline\Base\App;
+use FelixOnline\Exceptions\InternalException;
+
 /*
  * Current User class
  */
@@ -42,7 +49,7 @@ class CurrentUser extends User
 			return true;
 		} else {
 			// n.b. the session is cleared by isSessionRecent if invalid
-			
+
 			return $this->loginFromCookie();
 		}
 	}
@@ -53,7 +60,7 @@ class CurrentUser extends User
 	public function setUser($username)
 	{
 		$app = App::getInstance();
-		
+
 		try {
 			parent::__construct($username);
 		} catch (\FelixOnline\Exceptions\ModelNotFoundException $e) {
@@ -88,7 +95,7 @@ class CurrentUser extends User
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
-			"INSERT INTO `login` 
+			"INSERT INTO `login`
 			(
 				session_id,
 				session_name,
@@ -162,7 +169,7 @@ class CurrentUser extends User
 
 		if (
 			$user
-			&& $user->timediff <= SESSION_LENGTH 
+			&& $user->timediff <= SESSION_LENGTH
 			&& $user->ip == $app['env']['REMOTE_ADDR']
 			&& $user->browser == $app['env']['HTTP_USER_AGENT']
 		) {
@@ -183,7 +190,7 @@ class CurrentUser extends User
 		$app = App::getInstance();
 
 		$sessionid = $app['env']['session']->getId();
-		
+
 		if($this->resetSession(false)) {
 			return $sessionid;
 		} else {
@@ -198,18 +205,18 @@ class CurrentUser extends User
 		$app = App::getInstance();
 
 		// Validate our existing ID
-		$sql = $app['safesql']->query("SELECT 
-										user, 
-										TIMESTAMPDIFF(SECOND,timestamp,NOW()) AS timediff, 
-										ip, 
-										browser 
-									FROM `login` 
+		$sql = $app['safesql']->query("SELECT
+										user,
+										TIMESTAMPDIFF(SECOND,timestamp,NOW()) AS timediff,
+										ip,
+										browser
+									FROM `login`
 									WHERE session_id='%s'
 									AND session_name='%s'
-									AND valid=1 
-									AND logged_in=0 
+									AND valid=1
+									AND logged_in=0
 									AND deleted = 0
-									ORDER BY timediff ASC 
+									ORDER BY timediff ASC
 									LIMIT 1",
 									array($existing_id, SESSION_NAME));
 		$login = $app['db']->get_row($sql);
@@ -228,18 +235,18 @@ class CurrentUser extends User
 		}
 
 		if(
-			$login->timediff <= LOGIN_CHECK_LENGTH 
-			&& $ip == $app['env']['REMOTE_ADDR'] 
+			$login->timediff <= LOGIN_CHECK_LENGTH
+			&& $ip == $app['env']['REMOTE_ADDR']
 			&& $login->browser == $app['env']['HTTP_USER_AGENT']
 		) {
 			// Sessions is valid, now reconfigure it for the current session
 			$user = $login->user;
 
 			// Clear old ID
-			$sql = $app['safesql']->query("DELETE FROM `login` 
-										WHERE session_id='%s' 
+			$sql = $app['safesql']->query("DELETE FROM `login`
+										WHERE session_id='%s'
 										AND session_name='%s'
-										AND valid=1 
+										AND valid=1
 										AND logged_in=0
 										AND deleted=0",
 										array($existing_id, SESSION_NAME));
@@ -263,7 +270,7 @@ class CurrentUser extends User
 
 		// Do we invalidate this session ID?
 		if($flushdb) {
-			$sql = $app['safesql']->query("UPDATE `login` 
+			$sql = $app['safesql']->query("UPDATE `login`
 					SET valid = 0,
 					logged_in = 0
 					WHERE user='%s'
@@ -271,10 +278,10 @@ class CurrentUser extends User
 					AND session_name='%s'
 					AND deleted = 0",
 					array($this->getUser(), $sessionid, SESSION_NAME));
-					
+
 			return $app['db']->query($sql);
 		} else {
-			$sql = $app['safesql']->query("UPDATE `login` 
+			$sql = $app['safesql']->query("UPDATE `login`
 					SET valid = 1,
 					logged_in = 0
 					WHERE user='%s'
@@ -282,7 +289,7 @@ class CurrentUser extends User
 					AND session_name='%s'
 					AND deleted = 0",
 					array($this->getUser(), $sessionid, SESSION_NAME));
-					
+
 			return $app['db']->query($sql);
 		}
 	}
@@ -293,7 +300,7 @@ class CurrentUser extends User
 	private function destroySessions() {
 		$app = App::getInstance();
 
-		$sql = $app['safesql']->query("UPDATE `login` 
+		$sql = $app['safesql']->query("UPDATE `login`
 				SET valid = 0,
 				logged_in = 0
 				WHERE user='%s'
@@ -308,11 +315,11 @@ class CurrentUser extends User
 	 * Private: Destroy old sessions
 	 */
 	private function destroyOldSessions() {
-		$sql = "DELETE FROM cookies 
+		$sql = "DELETE FROM cookies
 				WHERE UNIX_TIMESTAMP() > UNIX_TIMESTAMP(expires)
 		";
 		$this->db->query($sql);
-		$sql = $this->safesql->query("UPDATE `login` 
+		$sql = $this->safesql->query("UPDATE `login`
 				SET valid = 0
 				WHERE user='%s'
 				AND deleted = 0
@@ -373,7 +380,7 @@ class CurrentUser extends User
 		$expiry_time = time() + COOKIE_LENGTH;
 
 		$app['env']['cookies']->set(COOKIE_NAME, $hash, $expiry_time, '/');
-		$sql = $app['safesql']->query("INSERT INTO `cookies` 
+		$sql = $app['safesql']->query("INSERT INTO `cookies`
 									(
 										hash,
 										user,

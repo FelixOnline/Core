@@ -1,7 +1,7 @@
 {
 	"name": "felixonline/core",
-	"description": "Felix Online Core",
-	"license": "MIT",
+	"description": "Felix Online Core Models",
+	"license": "BSD-3-Clause",
 	"authors": [
 		{
 			"name": "Jonathan Kim",
@@ -15,27 +15,11 @@
 	"repositories": [
 	],
 	"require": {
-		"robmorgan/phinx": "0.6.*",
-		"rzekanet/service-akismet": "1.*",
-		"jv2222/ezsql": "dev-master",
-		"tedivm/stash": "0.14.*",
-		"swiftmailer/swiftmailer": "5.*",
-		"oyejorge/less.php": "1.7.*",
-		"mrclay/minify": "2.3.*"
-	},
-	"require-dev": {
-		"phpunit/phpunit": "5.6.*",
-		"phpunit/dbunit": ">=1.2",
-		"ptrofimov/xpmock": "1.1.*",
-		"psy/psysh": "@stable",
-		"fzaninotto/faker": "1.6.*"
+		"felixonline/base": "dev-master",
 	},
 	"autoload": {
-		"psr-0": {
-			"FelixOnline": "src/"
-		},
-		"classmap": [
-			"lib/SafeSQL.php"
-		]
+		"psr-4": {
+            "FelixOnline\\Core\\": "src/FelixOnline/Core",
+		}
 	}
 }

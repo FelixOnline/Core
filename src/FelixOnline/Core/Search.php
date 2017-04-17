@@ -1,5 +1,12 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Base\BaseDB;
+use FelixOnline\Base\BaseManager;
+use FelixOnline\Base\Type;
+use FelixOnline\Base\App;
+use FelixOnline\Exceptions\InternalException;
+
 /**
  * Search query
  */
@@ -32,7 +39,7 @@ class Search
 			)
 		);
 		$results = $this->db->get_results($sql);
-		
+
 		if (!is_null($results)) {
 			foreach($results as $person) {
 				array_push($people, array(
@@ -41,7 +48,7 @@ class Search
 				));
 			}
 		}
-		
+
 		return array(
 			'count' => count($people),
 			'people' => $people
@@ -141,7 +148,7 @@ class Search
 				'articles' => array()
 			);
 		}
-	
+
 		$sql = $this->safesql->query(
 			"SELECT
 				article.id

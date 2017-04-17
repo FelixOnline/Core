@@ -1,5 +1,12 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Base\BaseDB;
+use FelixOnline\Base\BaseManager;
+use FelixOnline\Base\Type;
+use FelixOnline\Base\App;
+use FelixOnline\Exceptions\InternalException;
+
 /*
  * Comment class
  * Deals with both comment retrieval and comment submission
@@ -20,7 +27,7 @@ namespace FelixOnline\Core;
  *	  spam
  *
  * Comment flags:
- *		  active | pending | spam  
+ *		  active | pending | spam
  *			 0   |	0	|   0	  rejected comment
  *			 1   |	0	|   0	  approved comment
  *			 1   |	1	|   0	  pending moderation comment
@@ -33,7 +40,7 @@ namespace FelixOnline\Core;
  * Examples
  *	  // Get comment
  *	  $comment = new Comment(300);
- *	  echo $comment->getComment(); 
+ *	  echo $comment->getComment();
  *
  *	  // Submit comment
  *	  $comment = new Comment();
@@ -104,8 +111,8 @@ class Comment extends BaseDB
 	 * Public: Get comment content
 	 */
 	public function getContent()
-	{ 
-		$output = nl2br(trim($this->getComment())); 
+	{
+		$output = nl2br(trim($this->getComment()));
 		return $output;
 	}
 
@@ -178,9 +185,9 @@ class Comment extends BaseDB
 	 */
 	public function isRejected()
 	{
-		if (!$this->getActive() 
+		if (!$this->getActive()
 		   || !$this->getActive() && !$this->getPending()) { // if comment that is rejected
-			return true; 
+			return true;
 		} else {
 			return false;
 		}
@@ -200,7 +207,7 @@ class Comment extends BaseDB
 			return true;
 		} else {
 			return false;
-		} 
+		}
 	}
 
 	/**
@@ -272,7 +279,7 @@ class Comment extends BaseDB
 
 		if (!$this->userLikedOrDislikedComment($ip, $useragent)) { // check user hasn't already liked the comment
 			$sql = $app['safesql']->query(
-				"INSERT INTO `comment_like` 
+				"INSERT INTO `comment_like`
 				(
 					ip,
 					user_agent,
@@ -316,7 +323,7 @@ class Comment extends BaseDB
 
 		if (!$this->userLikedOrDislikedComment($ip, $useragent)) { // check user hasn't already liked the comment
 			$sql = $app['safesql']->query(
-				"INSERT INTO `comment_like` 
+				"INSERT INTO `comment_like`
 				(
 					ip,
 					user_agent,
@@ -443,8 +450,8 @@ class Comment extends BaseDB
 					$this->emailComment();
 				}
 			}
-		}		
-		
+		}
+
 		return $this->getId(); // return new comment id
 	}
 

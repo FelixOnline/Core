@@ -1,5 +1,12 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Base\BaseDB;
+use FelixOnline\Base\BaseManager;
+use FelixOnline\Base\Type;
+use FelixOnline\Base\App;
+use FelixOnline\Exceptions\InternalException;
+
 /*
  * Poll class
  */
@@ -35,7 +42,7 @@ class Poll extends BaseDB
 		if($this->getEnded()) {
 			return false;
 		}
-		
+
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$host = $_SERVER['HTTP_USER_AGENT'];
 

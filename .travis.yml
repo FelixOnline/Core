@@ -2,7 +2,7 @@ language: php
 
 php:
   - 5.6
-  - 7.0
+  - 7.1
 
 install:
   - composer self-update
@@ -25,3 +25,4 @@ notifications:
       - "chat.freenode.net#felixonline"
     on_success: change
     skip_join: true
+    on_failure: always

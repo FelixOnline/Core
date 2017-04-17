@@ -1,5 +1,12 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Base\BaseDB;
+use FelixOnline\Base\BaseManager;
+use FelixOnline\Base\Type;
+use FelixOnline\Base\App;
+use FelixOnline\Exceptions\InternalException;
+
 /*
  * Issue Archive - File
  */
@@ -30,7 +37,7 @@ class ArchiveFile extends BaseDb {
 	}
 
 	public function getThumbnailURL() {
-		$folder = \FelixOnline\Core\Settings::get('archive_url_location');
+		$folder = Settings::get('archive_url_location');
 		$url = $folder.'/thumbs/'.$this->getThumbnail();
 		return $url;
 	}

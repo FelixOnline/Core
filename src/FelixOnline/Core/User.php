@@ -1,5 +1,12 @@
 <?php
 namespace FelixOnline\Core;
+
+use FelixOnline\Base\BaseDB;
+use FelixOnline\Base\BaseManager;
+use FelixOnline\Base\Type;
+use FelixOnline\Base\App;
+use FelixOnline\Exceptions\InternalException;
+
 /*
  * User class
  *
@@ -82,7 +89,7 @@ class User extends BaseDB
 	public function getURL($pagenum = NULL) {
 		$app = App::getInstance();
 
-		$output = $app->getOption('base_url') . 'user/'.$this->getUser().'/'; 
+		$output = $app->getOption('base_url') . 'user/'.$this->getUser().'/';
 		if ($pagenum != NULL) {
 			$output .= $pagenum.'/';
 		}
@@ -97,7 +104,7 @@ class User extends BaseDB
 	public function getCommentPopularity() {
 		$total = $this->getLikes() + $this->getDislikes();
 		if($total) {
-			$popularity = 100 * ($this->getLikes() 
+			$popularity = 100 * ($this->getLikes()
 							/ ($this->getLikes() + $this->getDislikes()));
 			return round($popularity);
 		} else {
@@ -114,9 +121,9 @@ class User extends BaseDB
 
 		if (!$this->likes) {
 			$sql = $app['safesql']->query(
-				"SELECT 
-					SUM(likes) 
-				FROM `comment` 
+				"SELECT
+					SUM(likes)
+				FROM `comment`
 				WHERE user='%s'
 				AND `active`=1
 				AND deleted=0",
@@ -137,9 +144,9 @@ class User extends BaseDB
 
 		if (!$this->dislikes) {
 			$sql = $app['safesql']->query(
-				"SELECT 
-					SUM(dislikes) 
-				FROM `comment` 
+				"SELECT
+					SUM(dislikes)
+				FROM `comment`
 				WHERE user='%s'
 				AND `active`=1
 				AND deleted = 0",
@@ -233,12 +240,12 @@ class User extends BaseDB
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
-			"SELECT 
-				UNIX_TIMESTAMP(timestamp) as timestamp 
-			FROM `login` 
+			"SELECT
+				UNIX_TIMESTAMP(timestamp) as timestamp
+			FROM `login`
 			WHERE user='%s'
-			AND deleted=0 
-			ORDER BY timestamp ASC 
+			AND deleted=0
+			ORDER BY timestamp ASC
 			LIMIT 1",
 			array(
 				$this->getUser()
@@ -255,12 +262,12 @@ class User extends BaseDB
 		$app = App::getInstance();
 
 		$sql = $app['safesql']->query(
-			"SELECT 
-				UNIX_TIMESTAMP(timestamp) as timestamp 
-			FROM `login` 
-			WHERE user='%s' 
+			"SELECT
+				UNIX_TIMESTAMP(timestamp) as timestamp
+			FROM `login`
+			WHERE user='%s'
 			AND deleted=0
-			ORDER BY timestamp DESC 
+			ORDER BY timestamp DESC
 			LIMIT 1",
 			array(
 				$this->getUser()
@@ -299,8 +306,8 @@ class User extends BaseDB
 			"SELECT
 				COUNT(article_author.article)
 			FROM `article_author`
-			INNER JOIN `article` 
-			ON article_author.article = article.id 
+			INNER JOIN `article`
+			ON article_author.article = article.id
 			WHERE article_author.`author` = '%s'
 			AND article.deleted = 0
 			AND article_author.deleted = 0
