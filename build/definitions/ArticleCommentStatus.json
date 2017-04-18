@@ -1,0 +1,25 @@
+{
+    "class": "ArticleCommentStatus",
+    "table": "article_comment_status",
+    "dontLog": false,
+    "ignoreCodeCoverage": true,
+    "description": "Options for comment posting permissions on articles. Option definition table for Admin interface.",
+    "author": "Philip Kent",
+    "email": "philip.kent@me.com",
+    "license": "BSD",
+    "use": [],
+    "fields": [
+        {
+            "name": "description",
+            "type": "CharField",
+            "class": false,
+            "description": "Option description as defined in the class constants.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        }
+    ],
+    "preIncludeFile": true,
+    "postIncludeFile": false
+}

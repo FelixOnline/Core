@@ -87,8 +87,8 @@ function checkSyntax($fileName, $json)
         $error++;
     }
 
-    if (($json['preIncludeFile'] || $json['postIncludeFile']) && !$json['ignoreCodeCoverage']) {
-        echo $fileName.": You may not opt the file out of code coverage statistics if an include file is used.\n";
+    if ($json['postIncludeFile'] && !$json['ignoreCodeCoverage']) {
+        echo $fileName.": You may not opt the file out of code coverage statistics if a post include file is used.\n";
         $error++;
     }
 
@@ -162,7 +162,7 @@ function makeFile($json)
 
     if ($json['preIncludeFile']) {
         $string[] = '';
-        $string[] = file_get_contents(__DIR__ . '/includes/'.$json['name'].'Pre.php');
+        $string[] = file_get_contents(__DIR__ . '/includes/'.$json['class'].'Pre.php');
     }
 
     $string[] = '';
@@ -227,7 +227,7 @@ function makeFile($json)
 
     if ($json['postIncludeFile']) {
         $string[] = '';
-        $string[] = file_get_contents(__DIR__ . '/includes/'.$json['name'].'Post.php');
+        $string[] = file_get_contents(__DIR__ . '/includes/'.$json['class'].'Post.php');
     }
 
     $string[] = '}';
