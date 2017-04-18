@@ -1,0 +1,55 @@
+{
+    "class": "Text",
+    "table": "text_story",
+    "dontLog": false,
+    "ignoreCodeCoverage": true,
+    "description": "Article text bodies.",
+    "author": "Philip Kent",
+    "email": "philip.kent@me.com",
+    "license": "BSD",
+    "use": [],
+    "fields": [
+        {
+            "name": "user",
+            "type": "ForeignKey",
+            "class": "FelixOnline\\Core\\User",
+            "description": "User name of individual who wrote article text.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "content",
+            "type": "TextField",
+            "class": false,
+            "description": "Article text body in Sir Trevor JSON/Markdown format.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "timestamp",
+            "type": "DateTimeField",
+            "class": false,
+            "description": "Date and time the article body was created.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "converted",
+            "type": "BooleanField",
+            "class": false,
+            "description": "Flag to indicate the text was converted from HTML to JSON/Markdown format. Should always be 1 for new records.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        }
+    ],
+    "preIncludeFile": false,
+    "postIncludeFile": false
+}

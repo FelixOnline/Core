@@ -1,0 +1,65 @@
+{
+    "class": "AkismetLog",
+    "table": "akismet_log",
+    "dontLog": true,
+    "ignoreCodeCoverage": true,
+    "description": "Table to record the response from Akismet upon submitting a comment as spam/ham.",
+    "author": "Philip Kent",
+    "email": "philip.kent@me.com",
+    "license": "BSD",
+    "use": [],
+    "fields": [
+        {
+            "name": "comment_id",
+            "type": "ForeignKey",
+            "class": "FelixOnline\\Core\\Comment",
+            "description": "ID number of comment.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "timestamp",
+            "type": "DateTimeField",
+            "class": false,
+            "description": "Date and time that the Akismet request was made.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "action",
+            "type": "CharField",
+            "class": false,
+            "description": "Action sent to Akismet (almost always \"check\").",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "is_spam",
+            "type": "BooleanField",
+            "class": false,
+            "description": "Akismet response as to whether the comment is spam or not.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "error",
+            "type": "TextField",
+            "class": false,
+            "description": "Any error response from Akismet.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        }
+    ],
+    "preIncludeFile": false,
+    "postIncludeFile": false
+}

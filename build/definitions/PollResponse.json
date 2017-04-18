@@ -1,0 +1,55 @@
+{
+    "class": "PollResponse",
+    "table": "polls_response",
+    "dontLog": true,
+    "ignoreCodeCoverage": true,
+    "description": "Responses to individual polls.",
+    "author": "Philip Kent",
+    "email": "philip.kent@me.com",
+    "license": "BSD",
+    "use": [],
+    "fields": [
+        {
+            "name": "poll",
+            "type": "ForeignKey",
+            "class": "FelixOnline\\Core\\Poll",
+            "description": "ID number of poll.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "option",
+            "type": "ForeignKey",
+            "class": "FelixOnline\\Core\\PollOption",
+            "description": "ID number of poll option.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "ip",
+            "type": "TextField",
+            "class": false,
+            "description": "IP address of respondee to prevent multiple voting.\n * @todo use of TextField is inefficient.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "useragent",
+            "type": "TextField",
+            "class": false,
+            "description": "User agent of respondee to prevent multiple voting.\n * @todo use of TextField is inefficient.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        }
+    ],
+    "preIncludeFile": false,
+    "postIncludeFile": false
+}

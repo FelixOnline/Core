@@ -21,9 +21,10 @@ generated with a basic DocBlock and a constructor sufficient for making the
 model work with the Felix Online BaseApp ORM.
 
 You can specify external information in an "include"" file (useful for any
-other methods you may have). The file should be called Foo.php and placed into
+other methods you may have). The file should be called FooX.php and placed into
 an "includes" folder in this directory, where Foo is the class name as defined
-in the JSON file.
+in the JSON file. X is either Pre (before the Constructor) or Post (after)
+and both/either may be specified via "preIncludeFile" or "postIncludeFile".
 
 Any additional methods should follow PSR-1 and PSR-2 coding styles, and should
 be both fully documented and have associated unit tests. Ignored code coverage

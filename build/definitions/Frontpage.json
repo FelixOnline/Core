@@ -1,0 +1,45 @@
+{
+    "class": "Frontpage",
+    "table": "frontpage",
+    "dontLog": false,
+    "ignoreCodeCoverage": true,
+    "description": "Table to allocate articles to featured article sections on the front page.",
+    "author": "Philip Kent",
+    "email": "philip.kent@me.com",
+    "license": "BSD",
+    "use": [],
+    "fields": [
+        {
+            "name": "article",
+            "type": "ForeignKey",
+            "class": "FelixOnline\\Core\\Article",
+            "description": "ID number of article.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "section",
+            "type": "CharField",
+            "class": false,
+            "description": "Reference number for frontpage section.\n * @todo This should be in a more sensible format as it is not user-discoverable.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "sort_order",
+            "type": "IntegerField",
+            "class": false,
+            "description": "Sort order for articles in the same section. Numbers closer to zero would be expected to be placed at the top of lists.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        }
+    ],
+    "preIncludeFile": false,
+    "postIncludeFile": false
+}

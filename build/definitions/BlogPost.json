@@ -1,0 +1,85 @@
+{
+    "class": "BlogPost",
+    "table": "blog_post",
+    "dontLog": false,
+    "ignoreCodeCoverage": true,
+    "description": "Live blog posts.",
+    "author": "Philip Kent",
+    "email": "philip.kent@me.com",
+    "license": "BSD",
+    "use": [],
+    "fields": [
+        {
+            "name": "blog",
+            "type": "ForeignKey",
+            "class": "FelixOnline\\Core\\Blog",
+            "description": "ID number of blog.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "title",
+            "type": "CharField",
+            "class": false,
+            "description": "Title for blog post.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "content",
+            "type": "TextField",
+            "class": false,
+            "description": "Liveblog post contents.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "timestamp",
+            "type": "DateTimeField",
+            "class": false,
+            "description": "Date and time the post was published.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "author",
+            "type": "CharField",
+            "class": false,
+            "description": "Username of individual who authored and published the blog post.",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "sprinkler_prefix",
+            "type": "ForeignKey",
+            "class": "FelixOnline\\Core\\User",
+            "description": "Prefix defined on Sprinkler system (user agents connect to Sprinkler via this prefix to access this blog's posts).",
+            "primary": false,
+            "notnull": false,
+            "transform_no_html": false,
+            "dont_log": false
+        },
+        {
+            "name": "breaking",
+            "type": "BooleanField",
+            "class": false,
+            "description": "Flags the blog post as containing breaking news.",
+            "primary": false,
+            "notnull": true,
+            "transform_no_html": false,
+            "dont_log": false
+        }
+    ],
+    "preIncludeFile": false,
+    "postIncludeFile": false
+}
