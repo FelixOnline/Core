@@ -30,21 +30,19 @@ class ArticleManager extends BaseManager
 
 		if ($item->isMiss()) {
 			$sql = $app['safesql']->query(
-				"SELECT
-						DISTINCT av_id AS id,
-						COUNT(av_id) AS c
-					FROM (
-						SELECT av.article AS av_id FROM article_visit AS av
-						INNER JOIN article AS a
-							ON (av.article=a.id)
+				"SELECT av.article AS id, COUNT(av.article) AS c
+					FROM article_visit AS av
+					WHERE av.article IN (
+						SELECT a.id FROM article a
 						INNER JOIN article_publication AS ap
 							ON a.id = ap.article
 							AND ap.republished = 0
 							AND ap.publication_date >= NOW() - INTERVAL 3 WEEK
 							AND ap.publication_date <= NOW()
 							AND ap.deleted = 0
-						ORDER BY timestamp DESC LIMIT 500
-					) AS t GROUP BY id ORDER BY c DESC LIMIT %i",
+					)
+					AND av.timestamp >= NOW() - INTERVAL 3 WEEK
+					GROUP BY av.article ORDER BY c DESC LIMIT %i",
 				array($number_to_get)
 			);
 			$results = $this->query($sql);
