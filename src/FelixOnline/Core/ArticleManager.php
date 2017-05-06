@@ -41,21 +41,19 @@ class ArticleManager extends BaseManager
 
         if ($item->isMiss()) {
             $sql = $app['safesql']->query(
-                "SELECT
-						DISTINCT av_id AS id,
-						COUNT(av_id) AS c
-					FROM (
-						SELECT av.article AS av_id FROM article_visit AS av
-						INNER JOIN article AS a
-							ON (av.article=a.id)
-						INNER JOIN article_publication AS ap
-							ON a.id = ap.article
-							AND ap.republished = 0
-							AND ap.publication_date >= NOW() - INTERVAL 3 WEEK
-							AND ap.publication_date <= NOW()
-							AND ap.deleted = 0
-						ORDER BY timestamp DESC LIMIT 500
-					) AS t GROUP BY id ORDER BY c DESC LIMIT %i",
+                "SELECT av.article AS id, COUNT(av.article) AS c
+                    FROM article_visit AS av
+                    WHERE av.article IN (
+                        SELECT a.id FROM article a
+                        INNER JOIN article_publication AS ap
+                            ON a.id = ap.article
+                            AND ap.republished = 0
+                            AND ap.publication_date >= NOW() - INTERVAL 3 WEEK
+                            AND ap.publication_date <= NOW()
+                            AND ap.deleted = 0
+                    )
+                    AND av.timestamp >= NOW() - INTERVAL 3 WEEK
+                    GROUP BY av.article ORDER BY c DESC LIMIT %i",
                 array($number_to_get)
             );
             $results = $this->query($sql);
@@ -83,28 +81,28 @@ class ArticleManager extends BaseManager
         if ($item->isMiss()) {
             $sql = $app['safesql']->query(
                 "SELECT
-					article AS id,
-					SUM(count) AS count
-				FROM (
-					SELECT c.article,COUNT(*) AS count
-					FROM `comment` AS c
-					INNER JOIN `article` AS a ON (c.article=a.id)
-					INNER JOIN article_publication
-						ON a.id = article_publication.article
-						AND article_publication.republished = 0
-						AND article_publication.publication_date >= NOW() - INTERVAL 3 WEEK
-						AND article_publication.publication_date <= NOW()
-						AND article_publication.deleted = 0
-					WHERE c.`active`=1
-					AND c.`spam`=0
-					AND c.`pending`=0
-					AND timestamp >= NOW() - INTERVAL 3 WEEK
-					GROUP BY c.article
-					ORDER BY count DESC
-					LIMIT 20
-				) AS t
-				GROUP BY article
-				ORDER BY count DESC LIMIT %i",
+                    article AS id,
+                    SUM(count) AS count
+                FROM (
+                    SELECT c.article,COUNT(*) AS count
+                    FROM `comment` AS c
+                    INNER JOIN `article` AS a ON (c.article=a.id)
+                    INNER JOIN article_publication
+                        ON a.id = article_publication.article
+                        AND article_publication.republished = 0
+                        AND article_publication.publication_date >= NOW() - INTERVAL 3 WEEK
+                        AND article_publication.publication_date <= NOW()
+                        AND article_publication.deleted = 0
+                    WHERE c.`active`=1
+                    AND c.`spam`=0
+                    AND c.`pending`=0
+                    AND timestamp >= NOW() - INTERVAL 3 WEEK
+                    GROUP BY c.article
+                    ORDER BY count DESC
+                    LIMIT 20
+                ) AS t
+                GROUP BY article
+                ORDER BY count DESC LIMIT %i",
                 array(
                     $number_to_get
                 )
