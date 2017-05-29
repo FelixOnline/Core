@@ -203,7 +203,7 @@ class Comment extends BaseDB
 
         if ($this->getActive()
             && $this->getPending()
-            && $this->getIp() == $app['env']['REMOTE_ADDR']
+            && $this->getIp() == $app['env']['RemoteIP']
         ) { // if comment is pending for this ip address
             return true;
         } else {
@@ -387,9 +387,9 @@ class Comment extends BaseDB
             return parent::save();
         }
 
-        $this->setIp($app['env']['REMOTE_ADDR']);
-        $this->setUseragent($app['env']['HTTP_USER_AGENT']);
-        $this->setReferer($app['env']['HTTP_REFERER']);
+        $this->setIp($app['env']['RemoteIP']);
+        $this->setUseragent($app['env']['RemoteUA']);
+        $this->setReferer($app['env']['Referer']);
 
         if (!$this->getUser()) {
             // check key

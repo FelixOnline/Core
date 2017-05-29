@@ -5,6 +5,7 @@ use FelixOnline\Base\BaseDB;
 use FelixOnline\Base\BaseManager;
 use FelixOnline\Base\Type;
 use FelixOnline\Base\App;
+use FelixOnline\Base\AbstractUser;
 use FelixOnline\Exceptions\InternalException;
 
 /*
@@ -24,7 +25,7 @@ use FelixOnline\Exceptions\InternalException;
  *	  websiteurl  -
  *	  img		 -
  */
-class User extends BaseDB
+class User extends AbstractUser
 {
     private $articles;
     private $count;
@@ -82,6 +83,22 @@ class User extends BaseDB
         parent::__construct($fields, $uname);
     }
 
+    public function getUsername() {
+        return $this->getUser();
+    }
+
+    public function getPasswordHash() {
+        return null;
+    }
+
+    public function setUsername($username) {
+        $this->setUser($username);
+    }
+
+    public function setPasswordHash($hash) {
+        return null;
+    }
+
     /*
      * Public: Get url for user
      *
@@ -126,11 +143,11 @@ class User extends BaseDB
         if (!$this->likes) {
             $sql = $app['safesql']->query(
                 "SELECT
-					SUM(likes)
-				FROM `comment`
-				WHERE user='%s'
-				AND `active`=1
-				AND deleted=0",
+    SUM(likes)
+    FROM `comment`
+    WHERE user='%s'
+    AND `active`=1
+    AND deleted=0",
                 array(
                     $this->getUser(),
                 ));
@@ -150,11 +167,11 @@ class User extends BaseDB
         if (!$this->dislikes) {
             $sql = $app['safesql']->query(
                 "SELECT
-					SUM(dislikes)
-				FROM `comment`
-				WHERE user='%s'
-				AND `active`=1
-				AND deleted = 0",
+    SUM(dislikes)
+    FROM `comment`
+    WHERE user='%s'
+    AND `active`=1
+    AND deleted = 0",
                 array(
                     $this->getUser(),
                 ));
@@ -243,7 +260,74 @@ class User extends BaseDB
      */
     public function getInfo()
     {
-        return array(); // FIXME Utility::jsonDecode($this->fields['info']->getValue());
+        return self::jsonDecode($this->fields['info']->getValue());
+    }
+
+    /**
+    * Decode JSON string and throw error if fails
+    *
+    * @param string $string - JSON string to decode
+    *
+    * @static
+    *
+    * @return mixed - associative array
+    * @throws \Exception if json decode fails with message about why
+    */
+    public static function jsonDecode($string)
+    {
+        if ($string) {
+            $json = json_decode($string, true);
+            // if json_decode failed
+            if ($json === null) {
+                self::jsonLastError();
+            }
+            return $json;
+        } else {
+            return false;
+        }
+    }
+    /**
+    * Encode as JSON and throw error if fails
+    *
+    * @param mixed $data - data to encode
+    *
+    * @static
+    *
+    * @return string - json string
+    * @throws \Exception if json decode fails with message about why
+    */
+    public static function jsonEncode($data)
+    {
+        $json = json_encode($data);
+        // if json_encode failed
+        if ($json === false) {
+            self::jsonLastError();
+        }
+        return $json;
+    }
+
+    public static function jsonLastError()
+    {
+        switch (json_last_error()) {
+            case JSON_ERROR_DEPTH:
+                throw new InternalException('Maximum stack depth exceeded');
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                throw new InternalException('Underflow or the modes mismatch');
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                throw new InternalException('Unexpected control character found');
+                break;
+            case JSON_ERROR_SYNTAX:
+                throw new InternalException('Syntax error, malformed JSON');
+                break;
+            case JSON_ERROR_UTF8:
+                throw new InternalException('Malformed UTF-8 characters, possibly incorrectly encoded');
+                break;
+            default:
+                throw new InternalException('Unknown error');
+                break;
+        }
     }
 
     public function getFirstLogin()
@@ -252,12 +336,12 @@ class User extends BaseDB
 
         $sql = $app['safesql']->query(
             "SELECT
-				UNIX_TIMESTAMP(timestamp) as timestamp
-			FROM `login`
-			WHERE user='%s'
-			AND deleted=0
-			ORDER BY timestamp ASC
-			LIMIT 1",
+    UNIX_TIMESTAMP(timestamp) as timestamp
+    FROM `login`
+    WHERE user='%s'
+    AND deleted=0
+    ORDER BY timestamp ASC
+    LIMIT 1",
             array(
                 $this->getUser()
             ));
@@ -275,12 +359,12 @@ class User extends BaseDB
 
         $sql = $app['safesql']->query(
             "SELECT
-				UNIX_TIMESTAMP(timestamp) as timestamp
-			FROM `login`
-			WHERE user='%s'
-			AND deleted=0
-			ORDER BY timestamp DESC
-			LIMIT 1",
+    UNIX_TIMESTAMP(timestamp) as timestamp
+    FROM `login`
+    WHERE user='%s'
+    AND deleted=0
+    ORDER BY timestamp DESC
+    LIMIT 1",
             array(
                 $this->getUser()
             ));
@@ -318,14 +402,14 @@ class User extends BaseDB
 
         $sql = $app['safesql']->query(
             "SELECT
-				COUNT(article_author.article)
-			FROM `article_author`
-			INNER JOIN `article`
-			ON article_author.article = article.id
-			WHERE article_author.`author` = '%s'
-			AND article.deleted = 0
-			AND article_author.deleted = 0
-			AND searchable = 0",
+    COUNT(article_author.article)
+    FROM `article_author`
+    INNER JOIN `article`
+    ON article_author.article = article.id
+    WHERE article_author.`author` = '%s'
+    AND article.deleted = 0
+    AND article_author.deleted = 0
+    AND searchable = 0",
             array(
                 $this->getUser())
             );

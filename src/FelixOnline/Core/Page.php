@@ -40,7 +40,7 @@ class Page extends BaseDb
         );
 
         parent::__construct($fields, $id);
-        $this->csrf_token = Utility::generateCSRFToken('generic_page');
+        $this->csrf_token = Utility::generateCSRFToken('generic_page'); // FIXME
     }
 
     /*

@@ -216,8 +216,7 @@ class ArticleTest extends AppTestCase
     public function testLogVisitLoggedIn()
     {
         $app = \FelixOnline\Base\App::getInstance();
-        $this->fail('This test is broken due to missing loginUser function.');
-        // loginUser('felix');
+        $app['currentuser']->logIn(new \FelixOnline\Core\User('felix'));
 
         $article = new \FelixOnline\Core\Article(1);
 

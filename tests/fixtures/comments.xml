@@ -130,7 +130,7 @@
 		<field name="comment">Test pending comment</field>
 		<field name="timestamp">2010-11-02 03:31:24</field>
 		<field name="active">1</field>
-		<field name="ip">0.0.0.0</field>
+		<field name="ip">127.0.0.1</field>
 		<field name="email">test2@test.com</field>
 		<field name="useragent"></field>
 		<field name="referer"></field>

@@ -393,9 +393,22 @@ class Article extends BaseDB
     private function constructURL()
     {
         $cat = $this->getCategory()->getCat();
-        /*$dashed = Utility::urliseText($this->getTitle());*/ $dashed = '-'; //FIXME
+        $dashed = $this->getUrlisedTitle();
         $output = $cat.'/'.$this->getId().'/'.$dashed.'/'; // output: CAT/ID/TITLE/
         return $output;
+    }
+
+    /*
+     * Public: Return article title in URL-ised format
+     *
+     * Returns string
+     */
+    public function getUrlisedTitle() {
+        $title = strtolower($this->getTitle()); // Make title lowercase
+        $title = preg_replace('/[^\w\d_ -]/si', '', $title); // Remove special characters
+        $dashed = str_replace( " ", "-", $title); // Replace spaces with hypens
+        $utf8 = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $dashed); // Remove non printable characters
+        return $utf8;
     }
 
     /*
@@ -420,7 +433,7 @@ class Article extends BaseDB
 
         $user = null;
         if ($app['currentuser']->isLoggedIn()) {
-            $user = $app['currentuser']->getUser();
+            $user = $app['currentuser']->getUser()->getUsername();
 
             $sql = $app['safesql']->query(
                 "INSERT INTO
@@ -494,7 +507,7 @@ class Article extends BaseDB
 				AND `article_visit`.deleted = 0
 				AND timestamp >= NOW() - INTERVAL 4 WEEK",
                 array(
-                    $app['currentuser']->getUser(),
+                    $app['currentuser']->getUser()->getUsername(),
                     $this->getId()
                 )
             );

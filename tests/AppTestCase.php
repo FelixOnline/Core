@@ -46,17 +46,6 @@ class AppTestCase extends DatabaseTestCase
         $transport = \Swift_NullTransport::newInstance();
         $app['email'] = \Swift_Mailer::newInstance($transport);
 
-        $session = $this->mock('FelixOnline\\Base\\Session')
-            ->getId(1)
-            ->start(1)
-            ->reset()
-            ->new();
-
-        $this->reflect($session)
-            ->__set('session', array());
-
-        $app['env']['session'] = $session;
-
         if ($this->setCurrentUser) {
             $app['currentuser'] = new \FelixOnline\Core\CurrentUser();
         }
@@ -77,7 +66,6 @@ class AppTestCase extends DatabaseTestCase
         parent::tearDown();
 
         $app = \FelixOnline\Base\App::getInstance();
-
         $app['db']->dbh->close();
 
         \FelixOnline\Base\App::setInstance(null);
